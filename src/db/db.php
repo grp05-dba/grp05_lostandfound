@@ -13,11 +13,7 @@ class Connection
             $dbuser = $env['DB_USER'];
             $dbpass = $env['DB_PASSWORD'];
 
-            $connect = new PDO(
-                "pgsql:host=$dbhost;port=$dbport;dbname=$dbname",
-                $dbuser,
-                $dbpass
-            );
+            $connect = new PDO("pgsql:host=$dbhost;port=$dbport;dbname=$dbname",$dbuser,$dbpass);
 
             $connect->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
