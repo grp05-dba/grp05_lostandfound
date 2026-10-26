@@ -10,5 +10,4 @@ if ($connect) {
 else{
     echo "Database connection failed!";
 }
-
 ?>
