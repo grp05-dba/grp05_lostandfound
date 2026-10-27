@@ -2,11 +2,12 @@
 
 header('Content-Type: application/json');
 
-require_once __DIR__ . '/../src/repositories/itemRepository.php';
+
 require_once __DIR__ . '/../src/db/db.php';
 require_once __DIR__ . '/../src/controllers/adminController.php';
 require_once __DIR__ . '/../src/controllers/publicController.php';
 require_once __DIR__ . '/../src/services/adminService.php';
+require_once __DIR__ . '/../src/repositories/itemRepository.php';
 
 $connection = Connection::getConnection();
 
