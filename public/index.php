@@ -39,5 +39,7 @@ else {
 if($controller){
     $controller->handleRequest($method, $path);
 }
+else {
 http_response_code(404);
     echo json_encode(['error' => 'Controller not found']);
+}
