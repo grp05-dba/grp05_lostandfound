@@ -1,0 +1,45 @@
+CATEGORIES
+category_id PK
+name
+
+ITEMS
+item_id PK
+category_id FK
+title
+description
+location_found
+date_found
+time_found
+status
+
+CLAIMS
+claim_id PK
+claim_code UQ
+item_id FK
+full_name
+student_number
+email
+phone_number NULL
+status
+created_at
+
+LOST_REPORTS
+report_id PK
+report_code UQ
+category_id FK
+title
+description
+location_lost NULL
+date_lost NULL
+time_lost NULL
+full_name
+student_number
+email NULL
+phone_number NULL
+status
+created_at
+
+POTENTIAL_MATCHES
+match_id PK
+report_id FK
+item_id FK
