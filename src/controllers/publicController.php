@@ -1,4 +1,5 @@
 <?php
+//Yes is empty on purpose, as the public controller is not yet implemented.
 
 class PublicController {
     private PDO $pdo;
@@ -8,7 +9,7 @@ class PublicController {
         $this->pdo = $pdo;
     }
 
-    public function handleRequest(): void{
+    public function handleRequest(string $method, string $path): void{
         http_response_code(404);
         echo json_encode(['error' => 'Public endpoint not found']);
     }
