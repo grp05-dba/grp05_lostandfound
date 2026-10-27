@@ -286,5 +286,3 @@ PostgreSQL
 ```
 
 Follow the existing architecture when implementing new features. Keep HTTP handling in controllers, business logic in services, and SQL operations in repositories.
-
-The project lead is responsible for reviewing pull requests and integrating the team's contributions into `main`.
