@@ -286,3 +286,7 @@ PostgreSQL
 ```
 
 Follow the existing architecture when implementing new features. Keep HTTP handling in controllers, business logic in services, and SQL operations in repositories.
+
+## Additional Project Resources:
+- [Informal Documentation] (https://docs.google.com/document/d/1-5aMBfCVfKJ3zU1nbGnBMF0GyYv30UPKHnW3pPxG6Is/edit?tab=t.cgekm2zjfg#heading=h.pw7bwki50q29)
+- [Activity 2 Application Blueprint] (https://drive.google.com/file/d/1Aemwp4iH1OYGZf6ZI4rz8Pw3OHGaA_Dv/view?usp=drive_link)
