@@ -19,6 +19,8 @@ if (!$connection) {
 
 $adminService = new AdminService($connection);
 
+$controller = null;
+$method = $_SERVER['REQUEST_METHOD'];
 $path = $_SERVER['REQUEST_URI'];
 
 if (str_starts_with($path, '/api/admin/')) {
@@ -34,4 +36,8 @@ else {
     exit;
 }
 
-$controller->handleRequest();
+if($controller){
+    $controller->handleRequest($method, $path);
+}
+http_response_code(404);
+    echo json_encode(['error' => 'Controller not found']);

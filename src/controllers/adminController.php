@@ -7,9 +7,7 @@ class AdminController {
         $this->adminService = $adminService;
     }
 
-    public function handleRequest(): void {
-        $method = $_SERVER['REQUEST_METHOD'];
-        $path = $_SERVER['REQUEST_URI'];
+    public function handleRequest(string $method, string $path): void {
 
         //Test endpoint to check if the API is working
         if ($method === 'GET' && $path === '/api/admin/test') {
