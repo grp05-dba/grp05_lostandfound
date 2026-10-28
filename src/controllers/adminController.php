@@ -2,9 +2,11 @@
 
 class AdminController {
     private AdminService $adminService;
+    private PDO $connection;
 
-    public function __construct(AdminService $adminService) {
-        $this->adminService = $adminService;
+    public function __construct(PDO $connection) {
+        $this->connection = $connection;
+        $this->adminService = new AdminService($connection);
     }
 
     public function handleRequest(string $method, string $path): void {

@@ -12,6 +12,6 @@ class AdminService {
     }
 
     public function getAllItems(): array {
-    return $this->itemRepository->getAll();
+        return $this->itemRepository->getAll();
     }
 }

@@ -2,12 +2,13 @@
 
 header('Content-Type: application/json');
 
-
 require_once __DIR__ . '/../src/db/db.php';
 require_once __DIR__ . '/../src/controllers/adminController.php';
 require_once __DIR__ . '/../src/controllers/publicController.php';
 require_once __DIR__ . '/../src/services/adminService.php';
+require_once __DIR__ . '/../src/services/categoryService.php';
 require_once __DIR__ . '/../src/repositories/itemRepository.php';
+require_once __DIR__ . '/../src/repositories/categoryRepository.php';
 
 $connection = Connection::getConnection();
 
@@ -17,18 +18,15 @@ if (!$connection) {
     exit;
 }
 
-$adminService = new AdminService($connection);
-
 $controller = null;
 $method = $_SERVER['REQUEST_METHOD'];
 $path = $_SERVER['REQUEST_URI'];
 
 if (str_starts_with($path, '/api/admin/')) {
-    $controller = new AdminController($adminService);
+    $controller = new AdminController($connection);
 } 
 else if (str_starts_with($path, '/api/public/')) {
-    //$controller = new PublicController($connect);
-    //wait
+    $controller = new PublicController($connection);
 }
 else {
     http_response_code(404);
