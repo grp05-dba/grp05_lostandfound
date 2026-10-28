@@ -1,2 +1,4 @@
 .env
 sql/grp05_lostandfounddb_role_creation_script.sql
+public/send-sms.php
+public/test.php

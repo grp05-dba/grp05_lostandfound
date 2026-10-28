@@ -12,6 +12,8 @@ require_once __DIR__ . '/../src/repositories/categoryRepository.php';
 
 $connection = Connection::getConnection();
 
+//initiate textbee connection here
+
 if (!$connection) {
     http_response_code(500);
     echo json_encode(['error' => 'Database connection failed']);
