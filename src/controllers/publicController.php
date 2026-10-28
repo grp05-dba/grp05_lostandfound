@@ -16,6 +16,13 @@ class PublicController {
             return;
         }
 
+        if ($method === 'GET' && str_starts_with($path, '/api/public/categories/')) {
+            $id = (int) str_replace('/api/public/categories/', '', $path);
+
+            echo json_encode($this->categoryService->getCategoryById($id));
+            return;
+        }
+
         http_response_code(404);
         echo json_encode(['error' => 'Public endpoint not found']);
     }

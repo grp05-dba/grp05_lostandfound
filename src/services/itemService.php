@@ -1,6 +1,6 @@
 <?php
 
-class AdminService { 
+class ItemService { 
     private ItemRepository $itemRepository;
 
     public function __construct(PDO $connection) {

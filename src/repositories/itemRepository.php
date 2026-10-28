@@ -8,9 +8,9 @@ class ItemRepository {
     }
 
     public function getAll(): array {
-    $stmt = $this->connection->prepare('SELECT * FROM items');
-    $stmt->execute();
+        $stmt = $this->connection->prepare('SELECT * FROM items');
+        $stmt->execute();
 
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

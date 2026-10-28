@@ -1,25 +1,25 @@
 <?php
 
 class AdminController {
-    private AdminService $adminService;
+    private ItemService $itemService;
     private PDO $connection;
 
     public function __construct(PDO $connection) {
         $this->connection = $connection;
-        $this->adminService = new AdminService($connection);
+        $this->itemService = new ItemService($connection);
     }
 
     public function handleRequest(string $method, string $path): void {
 
         //Test endpoint to check if the API is working
         if ($method === 'GET' && $path === '/api/admin/test') {
-            echo json_encode($this->adminService->test());
+            echo json_encode($this->itemService->test());
             return;
         }
 
         //Endpoint to get all items from the database
         if ($method === 'GET' && $path === '/api/admin/items') {
-            echo json_encode($this->adminService->getAllItems());
+            echo json_encode($this->itemService->getAllItems());
             return;
         }
 
