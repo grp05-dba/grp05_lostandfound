@@ -8,7 +8,7 @@ class ClaimRepository {
     }
 
     public function getAll(): array {
-        $stmt = $this->connection->prepare('SELECT * FROM claims ORDER BY claim_id');
+        $stmt = $this->connection->prepare('SELECT * FROM claims');
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

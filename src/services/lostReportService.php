@@ -11,8 +11,12 @@ class LostReportService {
         return $this->lostReportRepository->getAll();
     }
 
-    public function getLostReportById(int $id): array {
-        $report = $this->lostReportRepository->getById($id);
+    public function getLostReportById(string $id): array {
+        if (!ctype_digit($id) || (int) $id < 1 || (float) $id > 2147483647) {
+            http_response_code(400);
+            return ['error' => 'ID must be a positive integer.'];
+        }
+        $report = $this->lostReportRepository->getById((int) $id);
         if ($report === false) {
             http_response_code(404);
             return ['message' => 'No report found.'];

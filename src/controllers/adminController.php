@@ -27,19 +27,21 @@ class AdminController {
             return;
         }
 
-        if ($method === 'GET' && preg_match('#^/api/admin/(items|lost-reports|claims)/([^/]+)$#', $path, $matches)) {
-            $id = filter_var($matches[2], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => 2147483647]]);
-            if ($id === false) {
-                http_response_code(400);
-                echo json_encode(['error' => 'ID must be a positive integer.']);
-                return;
-            }
-            $record = match ($matches[1]) {
-                'items' => $this->itemService->getItemById($id),
-                'lost-reports' => $this->lostReportService->getLostReportById($id),
-                'claims' => $this->claimService->getClaimById($id),
-            };
-            echo json_encode($record);
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/items/')) {
+            $id = substr($path, strlen('/api/admin/items/'));
+            echo json_encode($this->itemService->getItemById($id));
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/')) {
+            $id = substr($path, strlen('/api/admin/lost-reports/'));
+            echo json_encode($this->lostReportService->getLostReportById($id));
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/claims/')) {
+            $id = substr($path, strlen('/api/admin/claims/'));
+            echo json_encode($this->claimService->getClaimById($id));
             return;
         }
 
