@@ -1,6 +1,6 @@
 <?php
 
-class TextBeeClient{
+class TextBeeClient {
 
     private function request(string $method, string $endpoint, ?array $data = null): array {
         $env = parse_ini_file(__DIR__ . '/../../.env');
@@ -22,7 +22,7 @@ class TextBeeClient{
             CURLOPT_TIMEOUT => 10
         ];
 
-        if ($data !== null) {
+        if ($data) {
             $options[CURLOPT_POSTFIELDS] = json_encode($data);
         }
 
