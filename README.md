@@ -4,7 +4,7 @@
 
 Install the following before running the project:
 
-- **PHP** — with the `pgsql` and `pdo_pgsql` extensions enabled.
+- **PHP** — with the `pgsql` and `pdo_pgsql` extensions enabled. The TextBee endpoints also require `curl`.
 - **PostgreSQL** — database server.
 - **Git** — for version control and working with branches.
 - **API testing tool** — Postman or Thunder Client.
@@ -17,11 +17,11 @@ You may use a Windows PHP installation or a development environment such as XAMP
 Open a terminal or PowerShell and run:
 
 ```powershell
-git clone <repository-url>
-cd lost-and-found-dba
+git clone https://github.com/sanatorion/grp05_lostandfound.git
+cd grp05_lostandfound
 ```
 
-Replace `<repository-url>` with the URL of the project repository.
+Your GitHub account must have access to this private repository.
 
 ## 3. Set Up PostgreSQL
 
@@ -107,6 +107,7 @@ For example:
 ```ini
 extension=pdo_pgsql
 extension=pgsql
+extension=curl
 ```
 
 4. Save the file.
@@ -122,6 +123,14 @@ The database connection reads its configuration from a `.env` file in the projec
 
 Create a file named `.env` alongside the `public/`, `src/`, and `sql/` directories.
 
+You can start from the placeholder-only template:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+If `.env` already exists, edit it instead of overwriting it.
+
 Add the following configuration:
 
 ```ini
@@ -130,6 +139,8 @@ DB_PORT=5432
 DB_NAME=grp05_lostandfounddb
 DB_USER=your_postgres_username
 DB_PASSWORD=your_postgres_password
+TEXTBEE_API_KEY=""
+TEXTBEE_BASE_URL="https://api.textbee.dev"
 ```
 
 Replace the username and password with the credentials for your PostgreSQL account.
@@ -143,6 +154,10 @@ For example, if your local PostgreSQL account is named `postgres`, set `DB_USER=
 - Do not include real passwords in screenshots, commits, or shared documentation.
 
 The provided `src/db/db.php` reads these values using `parse_ini_file()` and uses them to create a PDO connection to PostgreSQL.
+
+Use the host and port of your actual local database. Prefer a dedicated application account with the table and sequence permissions the API needs, rather than a superuser for ordinary requests.
+
+The TextBee client appends `/api/v1/...` to `TEXTBEE_BASE_URL`, so the hosted-service value above does not include `/api/v1`. Add your own TextBee API key locally to check gateway statistics and devices. Database-backed endpoints can be tested without a TextBee key. Real gateway access is not verified by a successful database health check. See the [TextBee API reference](https://textbee.dev/docs/api-reference).
 
 ## 6. Run the API
 
@@ -184,6 +199,8 @@ For each endpoint, check:
 - The response when invalid or missing data is supplied.
 
 As new endpoints are implemented, their request methods, URLs, parameters, and expected responses should be documented in the project README or the team's API documentation.
+
+See [the current endpoint reference and verification notes](docs/api.md). The [Postman collection](docs/pupspot.postman_collection.json) contains local database-backed requests and response checks. It does not send SMS or call the gateway endpoints.
 
 ## 8. Development Workflow — Git Branches and Pull Requests
 
