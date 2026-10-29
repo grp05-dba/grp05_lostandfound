@@ -13,4 +13,10 @@ class ItemRepository {
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function getById(int $id): array|false {
+        $stmt = $this->connection->prepare('SELECT * FROM items WHERE item_id = :id');
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 }
