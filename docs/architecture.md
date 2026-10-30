@@ -52,4 +52,3 @@ Do not describe these files as completed claim creation, item registration, repo
 Keep future HTTP handling in controllers, coordination in services and SQL in repositories, following the lead's agreed conventions. Coordinate schema or architecture changes with the lead. This documentation branch changes no PHP or SQL.
 
 For the exact implemented paths and ID conversion behavior, see [API reference](api.md). For constraints the code must respect, see [database reference](database.md).
-

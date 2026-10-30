@@ -99,4 +99,3 @@ Stop the development server with Ctrl+C. Keep database shutdown separate from th
 | Duplicate key during sample load | Seed data already exists; do not repeatedly rerun the script |
 | Route returns 404 | Exact method and path in [API reference](api.md); query strings affect matching |
 | Browser shows JSON | Expected: this checkout currently serves an API, not a frontend |
-

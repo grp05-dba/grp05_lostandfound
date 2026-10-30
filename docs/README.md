@@ -17,4 +17,3 @@ The application currently provides database-backed retrieval and TextBee gateway
 The documentation branch is `docs/project-documentation`. Changes stay under `docs/`; the project lead reviews and merges this branch into `main` when ready. This supersedes the earlier temporary arrangement where course notes were held only outside the repository. Credentials, database dumps, local runtime files, and raw test logs remain outside Git.
 
 The [root setup README](../README.md) and [Activity 2 proposal linked there](../README.md#additional-project-resources) remain unchanged. This documentation does not revise the submitted proposal or certify course completion.
-

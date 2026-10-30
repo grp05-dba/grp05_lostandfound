@@ -50,4 +50,3 @@ See [setup](setup.md) for initialization order. Review [roles](user-roles.md) fo
 - Photo fields mentioned by entity comments are absent from this schema.
 
 Record proposed changes separately and obtain the lead's agreement before altering the schema or submitted proposal.
-

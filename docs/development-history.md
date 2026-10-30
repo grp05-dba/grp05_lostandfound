@@ -37,4 +37,3 @@ OpenAI Codex assisted with source/history inspection, documentation drafting and
 ## Keeping this history accurate
 
 Add a dated milestone tied to a real commit or test record when main changes. Preserve past results with their dates; do not present a previous test run as evidence for a later untested revision. See [branch workflow](branch-workflow.md) for synchronization and review.
-

@@ -68,4 +68,3 @@ EmailJSClient has a sendEmail method, but no reviewed controller route calls it.
 Administrative claim/report objects include contact information. The admin prefix is a routing convention, not an authorization boundary. There is no login middleware or enforced separate listener in this entry point; keep local demonstrations private. See [roles](user-roles.md).
 
 Use [setup](setup.md) before making read-only requests. Local verification details and their limits are in [development history](development-history.md). Never infer completed create/update workflows from successful retrieval tests.
-

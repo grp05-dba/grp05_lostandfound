@@ -66,4 +66,3 @@ Keep this branch available while the lead wants it maintained. Do not delete it 
 - Fetch reads remote updates; it does not overwrite the working tree.
 - Merging origin/main while on the documentation branch brings app changes into that branch.
 - Merging the documentation branch into main is the lead's separate action.
-

@@ -27,4 +27,3 @@ Use separate owner/maintenance credentials for administrative work. A successful
 The present API retrieves staff records and public categories. Public found-item browsing, report/claim submissions and cancellations, staff writes, and notification workflows still need implementation or integration. See [API reference](api.md) before attributing a capability to a role.
 
 The original proposal remains unchanged. Any decision about role separation or restrictions should be agreed with the project lead and reflected here after implementation.
-
