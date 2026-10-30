@@ -28,19 +28,19 @@ class AdminController {
         }
 
         if ($method === 'GET' && str_starts_with($path, '/api/admin/items/')) {
-            $id = substr($path, strlen('/api/admin/items/'));
+            $id = (int) substr($path, strlen('/api/admin/items/'));
             echo json_encode($this->itemService->getItemById($id));
             return;
         }
 
         if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/')) {
-            $id = substr($path, strlen('/api/admin/lost-reports/'));
+            $id = (int) substr($path, strlen('/api/admin/lost-reports/'));
             echo json_encode($this->lostReportService->getLostReportById($id));
             return;
         }
 
         if ($method === 'GET' && str_starts_with($path, '/api/admin/claims/')) {
-            $id = substr($path, strlen('/api/admin/claims/'));
+            $id = (int) substr($path, strlen('/api/admin/claims/'));
             echo json_encode($this->claimService->getClaimById($id));
             return;
         }

@@ -15,12 +15,8 @@ class ItemService {
         return $this->itemRepository->getAll();
     }
 
-    public function getItemById(string $id): array {
-        if (!ctype_digit($id) || (int) $id < 1 || (float) $id > 2147483647) {
-            http_response_code(400);
-            return ['error' => 'ID must be a positive integer.'];
-        }
-        $item = $this->itemRepository->getById((int) $id);
+    public function getItemById(int $id): array {
+        $item = $this->itemRepository->getById($id);
         if ($item === false) {
             http_response_code(404);
             return ['message' => 'No item found.'];
