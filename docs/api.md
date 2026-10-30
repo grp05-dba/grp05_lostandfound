@@ -63,6 +63,10 @@ The wrapper does not set the API's HTTP response status to the upstream status. 
 
 EmailJSClient has a sendEmail method, but no reviewed controller route calls it. No email-sending endpoint, automatic notification workflow or real delivery result is documented as working.
 
+## Proposed database error contract - not yet merged
+
+[PR #25](https://github.com/grp05-dba/grp05_lostandfound/pull/25) proposes HTTP 500 JSON responses for connection/query PDO exceptions instead of the current plain-text termination or uncaught exception output. It does not change integer coercion. See [the repository review](repository-review.md) for the reproduction and validation; this proposal is not main's current error contract until merged.
+
 ## Access and verification
 
 Administrative claim/report objects include contact information. The admin prefix is a routing convention, not an authorization boundary. There is no login middleware or enforced separate listener in this entry point; keep local demonstrations private. See [roles](user-roles.md).

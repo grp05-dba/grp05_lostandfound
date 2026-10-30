@@ -11,6 +11,7 @@ Group 5's lost-and-found API documentation. Reviewed October 31, 2026 against ap
 | [Application and database roles](user-roles.md) | Intended workflows versus permissions actually implemented |
 | [Development history](development-history.md) | Source-backed milestones and verification scope |
 | [Documentation branch workflow](branch-workflow.md) | Commit, push, pull, and merge main into this branch |
+| [Repository review](repository-review.md) | Reproduced error-handling bug, proposed fix, and work awaiting coordination |
 
 The application currently provides database-backed retrieval and TextBee gateway-information routes. It does not yet provide a frontend, write endpoints, cancellation workflows, or automatic matching. The EmailJS client and entity classes exist as foundations, not completed end-to-end workflows.
 
