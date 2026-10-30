@@ -11,6 +11,10 @@ require_once __DIR__ . '/../src/services/categoryService.php';
 require_once __DIR__ . '/../src/services/smsService.php';
 require_once __DIR__ . '/../src/repositories/itemRepository.php';
 require_once __DIR__ . '/../src/repositories/categoryRepository.php';
+require_once __DIR__ . '/../src/services/lostReportService.php';
+require_once __DIR__ . '/../src/services/claimService.php';
+require_once __DIR__ . '/../src/repositories/lostReportRepository.php';
+require_once __DIR__ . '/../src/repositories/claimRepository.php';
 
 $connection = Connection::getConnection();
 
