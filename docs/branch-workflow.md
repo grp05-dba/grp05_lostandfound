@@ -14,7 +14,7 @@ Confirm you are on docs/project-documentation and understand any uncommitted fil
 ## First checkout on another machine
 
 ```powershell
-git clone https://github.com/sanatorion/grp05_lostandfound.git
+git clone https://github.com/grp05-dba/grp05_lostandfound.git
 cd grp05_lostandfound
 git fetch origin
 git switch --track origin/docs/project-documentation

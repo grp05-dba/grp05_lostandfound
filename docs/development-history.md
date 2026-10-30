@@ -10,6 +10,7 @@ Documentation reviewed October 31, 2026 against main revision `17dfae5`. Milesto
 | Oct 29 | 85f5cea | docs folder introduced |
 | Oct 30 | 2b9346b, merged through PR #23 / 5aaac06 | Five administrative retrieval routes added; lead-requested integer conversion and unsorted queries retained |
 | Oct 30 | 17dfae5 | Controller prefix removal aligned with category style; Claim, Item and LostReport entity classes added |
+| Oct 31 | Repository organization | Repository transferred from sanatorion to grp05-dba; clone instructions now use the organization URL |
 | Oct 31 | Documentation branch | Current setup, API, architecture, schema, role mapping and branch workflow documented for review |
 
 PR #22, the earlier setup-documentation proposal, was closed without merge. Its content is not a claim about main. Earlier course files were temporarily kept outside the app repo; the lead's later direction places maintained project documentation under docs on its own branch.

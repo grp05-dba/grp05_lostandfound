@@ -14,7 +14,7 @@ The previously verified local environment used PHP 8.5.10 and PostgreSQL 18.3. T
 ## Clone and inspect configuration
 
 ```powershell
-git clone https://github.com/sanatorion/grp05_lostandfound.git
+git clone https://github.com/grp05-dba/grp05_lostandfound.git
 cd grp05_lostandfound
 php -v
 php --ini
