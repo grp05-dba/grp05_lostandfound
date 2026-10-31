@@ -16,9 +16,9 @@ require_once __DIR__ . '/../src/services/claimService.php';
 require_once __DIR__ . '/../src/repositories/lostReportRepository.php';
 require_once __DIR__ . '/../src/repositories/claimRepository.php';
 
-$connection = Connection::getConnection();
-
-if (!$connection) {
+try {
+    $connection = Connection::getConnection();
+} catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Database connection failed']);
     exit;
@@ -41,7 +41,13 @@ else {
 }
 
 if($controller){
-    $controller->handleRequest($method, $path);
+    try {
+        $controller->handleRequest($method, $path);
+    } catch (PDOException $e) {
+        error_log($e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => 'Database operation failed']);
+    }
 }
 else {
 http_response_code(404);
