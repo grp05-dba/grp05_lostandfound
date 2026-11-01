@@ -20,6 +20,8 @@ require_once __DIR__ . '/../src/repositories/lostReportRepository.php';
 require_once __DIR__ . '/../src/repositories/claimRepository.php';
 
 require_once __DIR__ . '/../src/entities/item.php';
+require_once __DIR__ . '/../src/entities/lostReport.php';
+require_once __DIR__ . '/../src/entities/claim.php';
 
 require_once __DIR__ . '/../src/utils/requestUtils.php';
 

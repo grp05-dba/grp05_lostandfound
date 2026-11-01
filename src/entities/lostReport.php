@@ -5,13 +5,13 @@ class LostReport {
     private int $category_id;
     private string $title;
     private string $description;
-    private string $location_lost;
-    private string $date_lost;
-    private string $time_lost;
+    private ?string $location_lost;
+    private ?string $date_lost;
+    private ?string $time_lost;
     private string $full_name;
     private string $student_number;
     private string $email;
-    private string $phone_number;
+    private ?string $phone_number;
     private string $status; //automatically set to "active" when an item is created by POSTGRESQL
     //photos
 
@@ -20,13 +20,13 @@ class LostReport {
         int $category_id,
         string $title,
         string $description,
-        string $location_lost,
-        string $date_lost,
-        string $time_lost,
+        ?string $location_lost,
+        ?string $date_lost,
+        ?string $time_lost,
         string $full_name,
         string $student_number,
         string $email,
-        string $phone_number
+        ?string $phone_number
     ) {
         $this->report_code = $report_code;
         $this->category_id = $category_id;
@@ -57,15 +57,15 @@ class LostReport {
         return $this->description;
     }
 
-    public function getLocationLost(): string {
+    public function getLocationLost(): ?string {
         return $this->location_lost;
     }
 
-    public function getDateLost(): string {
+    public function getDateLost(): ?string {
         return $this->date_lost;
     }
 
-    public function getTimeLost(): string {
+    public function getTimeLost(): ?string {
         return $this->time_lost;
     }
 
@@ -81,7 +81,7 @@ class LostReport {
         return $this->email;
     }
 
-    public function getPhoneNumber(): string {
+    public function getPhoneNumber(): ?string {
         return $this->phone_number;
     }
 
