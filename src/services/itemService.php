@@ -29,7 +29,6 @@ class ItemService {
             return $validationError;
         }
 
-        // Check if the category exists
         $category = $this->categoryRepository->getById((int) $data['category_id']);
         if (!$category) {
             http_response_code(400);
