@@ -6,7 +6,7 @@ class Claim {
     private string $full_name;
     private string $student_number;
     private string $email;
-    private string $phone_number;
+    private ?string $phone_number;
     private string $status; //automatically set to "pending" when an item is created by POSTGRESQL
     //photos
 
@@ -16,7 +16,7 @@ class Claim {
         string $full_name,
         string $student_number,
         string $email,
-        string $phone_number,
+        ?string $phone_number = null,
     ) {
         $this->claim_code = $claim_code;
         $this->item_id = $item_id;
@@ -46,7 +46,7 @@ class Claim {
         return $this->email;
     }
 
-    public function getPhoneNumber(): string {
+    public function getPhoneNumber(): ?string {
         return $this->phone_number;
     }
 

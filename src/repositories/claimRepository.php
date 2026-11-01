@@ -18,4 +18,27 @@ class ClaimRepository {
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function codeExists(string $code): bool {
+        $stmt = $this->connection->prepare('SELECT 1 FROM claims WHERE claim_code = :code');
+        $stmt->execute(['code' => $code]);
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public function create(Claim $claim): bool {
+        $stmt = $this->connection->prepare('INSERT INTO claims (
+            claim_code, item_id, full_name, student_number, email, phone_number
+        ) SELECT :claimCode, item_id, :fullName, :studentNumber, :email, :phoneNumber
+          FROM items WHERE item_id = :itemId AND status = :status');
+        $success = $stmt->execute([
+            'claimCode' => $claim->getClaimCode(),
+            'itemId' => $claim->getItemId(),
+            'fullName' => $claim->getFullName(),
+            'studentNumber' => $claim->getStudentNumber(),
+            'email' => $claim->getEmail(),
+            'phoneNumber' => $claim->getPhoneNumber(),
+            'status' => 'unclaimed'
+        ]);
+        return $success && $stmt->rowCount() === 1;
+    }
 }

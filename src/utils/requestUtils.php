@@ -23,7 +23,7 @@ class RequestUtils {
         return ['message' => 'Resource created successfully.'];
     }
 
-    public static function validateRequestBody(array $data, string $entityClass): ?array {
+    public static function validateRequestBody(array $data, string $entityClass, array $excludedFields = []): ?array {
         $reflection = new ReflectionClass($entityClass);
 
         $fields = [];
@@ -31,7 +31,7 @@ class RequestUtils {
             $fields[] = $property->getName();
         }
 
-        $fields = array_diff($fields, ['status']); // Exclude 'status' from required fields
+        $fields = array_diff($fields, ['status'], $excludedFields);
 
         $missingFields = array_diff($fields, array_keys($data));
         
@@ -39,6 +39,7 @@ class RequestUtils {
             http_response_code(400);
             return ['message' => 'Missing required fields: ' . implode(', ', $missingFields)];
         }
+
         return null;
     }
 }
