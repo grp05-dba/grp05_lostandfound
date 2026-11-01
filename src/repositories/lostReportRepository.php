@@ -19,15 +19,10 @@ class LostReportRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function generateReportCode(): string {
+    public function codeExists(string $code): bool {
         $stmt = $this->connection->prepare('SELECT 1 FROM lost_reports WHERE report_code = :code');
-        do {
-            $code = 'LR-' . strtoupper(bin2hex(random_bytes(16)));
-            $stmt->execute(['code' => $code]);
-            $exists = $stmt->fetchColumn();
-            $stmt->closeCursor();
-        } while ($exists !== false);
-        return $code;
+        $stmt->execute(['code' => $code]);
+        return $stmt->fetchColumn() !== false;
     }
 
     public function create(LostReport $report): bool {

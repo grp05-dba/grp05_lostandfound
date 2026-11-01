@@ -21,15 +21,55 @@ class LostReportService {
     public function createLostReport(array $data): array {
         $validationError = RequestUtils::validateRequestBody(
             $data, LostReport::class,
-            ['phone_number', 'location_lost', 'date_lost', 'time_lost'],
-            ['report_code']
+            ['phone_number', 'location_lost', 'date_lost', 'time_lost', 'report_code']
         );
         if ($validationError) {
             return $validationError;
         }
 
-        foreach (['title' => 255, 'location_lost' => 255, 'full_name' => 150, 'student_number' => 50, 'email' => 150, 'phone_number' => 50] as $field => $limit) {
-            if (isset($data[$field]) && preg_match_all('/./us', $data[$field]) > $limit) {
+        $validationError = $this->validateLostReport($data);
+        if ($validationError) {
+            return $validationError;
+        }
+
+        if (!$this->categoryRepository->getById($data['category_id'])) {
+            http_response_code(400);
+            return ['message' => 'Invalid category_id provided.'];
+        }
+
+        $report = new LostReport(
+            report_code: $this->generateReportCode(),
+            category_id: $data['category_id'],
+            title: $data['title'],
+            description: $data['description'],
+            location_lost: ($data['location_lost'] ?? '') === '' ? null : $data['location_lost'],
+            date_lost: ($data['date_lost'] ?? '') === '' ? null : $data['date_lost'],
+            time_lost: ($data['time_lost'] ?? '') === '' ? null : $data['time_lost'],
+            full_name: $data['full_name'],
+            student_number: $data['student_number'],
+            email: $data['email'],
+            phone_number: ($data['phone_number'] ?? '') === '' ? null : $data['phone_number']
+        );
+
+        return RequestUtils::handleCreateFailure($this->lostReportRepository->create($report));
+    }
+
+    private function validateLostReport(array $data): ?array {
+        if (!is_int($data['category_id']) || $data['category_id'] < 1 || $data['category_id'] > 2147483647) {
+            http_response_code(400);
+            return ['message' => 'Invalid field: category_id'];
+        }
+
+        foreach (['description' => null, 'date_lost' => null, 'time_lost' => null, 'title' => 255, 'location_lost' => 255, 'full_name' => 150, 'student_number' => 50, 'email' => 150, 'phone_number' => 50] as $field => $limit) {
+            $value = $data[$field] ?? null;
+            if (in_array($field, ['phone_number', 'location_lost', 'date_lost', 'time_lost'], true) && ($value === null || $value === '')) {
+                continue;
+            }
+            if (!is_string($value) || trim($value) === '' || str_contains($value, "\0")) {
+                http_response_code(400);
+                return ['message' => 'Invalid field: ' . $field];
+            }
+            if ($limit !== null && preg_match_all('/./us', $value) > $limit) {
                 http_response_code(400);
                 return ['message' => 'Field too long: ' . $field];
             }
@@ -53,25 +93,13 @@ class LostReportService {
             }
         }
 
-        if (!$this->categoryRepository->getById($data['category_id'])) {
-            http_response_code(400);
-            return ['message' => 'Invalid category_id provided.'];
-        }
+        return null;
+    }
 
-        $report = new LostReport(
-            report_code: $this->lostReportRepository->generateReportCode(),
-            category_id: $data['category_id'],
-            title: $data['title'],
-            description: $data['description'],
-            location_lost: ($data['location_lost'] ?? '') === '' ? null : $data['location_lost'],
-            date_lost: ($data['date_lost'] ?? '') === '' ? null : $data['date_lost'],
-            time_lost: ($data['time_lost'] ?? '') === '' ? null : $data['time_lost'],
-            full_name: $data['full_name'],
-            student_number: $data['student_number'],
-            email: $data['email'],
-            phone_number: ($data['phone_number'] ?? '') === '' ? null : $data['phone_number']
-        );
-
-        return RequestUtils::handleCreateFailure($this->lostReportRepository->create($report));
+    private function generateReportCode(): string {
+        do {
+            $code = 'LR-' . strtoupper(bin2hex(random_bytes(16)));
+        } while ($this->lostReportRepository->codeExists($code));
+        return $code;
     }
 }

@@ -19,15 +19,10 @@ class ClaimRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function generateClaimCode(): string {
+    public function codeExists(string $code): bool {
         $stmt = $this->connection->prepare('SELECT 1 FROM claims WHERE claim_code = :code');
-        do {
-            $code = 'CLM-' . strtoupper(bin2hex(random_bytes(16)));
-            $stmt->execute(['code' => $code]);
-            $exists = $stmt->fetchColumn();
-            $stmt->closeCursor();
-        } while ($exists !== false);
-        return $code;
+        $stmt->execute(['code' => $code]);
+        return $stmt->fetchColumn() !== false;
     }
 
     public function create(Claim $claim): bool {

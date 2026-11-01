@@ -19,20 +19,14 @@ class ClaimService {
     }
 
     public function createClaim(array $data): array {
-        $validationError = RequestUtils::validateRequestBody($data, Claim::class, ['phone_number'], ['claim_code']);
+        $validationError = RequestUtils::validateRequestBody($data, Claim::class, ['phone_number', 'claim_code']);
         if ($validationError) {
             return $validationError;
         }
 
-        foreach (['full_name' => 150, 'student_number' => 50, 'email' => 150, 'phone_number' => 50] as $field => $limit) {
-            if (isset($data[$field]) && preg_match_all('/./us', $data[$field]) > $limit) {
-                http_response_code(400);
-                return ['message' => 'Field too long: ' . $field];
-            }
-        }
-        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            http_response_code(400);
-            return ['message' => 'Invalid email provided.'];
+        $validationError = $this->validateClaim($data);
+        if ($validationError) {
+            return $validationError;
         }
 
         $item = $this->itemRepository->getById($data['item_id']);
@@ -42,7 +36,7 @@ class ClaimService {
         }
 
         $claim = new Claim(
-            claim_code: $this->claimRepository->generateClaimCode(),
+            claim_code: $this->generateClaimCode(),
             item_id: $data['item_id'],
             full_name: $data['full_name'],
             student_number: $data['student_number'],
@@ -51,5 +45,40 @@ class ClaimService {
         );
 
         return RequestUtils::handleCreateFailure($this->claimRepository->create($claim));
+    }
+
+    private function validateClaim(array $data): ?array {
+        if (!is_int($data['item_id']) || $data['item_id'] < 1 || $data['item_id'] > 2147483647) {
+            http_response_code(400);
+            return ['message' => 'Invalid field: item_id'];
+        }
+
+        foreach (['full_name' => 150, 'student_number' => 50, 'email' => 150, 'phone_number' => 50] as $field => $limit) {
+            $value = $data[$field] ?? null;
+            if (in_array($field, ['phone_number'], true) && ($value === null || $value === '')) {
+                continue;
+            }
+            if (!is_string($value) || trim($value) === '' || str_contains($value, "\0")) {
+                http_response_code(400);
+                return ['message' => 'Invalid field: ' . $field];
+            }
+            if ($limit !== null && preg_match_all('/./us', $value) > $limit) {
+                http_response_code(400);
+                return ['message' => 'Field too long: ' . $field];
+            }
+        }
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            http_response_code(400);
+            return ['message' => 'Invalid email provided.'];
+        }
+
+        return null;
+    }
+
+    private function generateClaimCode(): string {
+        do {
+            $code = 'CLM-' . strtoupper(bin2hex(random_bytes(16)));
+        } while ($this->claimRepository->codeExists($code));
+        return $code;
     }
 }

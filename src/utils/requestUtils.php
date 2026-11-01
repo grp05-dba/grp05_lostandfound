@@ -3,8 +3,7 @@
 class RequestUtils {
     public static function getRequestBody(): array {
         $input = file_get_contents('php://input');
-        $data = json_decode($input, true);
-        return is_array($data) ? $data : [];
+        return json_decode($input, true) ?? [];
     }
 
     public static function handleFindFailure(mixed $success): ?array {
@@ -24,7 +23,7 @@ class RequestUtils {
         return ['message' => 'Resource created successfully.'];
     }
 
-    public static function validateRequestBody(array $data, string $entityClass, array $optionalFields = [], array $generatedFields = []): ?array {
+    public static function validateRequestBody(array $data, string $entityClass, array $excludedFields = []): ?array {
         $reflection = new ReflectionClass($entityClass);
 
         $fields = [];
@@ -32,7 +31,7 @@ class RequestUtils {
             $fields[] = $property->getName();
         }
 
-        $fields = array_diff($fields, ['status'], $optionalFields, $generatedFields);
+        $fields = array_diff($fields, ['status'], $excludedFields);
 
         $missingFields = array_diff($fields, array_keys($data));
         
@@ -41,22 +40,6 @@ class RequestUtils {
             return ['message' => 'Missing required fields: ' . implode(', ', $missingFields)];
         }
 
-        foreach ($reflection->getProperties() as $property) {
-            $name = $property->getName();
-            if ($name === 'status' || in_array($name, $generatedFields, true) || !array_key_exists($name, $data)) {
-                continue;
-            }
-            $value = $data[$name];
-            if (in_array($name, $optionalFields, true) && ($value === null || $value === '')) {
-                continue;
-            }
-            $type = $property->getType()->getName();
-            if (($type === 'string' && (!is_string($value) || trim($value) === '' || str_contains($value, "\0"))) ||
-                ($type === 'int' && (!is_int($value) || $value < 1 || $value > 2147483647))) {
-                http_response_code(400);
-                return ['message' => 'Invalid field: ' . $name];
-            }
-        }
         return null;
     }
 }
