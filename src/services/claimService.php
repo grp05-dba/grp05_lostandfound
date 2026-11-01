@@ -12,11 +12,7 @@ class ClaimService {
     }
 
     public function getClaimById(int $id): array {
-        $claim = $this->claimRepository->getById($id);
-        if ($claim === false) {
-            http_response_code(404);
-            return ['message' => 'No claim found.'];
-        }
-        return $claim;
+        $success = $this->claimRepository->getById($id);
+        return RequestUtils::handleFindFailure($success) ?? $success;
     }
 }

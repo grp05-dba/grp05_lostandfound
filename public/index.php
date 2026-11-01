@@ -16,6 +16,10 @@ require_once __DIR__ . '/../src/services/claimService.php';
 require_once __DIR__ . '/../src/repositories/lostReportRepository.php';
 require_once __DIR__ . '/../src/repositories/claimRepository.php';
 
+require_once __DIR__ . '/../src/entities/item.php';
+
+require_once __DIR__ . '/../src/utils/requestUtils.php';
+
 try {
     $connection = Connection::getConnection();
 } catch (PDOException $e) {

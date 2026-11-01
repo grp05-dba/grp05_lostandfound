@@ -12,11 +12,7 @@ class LostReportService {
     }
 
     public function getLostReportById(int $id): array {
-        $report = $this->lostReportRepository->getById($id);
-        if ($report === false) {
-            http_response_code(404);
-            return ['message' => 'No report found.'];
-        }
-        return $report;
+        $success = $this->lostReportRepository->getById($id);
+        return RequestUtils::handleFindFailure($success) ?? $success;
     }
 }
