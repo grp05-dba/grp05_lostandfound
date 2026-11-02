@@ -31,6 +31,13 @@ class RequestUtils {
             $fields[] = $property->getName();
         }
 
+        $additionalFields = array_diff(array_keys($data), $fields);
+
+        if ($additionalFields) {
+            http_response_code(400);
+            return ['message' => 'Unexpected fields: ' . implode(', ', $additionalFields)];
+        }
+
         $fields = array_diff($fields, ['status'], $excludedFields);
 
         $missingFields = array_diff($fields, array_keys($data));
@@ -39,7 +46,7 @@ class RequestUtils {
             http_response_code(400);
             return ['message' => 'Missing required fields: ' . implode(', ', $missingFields)];
         }
-
+        
         return null;
     }
 
@@ -52,13 +59,25 @@ class RequestUtils {
             'title' => 255,
             'location_found' => 255,
             'location_lost' => 255,
-            'name' => 100, //for category name, tbh not even sure if this is needed but just in case
+            'name' => 100, // For category name, probably not even needed since categories are predefined, but just in case.
         ];
 
-        foreach ($fieldLimits as $field => $limit) {
-            $value = $data[$field] ?? null;
+        $optionalFields = [
+            'phone_number', 
+            'location_lost', 
+            'date_lost', 
+            'time_lost', 
+            //'location_found', why are these commented out? they're optional according to database schema, but should be required. will fix soon.
+            //'date_found', 
+            //'time_found'
+        ];
 
-            if ($field === 'phone_number' && empty($value)) {
+        foreach ($data as $field => $value) {
+            if (!array_key_exists($field, $fieldLimits)) {
+                continue;
+            }
+
+            if (in_array($field, $optionalFields, true) && empty($value)) {
                 continue;
             }
 
@@ -67,9 +86,9 @@ class RequestUtils {
                 return ['message' => "Invalid or empty field: $field"];
             }
 
-            if (mb_strlen($value) > $limit) {
+            if (mb_strlen($value) > $fieldLimits[$field]) {
                 http_response_code(400);
-                return ['message' => "Field too long: $field"];
+                return ['message' => "Field too long: $field (max: {$fieldLimits[$field]} characters)"];
             }
 
             if ($field === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
