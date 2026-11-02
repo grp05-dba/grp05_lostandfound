@@ -23,6 +23,27 @@ class RequestUtils {
         return ['message' => 'Resource created successfully.'];
     }
 
+    public static function handleUpdateFailure(bool $success): array {
+        if (!$success) {
+            http_response_code(500);
+            return ['message' => 'Failed to update resource.'];
+        }
+        return ['message' => 'Resource updated successfully.'];
+    }
+
+    public static function validatePatchFields(array $data, string $entityClass): ?array {
+        $reflection = new ReflectionClass($entityClass);
+
+        foreach (array_keys($data) as $field) {
+            if (!$reflection->hasProperty($field)) {
+                http_response_code(400);
+                return ['message' => "Unexpected field: $field"];
+            }
+        }
+
+        return null;
+    }
+
     public static function validateRequiredFields(array $data, string $entityClass, array $excludedFields = []): ?array {
         $reflection = new ReflectionClass($entityClass);
 

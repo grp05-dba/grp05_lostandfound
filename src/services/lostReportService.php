@@ -20,19 +20,13 @@ class LostReportService {
 
     public function createLostReport(array $data): array {
         $validationError = RequestUtils::validateRequiredFields($data, LostReport::class, ['phone_number', 'location_lost', 'date_lost', 'time_lost', 'report_code']);
-        if ($validationError) {
-            return $validationError;
-        }
+        if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
-        if ($validationError) {
-            return $validationError;
-        }
+        if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateDateTimeFields($data);
-        if ($validationError) {
-            return $validationError;
-        }
+        if ($validationError) return $validationError;
 
         if (!$this->categoryRepository->getById($data['category_id'])) {
             http_response_code(400);

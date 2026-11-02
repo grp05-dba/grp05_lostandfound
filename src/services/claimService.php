@@ -20,14 +20,10 @@ class ClaimService {
 
     public function createClaim(array $data): array {
         $validationError = RequestUtils::validateRequiredFields($data, Claim::class, ['phone_number', 'claim_code']);
-        if ($validationError) {
-            return $validationError;
-        }
+        if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
-        if ($validationError) {
-            return $validationError;
-        }
+        if ($validationError) return $validationError;
 
         $item = $this->itemRepository->getById($data['item_id']);
         if (!$item || $item['status'] !== 'unclaimed') {

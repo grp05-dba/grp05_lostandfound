@@ -61,6 +61,13 @@ class AdminController {
             return;
         }
 
+        if ($method === 'PATCH' && str_starts_with($path, '/api/admin/items/update/')) {
+            $itemId = (int) str_replace('/api/admin/items/update/', '', $path);
+            $result = $this->itemService->updateItem($itemId, RequestUtils::getRequestBody());
+            echo json_encode($result);
+            return;
+        }
+
 
         //Debugging endpoints-------------------------------------
         //Endpoints to get SMS gateway info (textbee integration)

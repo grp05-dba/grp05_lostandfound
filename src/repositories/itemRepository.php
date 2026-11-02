@@ -46,4 +46,18 @@ class ItemRepository {
             'timeFound' => $item->getTimeFound()
         ]);
     }
+
+    public function update(int $itemId, array $data): bool {
+        $updates = [];
+
+        foreach ($data as $field => $value) {
+            $updates[] = "$field = :$field";
+        }
+
+        $sql = 'UPDATE items SET ' . implode(', ', $updates) . ' WHERE item_id = :itemId';
+
+        $stmt = $this->connection->prepare($sql);
+
+        return $stmt->execute([...$data, 'itemId' => $itemId]);
+    }
 }

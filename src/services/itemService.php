@@ -25,19 +25,13 @@ class ItemService {
 
     public function createItem(array $data): array {
         $validationError = RequestUtils::validateRequiredFields($data, Item::class);
-        if ($validationError) {
-            return $validationError;
-        }
+        if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
-        if ($validationError) {
-            return $validationError;
-        }
+        if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateDateTimeFields($data);
-        if ($validationError) {
-            return $validationError;
-        }
+        if ($validationError) return $validationError;
 
         $category = $this->categoryRepository->getById((int) $data['category_id']);
         if (!$category) {
@@ -57,5 +51,35 @@ class ItemService {
         $success = $this->itemRepository->create($item);
 
         return RequestUtils::handleCreateFailure($success);
+    }
+
+    public function updateItem(int $itemId, array $data): array {
+        $item = $this->itemRepository->getById($itemId);
+        if (!$item) {
+            http_response_code(404);
+            return ['message' => 'Item not found.'];
+        }
+
+        $validationError = RequestUtils::validatePatchFields($data, Item::class);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateDateTimeFields($data);
+        if ($validationError) return $validationError;
+
+        if (isset($data['category_id'])) {
+            $category = $this->categoryRepository->getById((int) $data['category_id']);
+
+            if (!$category) {
+                http_response_code(400);
+                return ['message' => 'Invalid category_id provided.'];
+            }
+        }
+
+        $success = $this->itemRepository->update($itemId, $data);
+
+        return RequestUtils::handleUpdateFailure($success);
     }
 }
