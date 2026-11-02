@@ -20,7 +20,7 @@ CREATE TABLE items (
 CREATE TABLE lost_reports (
     report_id SERIAL PRIMARY KEY,
     report_code VARCHAR(50) UNIQUE NOT NULL,
-    category_id INT REFERENCES categories(category_id) ON DELETE SET NULL,
+    category_id INT REFERENCES categories(category_id) ON DELETE SET NULL,gu
     title VARCHAR(255) NOT NULL,
     description TEXT,
     location_lost VARCHAR(255),

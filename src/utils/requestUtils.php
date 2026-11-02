@@ -23,7 +23,7 @@ class RequestUtils {
         return ['message' => 'Resource created successfully.'];
     }
 
-    public static function validateRequestBody(array $data, string $entityClass, array $excludedFields = []): ?array {
+    public static function validateRequiredFields(array $data, string $entityClass, array $excludedFields = []): ?array {
         $reflection = new ReflectionClass($entityClass);
 
         $fields = [];
@@ -38,6 +38,88 @@ class RequestUtils {
         if ($missingFields) {
             http_response_code(400);
             return ['message' => 'Missing required fields: ' . implode(', ', $missingFields)];
+        }
+
+        return null;
+    }
+
+    public static function validateGeneralFields(array $data): ?array {
+        $fieldLimits = [
+            'full_name' => 150,
+            'student_number' => 50,
+            'email' => 150,
+            'phone_number' => 50,
+            'title' => 255,
+            'location_found' => 255,
+            'location_lost' => 255,
+            'name' => 100, //for category name, tbh not even sure if this is needed but just in case
+        ];
+
+        foreach ($fieldLimits as $field => $limit) {
+            $value = $data[$field] ?? null;
+
+            if ($field === 'phone_number' && empty($value)) {
+                continue;
+            }
+
+            if (!is_string($value) || trim($value) === '') {
+                http_response_code(400);
+                return ['message' => "Invalid or empty field: $field"];
+            }
+
+            if (mb_strlen($value) > $limit) {
+                http_response_code(400);
+                return ['message' => "Field too long: $field"];
+            }
+
+            if ($field === 'email' && !filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                http_response_code(400);
+                return ['message' => 'Invalid email provided.'];
+            }
+
+            if ($field === 'phone_number' && !preg_match('/^[0-9+\-]+$/', $value)) {
+                http_response_code(400);
+                return ['message' => 'Invalid phone number provided.'];
+            }
+        }
+
+        return null;
+    }
+
+    public static function validateDateTimeFields(array $data): ?array {
+        $fieldFormats = [
+            'date_found' => 'Y-m-d',
+            'time_found' => 'H:i:s',
+            'date_lost' => 'Y-m-d',
+            'time_lost' => 'H:i:s'
+        ];
+
+        foreach ($fieldFormats as $field => $format) {
+            $value = $data[$field] ?? null;
+
+            if (empty($value)) {
+                continue;
+            }
+
+            if (!is_string($value)) {
+                http_response_code(400);
+                return ['message' => "Invalid field: $field"];
+            }
+
+            if (($field === 'time_found' || $field === 'time_lost') && strlen($value) === 5) {
+                $format = 'H:i';
+            }
+
+            $dateTime = DateTimeImmutable::createFromFormat('!' . $format, $value);
+
+            if (
+                !$dateTime ||
+                $dateTime->format($format) !== $value ||
+                (($field === 'date_found' || $field === 'date_lost') && (int) $dateTime->format('Y') < 1)
+            ) {
+                http_response_code(400);
+                return ['message' => "Invalid field: $field"];
+            }
         }
 
         return null;

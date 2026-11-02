@@ -19,15 +19,17 @@ class LostReportService {
     }
 
     public function createLostReport(array $data): array {
-        $validationError = RequestUtils::validateRequestBody(
-            $data, LostReport::class,
-            ['phone_number', 'location_lost', 'date_lost', 'time_lost', 'report_code']
-        );
+        $validationError = RequestUtils::validateRequiredFields($data, LostReport::class, ['phone_number', 'location_lost', 'date_lost', 'time_lost', 'report_code']);
         if ($validationError) {
             return $validationError;
         }
 
-        $validationError = $this->validateLostReport($data);
+        $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) {
+            return $validationError;
+        }
+
+        $validationError = RequestUtils::validateDateTimeFields($data);
         if ($validationError) {
             return $validationError;
         }
@@ -52,48 +54,6 @@ class LostReportService {
         );
 
         return RequestUtils::handleCreateFailure($this->lostReportRepository->create($report));
-    }
-
-    private function validateLostReport(array $data): ?array {
-        if (!is_int($data['category_id']) || $data['category_id'] < 1 || $data['category_id'] > 2147483647) {
-            http_response_code(400);
-            return ['message' => 'Invalid field: category_id'];
-        }
-
-        foreach (['description' => null, 'date_lost' => null, 'time_lost' => null, 'title' => 255, 'location_lost' => 255, 'full_name' => 150, 'student_number' => 50, 'email' => 150, 'phone_number' => 50] as $field => $limit) {
-            $value = $data[$field] ?? null;
-            if (in_array($field, ['phone_number', 'location_lost', 'date_lost', 'time_lost'], true) && ($value === null || $value === '')) {
-                continue;
-            }
-            if (!is_string($value) || trim($value) === '' || str_contains($value, "\0")) {
-                http_response_code(400);
-                return ['message' => 'Invalid field: ' . $field];
-            }
-            if ($limit !== null && preg_match_all('/./us', $value) > $limit) {
-                http_response_code(400);
-                return ['message' => 'Field too long: ' . $field];
-            }
-        }
-        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            http_response_code(400);
-            return ['message' => 'Invalid email provided.'];
-        }
-        foreach (['date_lost' => 'Y-m-d', 'time_lost' => 'H:i:s'] as $field => $format) {
-            $value = $data[$field] ?? '';
-            if ($value === '') {
-                continue;
-            }
-            if ($field === 'time_lost' && strlen($value) === 5) {
-                $format = 'H:i';
-            }
-            $date = DateTimeImmutable::createFromFormat('!' . $format, $value);
-            if (!$date || $date->format($format) !== $value || ($field === 'date_lost' && (int) $date->format('Y') < 1)) {
-                http_response_code(400);
-                return ['message' => 'Invalid field: ' . $field];
-            }
-        }
-
-        return null;
     }
 
     private function generateReportCode(): string {

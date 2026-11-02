@@ -24,7 +24,17 @@ class ItemService {
     }
 
     public function createItem(array $data): array {
-        $validationError = RequestUtils::validateRequestBody($data, Item::class);
+        $validationError = RequestUtils::validateRequiredFields($data, Item::class);
+        if ($validationError) {
+            return $validationError;
+        }
+
+        $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) {
+            return $validationError;
+        }
+
+        $validationError = RequestUtils::validateDateTimeFields($data);
         if ($validationError) {
             return $validationError;
         }

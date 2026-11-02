@@ -26,10 +26,10 @@ class ClaimRepository {
     }
 
     public function create(Claim $claim): bool {
-        $stmt = $this->connection->prepare('INSERT INTO claims (
-            claim_code, item_id, full_name, student_number, email, phone_number
-        ) SELECT :claimCode, item_id, :fullName, :studentNumber, :email, :phoneNumber
-          FROM items WHERE item_id = :itemId AND status = :status');
+        $stmt = $this->connection->prepare(
+            'INSERT INTO claims (claim_code, item_id, full_name, student_number, email, phone_number) 
+            SELECT :claimCode, item_id, :fullName, :studentNumber, :email, :phoneNumber
+            FROM items WHERE item_id = :itemId AND status = :status');
         $success = $stmt->execute([
             'claimCode' => $claim->getClaimCode(),
             'itemId' => $claim->getItemId(),
