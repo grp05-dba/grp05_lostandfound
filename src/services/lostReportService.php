@@ -56,10 +56,9 @@ class LostReportService {
         return RequestUtils::handleCreateFailure($this->lostReportRepository->create($report));
     }
 
-    //needs to be fixed
     private function generateReportCode(): string {
         do {
-            $code = 'LR-' . strtoupper(bin2hex(random_bytes(16)));
+            $code = 'LR-' . date('Y') . '-' . random_int(100000, 999999);
         } while ($this->lostReportRepository->codeExists($code));
         return $code;
     }

@@ -47,10 +47,9 @@ class ClaimService {
         return RequestUtils::handleCreateFailure($this->claimRepository->create($claim));
     }
 
-    //needs to be fixed
     private function generateClaimCode(): string {
         do {
-            $code = 'CLM-' . strtoupper(bin2hex(random_bytes(16)));
+            $code = 'CLM-' . date('Y') . '-' . random_int(100000, 999999);
         } while ($this->claimRepository->codeExists($code));
         return $code;
     }
