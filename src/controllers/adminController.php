@@ -16,6 +16,8 @@ class AdminController {
     }
 
     public function handleRequest(string $method, string $path): void {
+        // Ignore query parameters when matching routes.
+        $path = parse_url($path, PHP_URL_PATH) ?: $path;
 
         //Lost report endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/lost-reports') {
@@ -23,9 +25,14 @@ class AdminController {
             return;
         }
 
-        if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/')) {
-            $id = (int) str_replace('/api/admin/lost-reports/', '', $path);
-            echo json_encode($this->lostReportService->getLostReportById($id));
+        if ($method === 'GET' && preg_match('#^/api/admin/lost-reports/(\\d+)$#', $path, $matches)) {
+            echo json_encode($this->lostReportService->getLostReportById((int) $matches[1]));
+            return;
+        }
+
+        if ($method === 'PATCH' && preg_match('#^/api/admin/lost-reports/(\\d+)$#', $path, $matches)) {
+            $result = $this->lostReportService->updateLostReport((int) $matches[1], RequestUtils::getRequestBody());
+            echo json_encode($result);
             return;
         }
 
