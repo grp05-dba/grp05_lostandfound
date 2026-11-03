@@ -43,6 +43,7 @@ CREATE TABLE claims (
     student_number VARCHAR(50),
     email VARCHAR(150) NOT NULL,
     phone_number VARCHAR(50),
+    contact_preference VARCHAR(10) NOT NULL DEFAULT 'email' CHECK (contact_preference IN ('email', 'phone')),
     status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

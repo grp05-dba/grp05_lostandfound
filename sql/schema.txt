@@ -20,6 +20,7 @@ full_name
 student_number
 email
 phone_number NULL
+contact_preference (email | phone)
 status
 created_at
 

@@ -31,6 +31,9 @@ class ClaimService {
         $validationError = RequestUtils::validateGeneralFields($data);
         if ($validationError) return $validationError;
 
+        $validationError = $this->validateContactPreference($data, $claim);
+        if ($validationError) return $validationError;
+
         if (isset($data['item_id'])) {
             $item = $this->itemRepository->getById((int) $data['item_id']);
 
@@ -59,6 +62,9 @@ class ClaimService {
         $validationError = RequestUtils::validateGeneralFields($data);
         if ($validationError) return $validationError;
 
+        $validationError = $this->validateContactPreference($data);
+        if ($validationError) return $validationError;
+
         $item = $this->itemRepository->getById($data['item_id']);
         if (!$item || $item['status'] !== 'unclaimed') {
             http_response_code(400);
@@ -71,10 +77,30 @@ class ClaimService {
             full_name: $data['full_name'],
             student_number: $data['student_number'],
             email: $data['email'],
+            contact_preference: $data['contact_preference'],
             phone_number: $data['phone_number'] ?? null
         );
 
         return RequestUtils::handleCreateFailure($this->claimRepository->create($claim));
+    }
+
+    private function validateContactPreference(array $data, ?array $existingClaim = null): ?array {
+        $preference = $data['contact_preference'] ?? $existingClaim['contact_preference'] ?? null;
+
+        if (!is_string($preference) || !in_array($preference, ['email', 'phone'], true)) {
+            http_response_code(400);
+            return ['message' => 'Invalid contact_preference provided. Allowed values: email, phone.'];
+        }
+
+        $phoneNumber = array_key_exists('phone_number', $data)
+            ? $data['phone_number']
+            : ($existingClaim['phone_number'] ?? null);
+        if ($preference === 'phone' && empty($phoneNumber)) {
+            http_response_code(400);
+            return ['message' => 'A phone_number is required when contact_preference is phone.'];
+        }
+
+        return null;
     }
 
     private function generateClaimCode(): string {

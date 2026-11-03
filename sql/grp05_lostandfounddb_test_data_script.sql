@@ -14,8 +14,8 @@ VALUES ('test-category');
 INSERT INTO items (category_id, title, description, location_found, date_found, time_found)
 VALUES (1, 'test-item', 'this is just a test item', 'found near testing site', CURRENT_DATE, LOCALTIME); 
 
-INSERT INTO claims (claim_code, item_id, full_name, student_number, email, phone_number, created_at)
-VALUES ('CLM-00001', 1, 'Juan Dela Cruz', '2024-00001', 'juan@example.com', '09171234567', CURRENT_TIMESTAMP);
+INSERT INTO claims (claim_code, item_id, full_name, student_number, email, phone_number, contact_preference, created_at)
+VALUES ('CLM-00001', 1, 'Juan Dela Cruz', '2024-00001', 'juan@example.com', '09171234567', 'phone', CURRENT_TIMESTAMP);
 
 INSERT INTO lost_reports (
     report_code,
