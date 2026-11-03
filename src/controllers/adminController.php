@@ -5,6 +5,7 @@ class AdminController {
     private SMSService $smsService;
     private LostReportService $lostReportService;
     private ClaimService $claimService;
+    private PotentialMatchService $potentialMatchService;
     private PDO $connection;
 
     public function __construct(PDO $connection) {
@@ -13,6 +14,7 @@ class AdminController {
         $this->smsService = new SMSService();
         $this->lostReportService = new LostReportService($connection);
         $this->claimService = new ClaimService($connection);
+        $this->potentialMatchService = new PotentialMatchService($connection);
     }
 
     public function handleRequest(string $method, string $path): void {
@@ -84,6 +86,27 @@ class AdminController {
             return;
         }
 
+
+        //Potential match endpoints-------------------------------------
+        if ($method === 'GET' && $path === '/api/admin/potential-matches') {
+            echo json_encode($this->potentialMatchService->getAllPotentialMatches());
+            return;
+        }
+
+        if ($method === 'POST' && $path === '/api/admin/potential-matches/generate') {
+            echo json_encode(['created' => $this->potentialMatchService->generatePotentialMatches()]);
+            return;
+        }
+
+        if ($method === 'GET' && preg_match('#^/api/admin/potential-matches/report/(\\d+)$#', $path, $matches)) {
+            echo json_encode($this->potentialMatchService->getMatchesForReport((int) $matches[1]));
+            return;
+        }
+
+        if ($method === 'GET' && preg_match('#^/api/admin/potential-matches/item/(\\d+)$#', $path, $matches)) {
+            echo json_encode($this->potentialMatchService->getMatchesForItem((int) $matches[1]));
+            return;
+        }
 
         //Debugging endpoints-------------------------------------
         //Endpoints to get SMS gateway info (textbee integration)
