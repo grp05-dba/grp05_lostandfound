@@ -4,6 +4,7 @@ class PotentialMatchService {
     private ItemRepository $itemRepository;
     private LostReportRepository $lostReportRepository;
     private PotentialMatchRepository $potentialMatchRepository;
+    private NotificationService $notificationService;
 
     private const MATCH_THRESHOLD = 0.55;
     private const TITLE_THRESHOLD = 0.40;
@@ -12,6 +13,7 @@ class PotentialMatchService {
         $this->itemRepository = new ItemRepository($connection);
         $this->lostReportRepository = new LostReportRepository($connection);
         $this->potentialMatchRepository = new PotentialMatchRepository($connection);
+        $this->notificationService = new NotificationService();
     }
 
     public function getAllPotentialMatches(): array {
@@ -59,6 +61,7 @@ class PotentialMatchService {
                     (int) $item['item_id']
                 )) {
                     $created++;
+                    $this->notificationService->notifyPotentialMatch($report, $item);
                 }
             }
         }

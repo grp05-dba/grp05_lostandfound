@@ -12,6 +12,7 @@ class LostReport {
     private string $student_number;
     private string $email;
     private ?string $phone_number;
+    private string $contact_preference;
     private string $status; //automatically set to "active" when an item is created by POSTGRESQL
     //photos
 
@@ -26,7 +27,8 @@ class LostReport {
         string $full_name,
         string $student_number,
         string $email,
-        ?string $phone_number
+        ?string $phone_number,
+        string $contact_preference = 'email'
     ) {
         $this->report_code = $report_code;
         $this->category_id = $category_id;
@@ -39,6 +41,7 @@ class LostReport {
         $this->student_number = $student_number;
         $this->email = $email;
         $this->phone_number = $phone_number;
+        $this->contact_preference = $contact_preference;
     }
 
     public function getReportCode(): string {
@@ -83,6 +86,10 @@ class LostReport {
 
     public function getPhoneNumber(): ?string {
         return $this->phone_number;
+    }
+
+    public function getContactPreference(): string {
+        return $this->contact_preference;
     }
 
     public function getStatus(): string {
