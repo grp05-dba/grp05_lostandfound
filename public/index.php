@@ -13,11 +13,13 @@ require_once __DIR__ . '/../src/services/categoryService.php';
 require_once __DIR__ . '/../src/services/smsService.php';
 require_once __DIR__ . '/../src/services/lostReportService.php';
 require_once __DIR__ . '/../src/services/claimService.php';
+require_once __DIR__ . '/../src/services/potentialMatchService.php';
 
 require_once __DIR__ . '/../src/repositories/itemRepository.php';
 require_once __DIR__ . '/../src/repositories/categoryRepository.php';
 require_once __DIR__ . '/../src/repositories/lostReportRepository.php';
 require_once __DIR__ . '/../src/repositories/claimRepository.php';
+require_once __DIR__ . '/../src/repositories/potentialMatchRepository.php';
 
 require_once __DIR__ . '/../src/entities/item.php';
 require_once __DIR__ . '/../src/entities/lostReport.php';
