@@ -33,7 +33,7 @@ class RequestUtils {
 
     public static function validatePatchFields(array $data, string $entityClass): ?array {
         $reflection = new ReflectionClass($entityClass);
-
+        
         foreach (array_keys($data) as $field) {
             if (!$reflection->hasProperty($field)) {
                 http_response_code(400);

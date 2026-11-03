@@ -54,6 +54,8 @@ class ItemRepository {
             $updates[] = "$field = :$field";
         }
 
+        if(empty($updates)) return false; 
+
         $sql = 'UPDATE items SET ' . implode(', ', $updates) . ' WHERE item_id = :itemId';
 
         $stmt = $this->connection->prepare($sql);

@@ -31,8 +31,9 @@ class AdminController {
             return;
         }
 
-        if ($method === 'PATCH' && preg_match('#^/api/admin/lost-reports/(\\d+)$#', $path, $matches)) {
-            $result = $this->lostReportService->updateLostReport((int) $matches[1], RequestUtils::getRequestBody());
+        if ($method === 'PATCH' && str_starts_with($path, '/api/admin/lost-reports/update/')) {
+            $itemId = (int) str_replace('/api/admin/lost-reports/update/', '', $path);
+            $result = $this->lostReportService->updateLostReport($itemId, RequestUtils::getRequestBody());
             echo json_encode($result);
             return;
         }

@@ -27,21 +27,17 @@ class LostReportRepository {
 
     public function update(int $reportId, array $data): bool {
         $updates = [];
-        $parameters = ['reportId' => $reportId];
 
         foreach ($data as $field => $value) {
-            $updates[] = $field . ' = :' . $field;
-            $parameters[$field] = $value;
+            $updates[] = "$field = :$field";
         }
 
-        if ($updates === []) {
-            return false;
-        }
+        if(empty($updates)) return false;
 
         $sql = 'UPDATE lost_reports SET ' . implode(', ', $updates) . ' WHERE report_id = :reportId';
         $stmt = $this->connection->prepare($sql);
 
-        return $stmt->execute($parameters);
+        return $stmt->execute([...$data, 'reportId' => $reportId]);
     }
 
     public function create(LostReport $report): bool {
