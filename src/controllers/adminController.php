@@ -5,6 +5,7 @@ class AdminController {
     private SMSService $smsService;
     private LostReportService $lostReportService;
     private ClaimService $claimService;
+    private PhotoService $photoService;
     private PDO $connection;
 
     public function __construct(PDO $connection) {
@@ -13,6 +14,7 @@ class AdminController {
         $this->smsService = new SMSService();
         $this->lostReportService = new LostReportService($connection);
         $this->claimService = new ClaimService($connection);
+        $this->photoService = new PhotoService($connection);
     }
 
     public function handleRequest(string $method, string $path): void {
@@ -58,6 +60,19 @@ class AdminController {
             return;
         }
 
+
+        //Item photo endpoints-------------------------------------
+        if (preg_match('#^/api/admin/items/(\\d+)/photos$#', $path, $matches)) {
+            $itemId = (int) $matches[1];
+            if ($method === 'POST') {
+                echo json_encode($this->photoService->addUploadedPhotos('item', $itemId, $_FILES['photos'] ?? []));
+                return;
+            }
+            if ($method === 'GET') {
+                echo json_encode($this->photoService->getPhotos('item', $itemId));
+                return;
+            }
+        }
 
         //Item endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/items') {
