@@ -34,34 +34,22 @@ class LostReportService {
             $validationError = RequestUtils::validatePatchFields($data, LostReport::class);
             if ($validationError) return $validationError;
 
-            // These columns are nullable in PostgreSQL. Treat an explicit empty string
-            // as a request to clear the value, rather than sending an invalid empty date/time.
-            $nullableFields = ['student_number', 'location_lost', 'date_lost', 'time_lost', 'phone_number'];
-            foreach ($nullableFields as $field) {
-                if (array_key_exists($field, $data) && $data[$field] === '') {
-                    $data[$field] = null;
-                }
-            }
-
-            // student_number is nullable in the database, so allow an explicit null value.
-            $generalValidationData = $data;
-            if (array_key_exists('student_number', $generalValidationData) && $generalValidationData['student_number'] === null) {
-                unset($generalValidationData['student_number']);
-            }
-
-            $validationError = RequestUtils::validateGeneralFields($generalValidationData);
+            $validationError = RequestUtils::validateGeneralFields($data);
             if ($validationError) return $validationError;
 
             $validationError = RequestUtils::validateDateTimeFields($data);
             if ($validationError) return $validationError;
 
             if (array_key_exists('report_code', $data)) {
-                if (!is_string($data['report_code']) || trim($data['report_code']) === '' || mb_strlen($data['report_code']) > 50) {
+                if (!is_string($data['report_code'])) {
                     http_response_code(400);
                     return ['message' => 'Invalid report_code provided.'];
                 }
 
-                if ($this->lostReportRepository->codeExistsForAnotherReport($data['report_code'], $reportId)) {
+                if (
+                    $data['report_code'] !== $report['report_code'] &&
+                    $this->lostReportRepository->codeExists($data['report_code'])
+                ) {
                     http_response_code(409);
                     return ['message' => 'The report_code is already in use.'];
                 }
@@ -74,18 +62,6 @@ class LostReportService {
                     return ['message' => 'Invalid category_id provided.'];
                 }
                 $data['category_id'] = $categoryId;
-            }
-
-            if (array_key_exists('student_number', $data) && $data['student_number'] !== null) {
-                if (!is_string($data['student_number']) || trim($data['student_number']) === '' || mb_strlen($data['student_number']) > 50) {
-                    http_response_code(400);
-                    return ['message' => 'Invalid student_number provided.'];
-                }
-            }
-
-            if (array_key_exists('description', $data) && $data['description'] !== null && !is_string($data['description'])) {
-                http_response_code(400);
-                return ['message' => 'Invalid description provided.'];
             }
 
             if (array_key_exists('status', $data)) {
