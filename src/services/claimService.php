@@ -3,10 +3,12 @@
 class ClaimService {
     private ClaimRepository $claimRepository;
     private ItemRepository $itemRepository;
+    private PotentialMatchRepository $potentialMatchRepository;
 
     public function __construct(PDO $connection) {
         $this->claimRepository = new ClaimRepository($connection);
         $this->itemRepository = new ItemRepository($connection);
+        $this->potentialMatchRepository = new PotentialMatchRepository($connection);
     }
 
     public function getAllClaims(): array {
@@ -16,6 +18,20 @@ class ClaimService {
     public function getClaimById(int $id): array {
         $success = $this->claimRepository->getById($id);
         return RequestUtils::handleFindFailure($success) ?? $success;
+    }
+
+    public function getClaimByCode(string $claimCode): array {
+        $claim = $this->claimRepository->getByCode($claimCode);
+
+        if (!$claim) {
+            http_response_code(404);
+            return ['message' => 'Claim not found.'];
+        }
+
+        return [
+            'claim' => $claim,
+            'potential_matches' => $this->potentialMatchRepository->getByItemId((int) $claim['item_id'])
+        ];
     }
 
     public function updateClaim(int $claimId, array $data): array {

@@ -19,6 +19,14 @@ class ClaimRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getByCode(string $claimCode): array|false {
+        $stmt = $this->connection->prepare(
+            'SELECT * FROM claims WHERE claim_code = :claimCode'
+        );
+        $stmt->execute(['claimCode' => $claimCode]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function codeExists(string $code): bool {
         $stmt = $this->connection->prepare('SELECT 1 FROM claims WHERE claim_code = :code');
         $stmt->execute(['code' => $code]);

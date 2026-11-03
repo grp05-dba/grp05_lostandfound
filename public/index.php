@@ -21,6 +21,7 @@ require_once __DIR__ . '/../src/repositories/itemRepository.php';
 require_once __DIR__ . '/../src/repositories/categoryRepository.php';
 require_once __DIR__ . '/../src/repositories/lostReportRepository.php';
 require_once __DIR__ . '/../src/repositories/claimRepository.php';
+require_once __DIR__ . '/../src/repositories/potentialMatchRepository.php';
 require_once __DIR__ . '/../src/repositories/photoRepository.php';
 
 require_once __DIR__ . '/../src/entities/item.php';

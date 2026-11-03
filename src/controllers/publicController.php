@@ -16,6 +16,7 @@ class PublicController {
     }
 
     public function handleRequest(string $method, string $path): void{
+        $path = parse_url($path, PHP_URL_PATH) ?: $path;
 
         if (preg_match('#^/api/public/lost-reports/(\\d+)/photos/(\\d+)$#', $path, $photoMatches) && $method === 'GET') {
             $photo = $this->photoService->getPhoto('lost_report', (int) $photoMatches[1], (int) $photoMatches[2]);
@@ -68,6 +69,20 @@ class PublicController {
 
         if ($method === 'POST' && $path === '/api/public/claims/add') {
             echo json_encode($this->claimService->createClaim(RequestUtils::getRequestBody()));
+            return;
+        }
+
+        if ($method === 'POST' && $path === '/api/public/claims/lookup') {
+            $data = RequestUtils::getRequestBody();
+            $claimCode = $data['claim_code'] ?? null;
+
+            if (!is_string($claimCode) || trim($claimCode) === '') {
+                http_response_code(400);
+                echo json_encode(['message' => 'A valid claim_code is required.']);
+                return;
+            }
+
+            echo json_encode($this->claimService->getClaimByCode(trim($claimCode)));
             return;
         }
 
