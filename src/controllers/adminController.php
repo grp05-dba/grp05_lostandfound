@@ -61,6 +61,16 @@ class AdminController {
         }
 
 
+        if (preg_match('#^/api/admin/items/(\\d+)/photos/(\\d+)$#', $path, $photoMatches) && $method === 'GET') {
+            $photo = $this->photoService->getPhoto('item', (int) $photoMatches[2]);
+            if (!$photo) { http_response_code(404); echo json_encode(['message' => 'Photo not found.']); return; }
+            header('Content-Type: ' . $photo['mime_type']);
+            header('Content-Disposition: inline; filename="' . basename($photo['file_name']) . '"');
+            $data = $photo['photo_data'];
+            echo is_resource($data) ? stream_get_contents($data) : $data;
+            return;
+        }
+
         //Item photo endpoints-------------------------------------
         if (preg_match('#^/api/admin/items/(\\d+)/photos$#', $path, $matches)) {
             $itemId = (int) $matches[1];
