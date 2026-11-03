@@ -34,6 +34,15 @@ class LostReportService {
             $validationError = RequestUtils::validatePatchFields($data, LostReport::class);
             if ($validationError) return $validationError;
 
+            // These columns are nullable in PostgreSQL. Treat an explicit empty string
+            // as a request to clear the value, rather than sending an invalid empty date/time.
+            $nullableFields = ['student_number', 'location_lost', 'date_lost', 'time_lost', 'phone_number'];
+            foreach ($nullableFields as $field) {
+                if (array_key_exists($field, $data) && $data[$field] === '') {
+                    $data[$field] = null;
+                }
+            }
+
             // student_number is nullable in the database, so allow an explicit null value.
             $generalValidationData = $data;
             if (array_key_exists('student_number', $generalValidationData) && $generalValidationData['student_number'] === null) {
