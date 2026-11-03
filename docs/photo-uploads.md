@@ -8,4 +8,6 @@ Apply `sql/migrations/004_add_entity_photos.sql` after the base schema. Upload p
 - `POST /api/public/lost-reports/{reportId}/photos`
 - `POST /api/public/claims/{claimId}/photos`
 
-Use `GET` on the same paths to list photo metadata. Photo bytes are not included in list responses. Database-backed storage means database backups also contain uploaded image data.
+Use `GET` on the same paths to list photo metadata. Photo bytes are not included in list responses; retrieve an image with `GET /api/{admin|public}/{items|lost-reports|claims}/{recordId}/photos/{photoId}` using the matching record route above. Database-backed storage means database backups also contain uploaded image data.
+
+For local PHP development, configure `upload_max_filesize` to at least `5M` and `post_max_size` to at least `26M` so a request containing five maximum-size images can reach the application.
