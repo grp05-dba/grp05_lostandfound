@@ -4,6 +4,7 @@ class PublicController {
     private CategoryService $categoryService;
     private LostReportService $lostReportService;
     private ClaimService $claimService;
+    private PhotoService $photoService;
     private PDO $connection;
 
     public function __construct(PDO $connection) {
@@ -11,9 +12,34 @@ class PublicController {
         $this->categoryService = new CategoryService($connection);
         $this->lostReportService = new LostReportService($connection);
         $this->claimService = new ClaimService($connection);
+        $this->photoService = new PhotoService($connection);
     }
 
     public function handleRequest(string $method, string $path): void{
+
+        if (preg_match('#^/api/public/lost-reports/(\\d+)/photos$#', $path, $matches)) {
+            $reportId = (int) $matches[1];
+            if ($method === 'POST') {
+                echo json_encode($this->photoService->addUploadedPhotos('lost_report', $reportId, $_FILES['photos'] ?? []));
+                return;
+            }
+            if ($method === 'GET') {
+                echo json_encode($this->photoService->getPhotos('lost_report', $reportId));
+                return;
+            }
+        }
+
+        if (preg_match('#^/api/public/claims/(\\d+)/photos$#', $path, $matches)) {
+            $claimId = (int) $matches[1];
+            if ($method === 'POST') {
+                echo json_encode($this->photoService->addUploadedPhotos('claim', $claimId, $_FILES['photos'] ?? []));
+                return;
+            }
+            if ($method === 'GET') {
+                echo json_encode($this->photoService->getPhotos('claim', $claimId));
+                return;
+            }
+        }
 
         if ($method === 'POST' && $path === '/api/public/lost-reports/add') {
             echo json_encode($this->lostReportService->createLostReport(RequestUtils::getRequestBody()));
