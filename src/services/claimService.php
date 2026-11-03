@@ -41,6 +41,11 @@ class ClaimService {
                 http_response_code(400);
                 return ['message' => 'Invalid claim_code provided.'];
             }
+
+            if ($this->claimRepository->codeExistsForAnotherClaim($data['claim_code'], $claimId)) {
+                http_response_code(409);
+                return ['message' => 'The claim_code is already in use.'];
+            }
         }
 
         if (array_key_exists('item_id', $data)) {
