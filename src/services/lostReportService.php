@@ -3,10 +3,12 @@
 class LostReportService {
     private LostReportRepository $lostReportRepository;
     private CategoryRepository $categoryRepository;
+    private PotentialMatchService $potentialMatchService;
 
     public function __construct(PDO $connection) {
         $this->lostReportRepository = new LostReportRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
+        $this->potentialMatchService = new PotentialMatchService($connection);
     }
 
     public function getAllLostReports(): array {
@@ -43,6 +45,11 @@ class LostReportService {
             }
         }
 
+        if (array_key_exists('contact_preference', $data) && !in_array($data['contact_preference'], ['email', 'sms'], true)) {
+            http_response_code(400);
+            return ['message' => 'Invalid contact_preference. Allowed values: email, sms.'];
+        }
+
         if (array_key_exists('status', $data)) {
             $allowedStatuses = ['active', 'resolved', 'cancelled'];
             if (!is_string($data['status']) || !in_array($data['status'], $allowedStatuses, true)) {
@@ -56,7 +63,7 @@ class LostReportService {
     }
 
     public function createLostReport(array $data): array {
-        $validationError = RequestUtils::validateRequiredFields($data, LostReport::class, ['phone_number', 'location_lost', 'date_lost', 'time_lost', 'report_code']);
+        $validationError = RequestUtils::validateRequiredFields($data, LostReport::class, ['phone_number', 'location_lost', 'date_lost', 'time_lost', 'report_code', 'contact_preference']);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
@@ -64,6 +71,11 @@ class LostReportService {
 
         $validationError = RequestUtils::validateDateTimeFields($data);
         if ($validationError) return $validationError;
+
+        if (isset($data['contact_preference']) && !in_array($data['contact_preference'], ['email', 'sms'], true)) {
+            http_response_code(400);
+            return ['message' => 'Invalid contact_preference. Allowed values: email, sms.'];
+        }
 
         if (!$this->categoryRepository->getById($data['category_id'])) {
             http_response_code(400);
@@ -81,10 +93,20 @@ class LostReportService {
             full_name: $data['full_name'],
             student_number: $data['student_number'],
             email: $data['email'],
-            phone_number: ($data['phone_number'] ?? '') === '' ? null : $data['phone_number']
+            phone_number: ($data['phone_number'] ?? '') === '' ? null : $data['phone_number'],
+            contact_preference: $data['contact_preference'] ?? 'email'
         );
 
-        return RequestUtils::handleCreateFailure($this->lostReportRepository->create($report));
+        $success = $this->lostReportRepository->create($report);
+        if (!$success) return RequestUtils::handleCreateFailure(false);
+
+        try {
+            $this->potentialMatchService->generatePotentialMatches();
+        } catch (Throwable $e) {
+            error_log('Potential matching after lost report creation failed: ' . $e->getMessage());
+        }
+
+        return RequestUtils::handleCreateFailure(true);
     }
 
     private function generateReportCode(): string {

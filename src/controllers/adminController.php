@@ -110,6 +110,27 @@ class AdminController {
         }
 
 
+        //Potential match endpoints-------------------------------------
+        if ($method === 'GET' && $path === '/api/admin/potential-matches') {
+            echo json_encode($this->potentialMatchService->getAllPotentialMatches());
+            return;
+        }
+
+        if ($method === 'POST' && $path === '/api/admin/potential-matches/generate') {
+            echo json_encode(['created' => $this->potentialMatchService->generatePotentialMatches()]);
+            return;
+        }
+
+        if ($method === 'GET' && preg_match('#^/api/admin/potential-matches/report/(\\d+)$#', $path, $matches)) {
+            echo json_encode($this->potentialMatchService->getMatchesForReport((int) $matches[1]));
+            return;
+        }
+
+        if ($method === 'GET' && preg_match('#^/api/admin/potential-matches/item/(\\d+)$#', $path, $matches)) {
+            echo json_encode($this->potentialMatchService->getMatchesForItem((int) $matches[1]));
+            return;
+        }
+
         //Debugging endpoints-------------------------------------
         //Endpoints to get SMS gateway info (textbee integration)
         if ($method === 'GET' && $path === '/api/admin/sms/stats') {

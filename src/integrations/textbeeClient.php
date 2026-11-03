@@ -1,58 +1,41 @@
 <?php
 
 class TextBeeClient {
+    private array $env;
+
+    public function __construct() {
+        $env = parse_ini_file(__DIR__ . '/../../.env');
+        $this->env = is_array($env) ? $env : [];
+    }
 
     private function request(string $method, string $endpoint, ?array $data = null): array {
-        $env = parse_ini_file(__DIR__ . '/../../.env');
-
-        $apiKey = $env['TEXTBEE_API_KEY'];
-        $baseUrl = $env['TEXTBEE_BASE_URL'];
+        $apiKey = $this->env['TEXTBEE_API_KEY'] ?? '';
+        $baseUrl = rtrim($this->env['TEXTBEE_BASE_URL'] ?? 'https://api.textbee.dev/api/v1', '/');
+        if ($apiKey === '') return ['success' => false, 'status' => 0, 'message' => 'TextBee is not configured.'];
 
         $ch = curl_init($baseUrl . $endpoint);
-
-        $headers = [
-            'x-api-key: ' . $apiKey,
-            'Content-Type: application/json'
-        ];
-
         $options = [
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_HTTPHEADER => ['x-api-key: ' . $apiKey, 'Content-Type: application/json'],
             CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_TIMEOUT => 10
+            CURLOPT_TIMEOUT => 10,
         ];
-
-        if ($data) {
-            $options[CURLOPT_POSTFIELDS] = json_encode($data);
-        }
-
+        if ($data !== null) $options[CURLOPT_POSTFIELDS] = json_encode($data);
         curl_setopt_array($ch, $options);
-
         $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        
-        if ($response === false) {
-            return [
-                'success' => false,
-                'status' => 0,
-                'message' => 'Unable to connect to TextBee.'
-            ];
-        }
+        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
 
-        $responseData = json_decode($response, true);
-        
-        return [
-            'success' => $httpCode >= 200 && $httpCode < 300,
-            'status' => $httpCode,
-            'response' => $responseData ?? $response
-        ];
+        if ($response === false) return ['success' => false, 'status' => 0, 'message' => $error ?: 'Unable to connect to TextBee.'];
+        $decoded = json_decode($response, true);
+        return ['success' => $httpCode >= 200 && $httpCode < 300, 'status' => $httpCode, 'response' => $decoded ?? $response];
     }
 
-    public function getGatewayStats(): array {
-        return $this->request('GET', '/api/v1/gateway/stats');
-    }
+    public function getGatewayStats(): array { return $this->request('GET', '/gateway/stats'); }
+    public function getGatewayDevices(): array { return $this->request('GET', '/gateway/devices'); }
 
-    public function getGatewayDevices(): array {
-        return $this->request('GET', '/api/v1/gateway/devices');
+    public function sendSMS(string $phoneNumber, string $message): array {
+        return $this->request('POST', '/gateway/send-sms', ['recipients' => [$phoneNumber], 'message' => $message]);
     }
 }
