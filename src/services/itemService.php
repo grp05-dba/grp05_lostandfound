@@ -4,10 +4,12 @@ class ItemService {
     private ItemRepository $itemRepository;
 
     private CategoryRepository $categoryRepository;
+    private PotentialMatchService $potentialMatchService;
 
     public function __construct(PDO $connection) {
         $this->itemRepository = new ItemRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
+        $this->potentialMatchService = new PotentialMatchService($connection);
     }
 
     public function test(): array{
@@ -49,8 +51,15 @@ class ItemService {
         );
 
         $success = $this->itemRepository->create($item);
+        if (!$success) return RequestUtils::handleCreateFailure(false);
 
-        return RequestUtils::handleCreateFailure($success);
+        try {
+            $this->potentialMatchService->generatePotentialMatches();
+        } catch (Throwable $e) {
+            error_log('Potential matching after item creation failed: ' . $e->getMessage());
+        }
+
+        return RequestUtils::handleCreateFailure(true);
     }
 //hehe
     public function updateItem(int $itemId, array $data): array {
