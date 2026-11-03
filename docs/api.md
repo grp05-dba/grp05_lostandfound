@@ -23,7 +23,7 @@ Lists return `[]` when empty. Queries have no ORDER BY, pagination or filtering.
 For example, a category lookup can return:
 
 ```json
-{"category_id": 1, "name": "test-category"
+{"category_id": 1, "name": "test-category"}
 ```
 
 Values come from the actual database; sample dates and timestamps are generated when the sample script runs.
