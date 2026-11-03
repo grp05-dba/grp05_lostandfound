@@ -3,10 +3,12 @@
 class LostReportService {
     private LostReportRepository $lostReportRepository;
     private CategoryRepository $categoryRepository;
+    private PotentialMatchService $potentialMatchService;
 
     public function __construct(PDO $connection) {
         $this->lostReportRepository = new LostReportRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
+        $this->potentialMatchService = new PotentialMatchService($connection);
     }
 
     public function getAllLostReports(): array {
@@ -84,7 +86,16 @@ class LostReportService {
             phone_number: ($data['phone_number'] ?? '') === '' ? null : $data['phone_number']
         );
 
-        return RequestUtils::handleCreateFailure($this->lostReportRepository->create($report));
+        $success = $this->lostReportRepository->create($report);
+        if (!$success) return RequestUtils::handleCreateFailure(false);
+
+        try {
+            $this->potentialMatchService->generatePotentialMatches();
+        } catch (Throwable $e) {
+            error_log('Potential matching after lost report creation failed: ' . $e->getMessage());
+        }
+
+        return RequestUtils::handleCreateFailure(true);
     }
 
     private function generateReportCode(): string {
