@@ -25,6 +25,25 @@ class LostReportRepository {
         return $stmt->fetchColumn() !== false;
     }
 
+    public function update(int $reportId, array $data): bool {
+        $updates = [];
+        $parameters = ['reportId' => $reportId];
+
+        foreach ($data as $field => $value) {
+            $updates[] = $field . ' = :' . $field;
+            $parameters[$field] = $value;
+        }
+
+        if ($updates === []) {
+            return false;
+        }
+
+        $sql = 'UPDATE lost_reports SET ' . implode(', ', $updates) . ' WHERE report_id = :reportId';
+        $stmt = $this->connection->prepare($sql);
+
+        return $stmt->execute($parameters);
+    }
+
     public function create(LostReport $report): bool {
         $stmt = $this->connection->prepare('INSERT INTO lost_reports (
             report_code, category_id, title, description, location_lost, date_lost,
