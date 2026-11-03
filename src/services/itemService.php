@@ -78,6 +78,14 @@ class ItemService {
             }
         }
 
+        if (array_key_exists('status', $data)) {
+            $allowedStatuses = ['unclaimed', 'claimed', 'archived'];
+            if (!is_string($data['status']) || !in_array($data['status'], $allowedStatuses, true)) {
+                http_response_code(400);
+                return ['message' => 'Invalid status provided. Allowed values: pending, approved, rejected.'];
+            }
+        }
+
         $success = $this->itemRepository->update($itemId, $data);
 
         return RequestUtils::handleUpdateFailure($success);
