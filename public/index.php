@@ -4,21 +4,30 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/../src/db/db.php';
 require_once __DIR__ . '/../src/integrations/textbeeClient.php';
+
 require_once __DIR__ . '/../src/controllers/adminController.php';
 require_once __DIR__ . '/../src/controllers/publicController.php';
+
 require_once __DIR__ . '/../src/services/itemService.php';
 require_once __DIR__ . '/../src/services/categoryService.php';
 require_once __DIR__ . '/../src/services/smsService.php';
-require_once __DIR__ . '/../src/repositories/itemRepository.php';
-require_once __DIR__ . '/../src/repositories/categoryRepository.php';
 require_once __DIR__ . '/../src/services/lostReportService.php';
 require_once __DIR__ . '/../src/services/claimService.php';
+
+require_once __DIR__ . '/../src/repositories/itemRepository.php';
+require_once __DIR__ . '/../src/repositories/categoryRepository.php';
 require_once __DIR__ . '/../src/repositories/lostReportRepository.php';
 require_once __DIR__ . '/../src/repositories/claimRepository.php';
 
-$connection = Connection::getConnection();
+require_once __DIR__ . '/../src/entities/item.php';
+require_once __DIR__ . '/../src/entities/lostReport.php';
+require_once __DIR__ . '/../src/entities/claim.php';
 
-if (!$connection) {
+require_once __DIR__ . '/../src/utils/requestUtils.php';
+
+try {
+    $connection = Connection::getConnection();
+} catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Database connection failed']);
     exit;
@@ -41,7 +50,13 @@ else {
 }
 
 if($controller){
-    $controller->handleRequest($method, $path);
+    try {
+        $controller->handleRequest($method, $path);
+    } catch (PDOException $e) {
+        error_log($e->getMessage());
+        http_response_code(500);
+        echo json_encode(['error' => 'Database operation failed']);
+    }
 }
 else {
 http_response_code(404);

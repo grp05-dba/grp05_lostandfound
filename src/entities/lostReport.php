@@ -1,45 +1,91 @@
 <?php
 
 class LostReport {
-    private string $reportCode;
-    private int $categoryId;
+    private string $report_code;
+    private int $category_id;
     private string $title;
     private string $description;
-    private string $locationLost; 
-    private string $dateLost;
-    private string $timeLost;
-    private string $fullName;
-    private string $studentNumber;
+    private ?string $location_lost;
+    private ?string $date_lost;
+    private ?string $time_lost;
+    private string $full_name;
+    private string $student_number;
     private string $email;
-    private string $phoneNumber;
-    private string $status;
+    private ?string $phone_number;
+    private string $status; //automatically set to "active" when an item is created by POSTGRESQL
     //photos
 
     public function __construct(
-        string $reportCode,
-        int $categoryId,
+        string $report_code,
+        int $category_id,
         string $title,
         string $description,
-        string $locationLost,
-        string $dateLost,
-        string $timeLost,
-        string $fullName,
-        string $studentNumber,
+        ?string $location_lost,
+        ?string $date_lost,
+        ?string $time_lost,
+        string $full_name,
+        string $student_number,
         string $email,
-        string $phoneNumber,
-        string $status
+        ?string $phone_number
     ) {
-        $this->reportCode = $reportCode;
-        $this->categoryId = $categoryId;
+        $this->report_code = $report_code;
+        $this->category_id = $category_id;
         $this->title = $title;
         $this->description = $description;
-        $this->locationLost = $locationLost;
-        $this->dateLost = $dateLost;
-        $this->timeLost = $timeLost;
-        $this->fullName = $fullName;
-        $this->studentNumber = $studentNumber;
+        $this->location_lost = $location_lost;
+        $this->date_lost = $date_lost;
+        $this->time_lost = $time_lost;
+        $this->full_name = $full_name;
+        $this->student_number = $student_number;
         $this->email = $email;
-        $this->phoneNumber = $phoneNumber;
-        $this->status = $status;
+        $this->phone_number = $phone_number;
+    }
+
+    public function getReportCode(): string {
+        return $this->report_code;
+    }
+
+    public function getCategoryId(): int {
+        return $this->category_id;
+    }
+
+    public function getTitle(): string {
+        return $this->title;
+    }
+
+    public function getDescription(): string {
+        return $this->description;
+    }
+
+    public function getLocationLost(): ?string {
+        return $this->location_lost;
+    }
+
+    public function getDateLost(): ?string {
+        return $this->date_lost;
+    }
+
+    public function getTimeLost(): ?string {
+        return $this->time_lost;
+    }
+
+    public function getFullName(): string {
+        return $this->full_name;
+    }
+
+    public function getStudentNumber(): string {
+        return $this->student_number;
+    }
+
+    public function getEmail(): string {
+        return $this->email;
+    }
+
+    public function getPhoneNumber(): ?string {
+        return $this->phone_number;
+    }
+
+    public function getStatus(): string {
+        return $this->status;
     }
 }

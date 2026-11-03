@@ -3,8 +3,11 @@
 class ItemService { 
     private ItemRepository $itemRepository;
 
+    private CategoryRepository $categoryRepository;
+
     public function __construct(PDO $connection) {
         $this->itemRepository = new ItemRepository($connection);
+        $this->categoryRepository = new CategoryRepository($connection);
     }
 
     public function test(): array{
@@ -16,11 +19,67 @@ class ItemService {
     }
 
     public function getItemById(int $id): array {
-        $item = $this->itemRepository->getById($id);
-        if ($item === false) {
-            http_response_code(404);
-            return ['message' => 'No item found.'];
+        $success = $this->itemRepository->getById($id);
+        return RequestUtils::handleFindFailure($success) ?? $success;
+    }
+
+    public function createItem(array $data): array {
+        $validationError = RequestUtils::validateRequiredFields($data, Item::class);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateDateTimeFields($data);
+        if ($validationError) return $validationError;
+
+        $category = $this->categoryRepository->getById((int) $data['category_id']);
+        if (!$category) {
+            http_response_code(400);
+            return ['message' => 'Invalid category_id provided.'];
         }
-        return $item;
+
+        $item = new Item(
+            category_id: (int) $data['category_id'],
+            title: $data['title'],
+            description: $data['description'],
+            location_found: $data['location_found'],
+            date_found: $data['date_found'],
+            time_found: $data['time_found']
+        );
+
+        $success = $this->itemRepository->create($item);
+
+        return RequestUtils::handleCreateFailure($success);
+    }
+//hehe
+    public function updateItem(int $itemId, array $data): array {
+        $item = $this->itemRepository->getById($itemId);
+        if (!$item) {
+            http_response_code(404);
+            return ['message' => 'Item not found.'];
+        }
+
+        $validationError = RequestUtils::validatePatchFields($data, Item::class);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateDateTimeFields($data);
+        if ($validationError) return $validationError;
+
+        if (isset($data['category_id'])) {
+            $category = $this->categoryRepository->getById((int) $data['category_id']);
+
+            if (!$category) {
+                http_response_code(400);
+                return ['message' => 'Invalid category_id provided.'];
+            }
+        }
+
+        $success = $this->itemRepository->update($itemId, $data);
+
+        return RequestUtils::handleUpdateFailure($success);
     }
 }

@@ -18,4 +18,33 @@ class LostReportRepository {
         $stmt->execute(['id' => $id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function codeExists(string $code): bool {
+        $stmt = $this->connection->prepare('SELECT 1 FROM lost_reports WHERE report_code = :code');
+        $stmt->execute(['code' => $code]);
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public function create(LostReport $report): bool {
+        $stmt = $this->connection->prepare('INSERT INTO lost_reports (
+            report_code, category_id, title, description, location_lost, date_lost,
+            time_lost, full_name, student_number, email, phone_number
+        ) VALUES (
+            :reportCode, :categoryId, :title, :description, :locationLost, :dateLost,
+            :timeLost, :fullName, :studentNumber, :email, :phoneNumber
+        )');
+        return $stmt->execute([
+            'reportCode' => $report->getReportCode(),
+            'categoryId' => $report->getCategoryId(),
+            'title' => $report->getTitle(),
+            'description' => $report->getDescription(),
+            'locationLost' => $report->getLocationLost(),
+            'dateLost' => $report->getDateLost(),
+            'timeLost' => $report->getTimeLost(),
+            'fullName' => $report->getFullName(),
+            'studentNumber' => $report->getStudentNumber(),
+            'email' => $report->getEmail(),
+            'phoneNumber' => $report->getPhoneNumber()
+        ]);
+    }
 }

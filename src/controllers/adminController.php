@@ -17,19 +17,9 @@ class AdminController {
 
     public function handleRequest(string $method, string $path): void {
 
+        //Lost report endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/lost-reports') {
             echo json_encode($this->lostReportService->getAllLostReports());
-            return;
-        }
-
-        if ($method === 'GET' && $path === '/api/admin/claims') {
-            echo json_encode($this->claimService->getAllClaims());
-            return;
-        }
-
-        if ($method === 'GET' && str_starts_with($path, '/api/admin/items/')) {
-            $id = (int) str_replace('/api/admin/items/', '', $path);
-            echo json_encode($this->itemService->getItemById($id));
             return;
         }
 
@@ -39,25 +29,47 @@ class AdminController {
             return;
         }
 
+
+        //Claim endpoints-------------------------------------
+        if ($method === 'GET' && $path === '/api/admin/claims') {
+            echo json_encode($this->claimService->getAllClaims());
+            return;
+        }
+
         if ($method === 'GET' && str_starts_with($path, '/api/admin/claims/')) {
             $id = (int) str_replace('/api/admin/claims/', '', $path);
             echo json_encode($this->claimService->getClaimById($id));
             return;
         }
 
-        //Test endpoint to check if the API is working
-        if ($method === 'GET' && $path === '/api/admin/test') {
-            echo json_encode($this->itemService->test());
-            return;
-        }
 
-        //Endpoint to get all items from the database
+        //Item endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/items') {
             echo json_encode($this->itemService->getAllItems());
             return;
         }
 
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/items/')) {
+            $id = (int) str_replace('/api/admin/items/', '', $path);
+            echo json_encode($this->itemService->getItemById($id));
+            return;
+        }
 
+        if ($method === 'POST' && $path === '/api/admin/items/add') {
+            $result = $this->itemService->createItem(RequestUtils::getRequestBody());
+            echo json_encode($result);
+            return;
+        }
+
+        if ($method === 'PATCH' && str_starts_with($path, '/api/admin/items/update/')) {
+            $itemId = (int) str_replace('/api/admin/items/update/', '', $path);
+            $result = $this->itemService->updateItem($itemId, RequestUtils::getRequestBody());
+            echo json_encode($result);
+            return;
+        }
+
+
+        //Debugging endpoints-------------------------------------
         //Endpoints to get SMS gateway info (textbee integration)
         if ($method === 'GET' && $path === '/api/admin/sms/stats') {
             echo json_encode($this->smsService->getGatewayStats());
@@ -66,6 +78,13 @@ class AdminController {
 
         if ($method === 'GET' && $path === '/api/admin/sms/devices') {
             echo json_encode($this->smsService->getGatewayDevices());
+            return;
+        }
+
+
+        //Test endpoint to check if the API is working
+        if ($method === 'GET' && $path === '/api/admin/test') {
+            echo json_encode($this->itemService->test());
             return;
         }
 

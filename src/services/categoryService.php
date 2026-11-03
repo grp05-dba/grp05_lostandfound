@@ -12,11 +12,7 @@ class CategoryService {
     }
 
     public function getCategoryById(int $id): array {
-        $response = $this->categoryRepository->getById($id);
-        if ($response === false) {
-            http_response_code(404);
-            return ['error' => 'Category not found'];
-        }
-        return $response;
+        $success = $this->categoryRepository->getById($id);
+        return RequestUtils::handleFindFailure($success) ?? $success;
     }
 }
