@@ -5,7 +5,7 @@ class AdminController {
     private SMSService $smsService;
     private LostReportService $lostReportService;
     private ClaimService $claimService;
-    private PotentialMatchService $potentialMatchService;
+    private PhotoService $photoService;
     private PDO $connection;
 
     public function __construct(PDO $connection) {
@@ -14,7 +14,7 @@ class AdminController {
         $this->smsService = new SMSService();
         $this->lostReportService = new LostReportService($connection);
         $this->claimService = new ClaimService($connection);
-        $this->potentialMatchService = new PotentialMatchService($connection);
+        $this->photoService = new PhotoService($connection);
     }
 
     public function handleRequest(string $method, string $path): void {
@@ -60,6 +60,29 @@ class AdminController {
             return;
         }
 
+
+        if (preg_match('#^/api/admin/items/(\\d+)/photos/(\\d+)$#', $path, $photoMatches) && $method === 'GET') {
+            $photo = $this->photoService->getPhoto('item', (int) $photoMatches[1], (int) $photoMatches[2]);
+            if (!$photo) { http_response_code(404); echo json_encode(['message' => 'Photo not found.']); return; }
+            header('Content-Type: ' . $photo['mime_type']);
+            header('Content-Disposition: inline; filename="' . basename($photo['file_name']) . '"');
+            $data = $photo['photo_data'];
+            echo is_resource($data) ? stream_get_contents($data) : $data;
+            return;
+        }
+
+        //Item photo endpoints-------------------------------------
+        if (preg_match('#^/api/admin/items/(\\d+)/photos$#', $path, $matches)) {
+            $itemId = (int) $matches[1];
+            if ($method === 'POST') {
+                echo json_encode($this->photoService->addUploadedPhotos('item', $itemId, $_FILES['photos'] ?? []));
+                return;
+            }
+            if ($method === 'GET') {
+                echo json_encode($this->photoService->getPhotos('item', $itemId));
+                return;
+            }
+        }
 
         //Item endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/items') {
