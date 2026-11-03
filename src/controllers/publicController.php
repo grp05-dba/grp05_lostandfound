@@ -17,6 +17,16 @@ class PublicController {
 
     public function handleRequest(string $method, string $path): void{
 
+        if (preg_match('#^/api/public/lost-reports/(\\d+)/photos/(\\d+)$#', $path, $photoMatches) && $method === 'GET') {
+            $photo = $this->photoService->getPhoto('lost_report', (int) $photoMatches[2]);
+            if (!$photo) { http_response_code(404); echo json_encode(['message' => 'Photo not found.']); return; }
+            header('Content-Type: ' . $photo['mime_type']);
+            header('Content-Disposition: inline; filename="' . basename($photo['file_name']) . '"');
+            $data = $photo['photo_data'];
+            echo is_resource($data) ? stream_get_contents($data) : $data;
+            return;
+        }
+
         if (preg_match('#^/api/public/lost-reports/(\\d+)/photos$#', $path, $matches)) {
             $reportId = (int) $matches[1];
             if ($method === 'POST') {
@@ -27,6 +37,16 @@ class PublicController {
                 echo json_encode($this->photoService->getPhotos('lost_report', $reportId));
                 return;
             }
+        }
+
+        if (preg_match('#^/api/public/claims/(\\d+)/photos/(\\d+)$#', $path, $photoMatches) && $method === 'GET') {
+            $photo = $this->photoService->getPhoto('claim', (int) $photoMatches[2]);
+            if (!$photo) { http_response_code(404); echo json_encode(['message' => 'Photo not found.']); return; }
+            header('Content-Type: ' . $photo['mime_type']);
+            header('Content-Disposition: inline; filename="' . basename($photo['file_name']) . '"');
+            $data = $photo['photo_data'];
+            echo is_resource($data) ? stream_get_contents($data) : $data;
+            return;
         }
 
         if (preg_match('#^/api/public/claims/(\\d+)/photos$#', $path, $matches)) {
