@@ -46,12 +46,12 @@ class PhotoRepository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getData(string $type, int $photoId): array|false {
+    public function getData(string $type, int $ownerId, int $photoId): array|false {
         $target = $this->target($type);
         $stmt = $this->connection->prepare(
-            'SELECT file_name, mime_type, photo_data FROM ' . $target['table'] . ' WHERE photo_id = :photoId'
+            'SELECT file_name, mime_type, photo_data FROM ' . $target['table'] . ' WHERE ' . $target['owner'] . ' = :ownerId AND photo_id = :photoId'
         );
-        $stmt->execute(['photoId' => $photoId]);
+        $stmt->execute(['ownerId' => $ownerId, 'photoId' => $photoId]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }
