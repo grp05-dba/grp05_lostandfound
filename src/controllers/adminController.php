@@ -44,8 +44,9 @@ class AdminController {
             return;
         }
 
-        if ($method === 'PATCH' && preg_match('#^/api/admin/claims/(\\d+)$#', $path, $matches)) {
-            $result = $this->claimService->updateClaim((int) $matches[1], RequestUtils::getRequestBody());
+        if ($method === 'PATCH' && str_starts_with($path, '/api/admin/claims/update/')) {
+            $claimId = (int) str_replace('/api/admin/claims/update/', '', $path);
+            $result = $this->claimService->updateClaim($claimId, RequestUtils::getRequestBody());
             echo json_encode($result);
             return;
         }

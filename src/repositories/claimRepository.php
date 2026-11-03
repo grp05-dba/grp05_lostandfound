@@ -44,20 +44,16 @@ class ClaimRepository {
 
     public function update(int $claimId, array $data): bool {
         $updates = [];
-        $parameters = ['claimId' => $claimId];
 
         foreach ($data as $field => $value) {
-            $updates[] = $field . ' = :' . $field;
-            $parameters[$field] = $value;
+            $updates[] = "$field = :$field";
         }
 
-        if ($updates === []) {
-            return false;
-        }
+        if(empty($updates)) return false;
 
         $sql = 'UPDATE claims SET ' . implode(', ', $updates) . ' WHERE claim_id = :claimId';
         $stmt = $this->connection->prepare($sql);
 
-        return $stmt->execute($parameters);
+        return $stmt->execute([...$data, 'claimId' => $claimId]);
     }
 }

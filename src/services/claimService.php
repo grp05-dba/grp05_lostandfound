@@ -25,39 +25,19 @@ class ClaimService {
             return ['message' => 'Claim not found.'];
         }
 
-        if ($data === []) {
-            http_response_code(400);
-            return ['message' => 'Request body must contain at least one field.'];
-        }
-
         $validationError = RequestUtils::validatePatchFields($data, Claim::class);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
         if ($validationError) return $validationError;
 
-        if (array_key_exists('claim_code', $data)) {
-            if (!is_string($data['claim_code'])) {
-                http_response_code(400);
-                return ['message' => 'Invalid claim_code provided.'];
-            }
+        if (isset($data['item_id'])) {
+            $item = $this->itemRepository->getById((int) $data['item_id']);
 
-            if (
-                $data['claim_code'] !== $claim['claim_code'] &&
-                $this->claimRepository->codeExists($data['claim_code'])
-            ) {
-                http_response_code(409);
-                return ['message' => 'The claim_code is already in use.'];
-            }
-        }
-
-        if (array_key_exists('item_id', $data)) {
-            $itemId = filter_var($data['item_id'], FILTER_VALIDATE_INT);
-            if ($itemId === false || $itemId < 1 || !$this->itemRepository->getById($itemId)) {
+            if (!$item) {
                 http_response_code(400);
                 return ['message' => 'Invalid item_id provided.'];
             }
-            $data['item_id'] = $itemId;
         }
 
         if (array_key_exists('status', $data)) {
