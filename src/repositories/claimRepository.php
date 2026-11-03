@@ -41,4 +41,37 @@ class ClaimRepository {
         ]);
         return $success && $stmt->rowCount() === 1;
     }
+
+    public function update(int $claimId, array $data): bool {
+        $allowedFields = [
+            'claim_code',
+            'item_id',
+            'full_name',
+            'student_number',
+            'email',
+            'phone_number',
+            'status'
+        ];
+
+        $updates = [];
+        $parameters = ['claimId' => $claimId];
+
+        foreach ($data as $field => $value) {
+            if (!in_array($field, $allowedFields, true)) {
+                return false;
+            }
+
+            $updates[] = $field . ' = :' . $field;
+            $parameters[$field] = $value;
+        }
+
+        if ($updates === []) {
+            return false;
+        }
+
+        $sql = 'UPDATE claims SET ' . implode(', ', $updates) . ' WHERE claim_id = :claimId';
+        $stmt = $this->connection->prepare($sql);
+
+        return $stmt->execute($parameters);
+    }
 }
