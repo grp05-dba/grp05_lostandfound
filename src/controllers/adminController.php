@@ -25,8 +25,9 @@ class AdminController {
             return;
         }
 
-        if ($method === 'GET' && preg_match('#^/api/admin/lost-reports/(\\d+)$#', $path, $matches)) {
-            echo json_encode($this->lostReportService->getLostReportById((int) $matches[1]));
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/')) {
+            $id = (int) str_replace('/api/admin/lost-reports/', '', $path);
+            echo json_encode($this->lostReportService->getLostReportById($id));
             return;
         }
 
