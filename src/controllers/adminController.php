@@ -38,8 +38,9 @@ class AdminController {
             return;
         }
 
-        if ($method === 'GET' && preg_match('#^/api/admin/claims/(\\d+)$#', $path, $matches)) {
-            echo json_encode($this->claimService->getClaimById((int) $matches[1]));
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/claims/')) {
+            $id = (int) str_replace('/api/admin/claims/', '', $path);
+            echo json_encode($this->claimService->getClaimById($id));
             return;
         }
 

@@ -37,12 +37,15 @@ class ClaimService {
         if ($validationError) return $validationError;
 
         if (array_key_exists('claim_code', $data)) {
-            if (!is_string($data['claim_code']) || trim($data['claim_code']) === '' || mb_strlen($data['claim_code']) > 50) {
+            if (!is_string($data['claim_code'])) {
                 http_response_code(400);
                 return ['message' => 'Invalid claim_code provided.'];
             }
 
-            if ($this->claimRepository->codeExistsForAnotherClaim($data['claim_code'], $claimId)) {
+            if (
+                $data['claim_code'] !== $claim['claim_code'] &&
+                $this->claimRepository->codeExists($data['claim_code'])
+            ) {
                 http_response_code(409);
                 return ['message' => 'The claim_code is already in use.'];
             }
@@ -55,13 +58,6 @@ class ClaimService {
                 return ['message' => 'Invalid item_id provided.'];
             }
             $data['item_id'] = $itemId;
-        }
-
-        if (array_key_exists('student_number', $data)) {
-            if (!is_string($data['student_number']) || trim($data['student_number']) === '' || mb_strlen($data['student_number']) > 50) {
-                http_response_code(400);
-                return ['message' => 'Invalid student_number provided.'];
-            }
         }
 
         if (array_key_exists('status', $data)) {

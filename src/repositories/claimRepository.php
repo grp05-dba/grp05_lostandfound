@@ -25,14 +25,6 @@ class ClaimRepository {
         return $stmt->fetchColumn() !== false;
     }
 
-    public function codeExistsForAnotherClaim(string $code, int $claimId): bool {
-        $stmt = $this->connection->prepare(
-            'SELECT 1 FROM claims WHERE claim_code = :code AND claim_id <> :claimId'
-        );
-        $stmt->execute(['code' => $code, 'claimId' => $claimId]);
-        return $stmt->fetchColumn() !== false;
-    }
-
     public function create(Claim $claim): bool {
         $stmt = $this->connection->prepare(
             'INSERT INTO claims (claim_code, item_id, full_name, student_number, email, phone_number) 
@@ -51,24 +43,10 @@ class ClaimRepository {
     }
 
     public function update(int $claimId, array $data): bool {
-        $allowedFields = [
-            'claim_code',
-            'item_id',
-            'full_name',
-            'student_number',
-            'email',
-            'phone_number',
-            'status'
-        ];
-
         $updates = [];
         $parameters = ['claimId' => $claimId];
 
         foreach ($data as $field => $value) {
-            if (!in_array($field, $allowedFields, true)) {
-                return false;
-            }
-
             $updates[] = $field . ' = :' . $field;
             $parameters[$field] = $value;
         }
