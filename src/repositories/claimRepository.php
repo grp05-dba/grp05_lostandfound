@@ -41,4 +41,19 @@ class ClaimRepository {
         ]);
         return $success && $stmt->rowCount() === 1;
     }
+
+    public function update(int $claimId, array $data): bool {
+        $updates = [];
+
+        foreach ($data as $field => $value) {
+            $updates[] = "$field = :$field";
+        }
+
+        if(empty($updates)) return false;
+
+        $sql = 'UPDATE claims SET ' . implode(', ', $updates) . ' WHERE claim_id = :claimId';
+        $stmt = $this->connection->prepare($sql);
+
+        return $stmt->execute([...$data, 'claimId' => $claimId]);
+    }
 }

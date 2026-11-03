@@ -51,6 +51,13 @@ class AdminController {
             return;
         }
 
+        if ($method === 'PATCH' && str_starts_with($path, '/api/admin/claims/update/')) {
+            $claimId = (int) str_replace('/api/admin/claims/update/', '', $path);
+            $result = $this->claimService->updateClaim($claimId, RequestUtils::getRequestBody());
+            echo json_encode($result);
+            return;
+        }
+
 
         //Item endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/items') {

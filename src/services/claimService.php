@@ -18,6 +18,40 @@ class ClaimService {
         return RequestUtils::handleFindFailure($success) ?? $success;
     }
 
+    public function updateClaim(int $claimId, array $data): array {
+        $claim = $this->claimRepository->getById($claimId);
+        if (!$claim) {
+            http_response_code(404);
+            return ['message' => 'Claim not found.'];
+        }
+
+        $validationError = RequestUtils::validatePatchFields($data, Claim::class);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) return $validationError;
+
+        if (isset($data['item_id'])) {
+            $item = $this->itemRepository->getById((int) $data['item_id']);
+
+            if (!$item) {
+                http_response_code(400);
+                return ['message' => 'Invalid item_id provided.'];
+            }
+        }
+
+        if (array_key_exists('status', $data)) {
+            $allowedStatuses = ['pending', 'approved', 'rejected'];
+            if (!is_string($data['status']) || !in_array($data['status'], $allowedStatuses, true)) {
+                http_response_code(400);
+                return ['message' => 'Invalid status provided. Allowed values: pending, approved, rejected.'];
+            }
+        }
+
+        $success = $this->claimRepository->update($claimId, $data);
+        return RequestUtils::handleUpdateFailure($success);
+    }
+
     public function createClaim(array $data): array {
         $validationError = RequestUtils::validateRequiredFields($data, Claim::class, ['phone_number', 'claim_code']);
         if ($validationError) return $validationError;
