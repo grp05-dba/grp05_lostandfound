@@ -57,8 +57,8 @@ class PhotoService {
         return ['message' => 'Photos saved successfully.', 'saved' => $saved];
     }
 
-    public function getPhoto(string $type, int $photoId): array|false {
-        return $this->photoRepository->getData($type, $photoId);
+    public function getPhoto(string $type, int $ownerId, int $photoId): array|false {
+        return $this->photoRepository->getData($type, $ownerId, $photoId);
     }
 
     public function getPhotos(string $type, int $ownerId): array {
