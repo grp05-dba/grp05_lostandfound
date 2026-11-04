@@ -508,7 +508,7 @@
     $("#detail-dialog").showModal();
 
     if (!isClaim && r.report_code) {
-      const panel = $(".admin-matches", "#detail-content");
+      const panel = $(".admin-matches", $("#detail-content"));
       try {
         const matches = await request(ADMIN + "/lost-reports/matches/" + encodeURIComponent(r.report_code));
         panel.innerHTML = "<h3>Automatically identified potential matches</h3>" +
