@@ -53,12 +53,17 @@ The repository contains the following SQL scripts:
 
 - `sql/grp05_lostandfounddb_script.sql` — creates the database tables and schema.
 - `sql/grp05_lostandfounddb_test_data_script.sql` — inserts test data.
+- `sql/grp05_lostandfounddb_role_creation_sample_script.sql` — creates the application and public database roles and grants their privileges.
 
 Run `grp05_lostandfounddb_script.sql` against the `grp05_lostandfounddb` database first.
 
 After the schema has been created successfully, run `grp05_lostandfounddb_test_data_script.sql` against the same database.
 
 **Important:** Execute the schema script before the test-data script because the test data depends on the tables and relationships defined by the schema.
+
+### Step 4: Create the application database roles
+
+After creating the schema, run `grp05_lostandfounddb_role_creation_sample_script.sql` with a PostgreSQL administrator account. Replace both `enter_your_password_here` placeholders with local passwords before running it. Use the same credentials for `DB_USER` / `DB_PASSWORD` and `DB_PUBLIC_USER` / `DB_PUBLIC_PASSWORD` in `.env`, respectively. Do not commit the passwords.
 
 ## 4. Configure PHP PostgreSQL Support
 
