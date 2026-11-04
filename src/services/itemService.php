@@ -1,8 +1,7 @@
 <?php
 
-class ItemService { 
+class ItemService {
     private ItemRepository $itemRepository;
-
     private CategoryRepository $categoryRepository;
     private PotentialMatchService $potentialMatchService;
 
@@ -12,7 +11,7 @@ class ItemService {
         $this->potentialMatchService = new PotentialMatchService($connection);
     }
 
-    public function test(): array{
+    public function test(): array {
         return ['message' => 'its working! :D'];
     }
 
@@ -50,8 +49,8 @@ class ItemService {
             time_found: $data['time_found']
         );
 
-        $success = $this->itemRepository->create($item);
-        if (!$success) return RequestUtils::handleCreateFailure(false);
+        $itemId = $this->itemRepository->create($item);
+        if ($itemId === false) return RequestUtils::handleCreateFailure(false);
 
         try {
             $this->potentialMatchService->generatePotentialMatches();
@@ -59,9 +58,9 @@ class ItemService {
             error_log('Potential matching after item creation failed: ' . $e->getMessage());
         }
 
-        return RequestUtils::handleCreateFailure(true);
+        return array_merge(RequestUtils::handleCreateFailure(true), ['item_id' => $itemId]);
     }
-//hehe
+
     public function updateItem(int $itemId, array $data): array {
         $item = $this->itemRepository->getById($itemId);
         if (!$item) {
@@ -80,7 +79,6 @@ class ItemService {
 
         if (isset($data['category_id'])) {
             $category = $this->categoryRepository->getById((int) $data['category_id']);
-
             if (!$category) {
                 http_response_code(400);
                 return ['message' => 'Invalid category_id provided.'];
@@ -91,12 +89,11 @@ class ItemService {
             $allowedStatuses = ['unclaimed', 'claimed', 'archived'];
             if (!is_string($data['status']) || !in_array($data['status'], $allowedStatuses, true)) {
                 http_response_code(400);
-                return ['message' => 'Invalid status provided. Allowed values: pending, approved, rejected.'];
+                return ['message' => 'Invalid status provided. Allowed values: unclaimed, claimed, archived.'];
             }
         }
 
         $success = $this->itemRepository->update($itemId, $data);
-
         return RequestUtils::handleUpdateFailure($success);
     }
 }
