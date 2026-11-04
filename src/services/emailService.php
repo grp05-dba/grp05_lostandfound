@@ -84,7 +84,7 @@ class EmailService {
         $data = [
             "template_params" => [
                 "body" => "Hi $name,\n\n" .
-                    "Your claim has been approved! Please visit the office to claim your item. Use your claim reference code, $claimCode, to view your claim receipt in PUP-SPOT, then take a screenshot and present it to the office for verification.\n\n",
+                    "Your claim has been approved! Please visit the office to claim your item. Use your claim reference code, $claimCode, to view your claim submission in PUP-SPOT, then take a screenshot and present it to the office for verification.\n\n",
                 "email" => $email
             ]
         ];
