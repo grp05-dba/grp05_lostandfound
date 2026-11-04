@@ -435,7 +435,9 @@
                       esc(item.description || "") +
                       '</p><button type="button" class="button button-primary" data-match-claim="' +
                       esc(item.item_id) +
-                      '">Request claim</button></div></article>'
+                      '">Request claim</button><button type="button" class="button button-quiet match-delete-button" data-delete-match="' +
+                      esc(item.match_id) +
+                      '">Remove match</button></div></article>'
                     );
                   })
                   .join("") +
@@ -499,6 +501,30 @@
         cancel.disabled = false;
         toast(error.message);
       }
+    }
+    const removeMatch = e.target.closest("[data-delete-match]");
+    if (removeMatch) {
+      if (!window.confirm("Remove this potential match from your lost report?")) return;
+      removeMatch.disabled = true;
+      try {
+        await request(
+          API + "/lost-reports/matches/" +
+            encodeURIComponent($('input[name="code"]', $("#track-form")).value.trim()) +
+            "/" + encodeURIComponent(removeMatch.dataset.deleteMatch),
+          { method: "DELETE" },
+        );
+        const card = removeMatch.closest(".match-card");
+        const grid = card?.parentElement;
+        card?.remove();
+        if (grid && !grid.querySelector(".match-card")) {
+          grid.outerHTML = "<p>No potential matches remain for this report.</p>";
+        }
+        toast("Potential match removed");
+      } catch (error) {
+        removeMatch.disabled = false;
+        toast(error.message);
+      }
+      return;
     }
     const claim = e.target.closest("[data-match-claim]");
     if (claim) {
