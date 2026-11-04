@@ -2,19 +2,26 @@
 
 class PublicController {
     private CategoryService $categoryService;
+    private ItemService $itemService;
+    private SearchService $searchService;
     private LostReportService $lostReportService;
     private ClaimService $claimService;
+    private PotentialMatchService $potentialMatchService;
     private PDO $connection;
 
     public function __construct(PDO $connection) {
         $this->connection = $connection;
         $this->categoryService = new CategoryService($connection);
+        $this->itemService = new ItemService($connection);
+        $this->searchService = new SearchService($connection);
         $this->lostReportService = new LostReportService($connection);
         $this->claimService = new ClaimService($connection);
+        $this->potentialMatchService = new PotentialMatchService($connection);
     }
 
     public function handleRequest(string $method, string $path): void{
         // Ignore query parameters when matching routes.
+        $query = parse_url($path, PHP_URL_QUERY) ?? '';
         $path = parse_url($path, PHP_URL_PATH) ?: $path;   
 
 
@@ -26,6 +33,19 @@ class PublicController {
 
         if ($method === 'POST' && $path === '/api/public/lost-reports/view') {
             echo json_encode($this->lostReportService->getLostReportByCode(RequestUtils::getRequestBody()['report_code']));
+            return;
+        }
+
+        if ($method === 'POST' && $path === '/api/public/lost-reports/cancel') {
+            echo json_encode($this->lostReportService->cancelLostReportByCode(RequestUtils::getRequestBody()['report_code']));
+            return;
+        }
+
+        
+        //Potential match endpoints-------------------------------------
+        if ($method === 'GET' && str_starts_with($path, '/api/public/lost-reports/matches/')) {
+            $reportCode = str_replace('/api/public/lost-reports/matches/', '', $path);
+            echo json_encode($this->potentialMatchService->getPotentialMatchesByReportCode($reportCode));
             return;
         }
 
@@ -43,6 +63,18 @@ class PublicController {
 
 
         // Miscellaneous public endpoints-------------------------------------
+        if ($method === 'GET' && $path === '/api/public/items') {
+            echo json_encode($this->itemService->getAllUnclaimedItems());
+            return;
+        }
+
+        if ($method === 'GET' && $path === '/api/public/items/search') {
+            $filters = [];
+            parse_str($query, $filters);
+            echo json_encode($this->searchService->searchItems($filters));
+            return;
+        }
+
         if ($method === 'GET' && $path === '/api/public/categories') {
             echo json_encode($this->categoryService->getAllCategories());
             return;

@@ -24,6 +24,17 @@ class PotentialMatchService {
         return RequestUtils::handleFindFailure($success) ?? $success;
     }
 
+    public function getPotentialMatchesByReportCode(string $reportCode): array {
+        $report = $this->lostReportRepository->getByCode($reportCode);
+        $failure = RequestUtils::handleFindFailure($report);
+
+        if ($failure) {
+            return $failure;
+        }
+
+        return $this->potentialMatchRepository->getByReportCode($reportCode);
+    }
+
     public function deleteByReportId(int $reportId): void {
         $this->potentialMatchRepository->deleteByReportId($reportId);
     }
@@ -88,10 +99,10 @@ class PotentialMatchService {
         $contactPreference = $lostReport['contact_preference'] ?? null;
 
         if ($contactPreference === 'sms' && !empty($lostReport['phone_number'])) {
-            $result = $this->smsService->sendSMS($lostReport, $item);
+            $result = $this->smsService->sendSMSPotentialMatchNotification($lostReport, $item);
             error_log('TextBee SMS response: ' . json_encode($result));
         } elseif ($contactPreference === 'email' && !empty($lostReport['email'])) {
-            $result = $this->emailService->sendEmail($lostReport, $item);
+            $result = $this->emailService->sendEmailPotentialMatchNotification($lostReport, $item);
             error_log('EmailJS response: ' . json_encode($result));
         }
     }

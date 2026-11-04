@@ -5,11 +5,15 @@ class LostReportService {
     private CategoryRepository $categoryRepository;
 
     private PotentialMatchService $potentialMatchService;
+    private SMSService $smsService;
+    private EmailService $emailService;
 
     public function __construct(PDO $connection) {
         $this->lostReportRepository = new LostReportRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
         $this->potentialMatchService = new PotentialMatchService($connection);
+        $this->smsService = new SMSService();
+        $this->emailService = new EmailService();
     }
 
     public function getAllLostReports(): array {
@@ -68,6 +72,26 @@ class LostReportService {
             $updatedReport = $this->lostReportRepository->getById($reportId);
 
             if ($updatedReport) {
+                if (
+                    $report['status'] !== 'cancelled' &&
+                    $updatedReport['status'] === 'cancelled' &&
+                    $updatedReport['contact_preference'] === 'sms' &&
+                    !empty($updatedReport['phone_number'])
+                ) {
+                    $smsResult = $this->smsService->sendSMSLostReportCancellation($updatedReport);
+                    error_log('TextBee lost-report cancellation response: ' . json_encode($smsResult));
+                }
+
+                if (
+                    $report['status'] !== 'cancelled' &&
+                    $updatedReport['status'] === 'cancelled' &&
+                    $updatedReport['contact_preference'] === 'email' &&
+                    !empty($updatedReport['email'])
+                ) {
+                    $emailResult = $this->emailService->sendEmailLostReportCancellation($updatedReport);
+                    error_log('EmailJS lost-report cancellation response: ' . json_encode($emailResult));
+                }
+
                 if ($updatedReport['status'] !== 'active') {
                     $this->potentialMatchService->deleteByReportId($reportId);
                     $matchesRefreshed = 2;
@@ -126,12 +150,44 @@ class LostReportService {
         }
 
         $matchesSaved = $this->potentialMatchService->findPotentialMatches($createdReport);
+
+        if (
+            $createdReport['contact_preference'] === 'sms' &&
+            !empty($createdReport['phone_number'])
+        ) {
+            $smsResult = $this->smsService->sendSMSLostReportCreation($createdReport);
+            error_log('TextBee lost-report creation response: ' . json_encode($smsResult));
+        } elseif (
+            $createdReport['contact_preference'] === 'email' &&
+            !empty($createdReport['email'])
+        ) {
+            $emailResult = $this->emailService->sendEmailLostReportCreation($createdReport);
+            error_log('EmailJS lost-report creation response: ' . json_encode($emailResult));
+        }
+
         return RequestUtils::handleCreateFailure(true, $matchesSaved);
     }
     
     public function getLostReportByCode(string $code): array {
         $success = $this->lostReportRepository->getByCode($code);
+
+        if ($success && $success['status'] !== 'active') {
+            http_response_code(404);
+            return ['message' => 'Active lost report not found.'];
+        }
+
         return RequestUtils::handleFindFailure($success) ?? $success;
+    }
+
+    public function cancelLostReportByCode(string $code): array {
+        $report = $this->lostReportRepository->getByCode($code);
+
+        if (!$report || $report['status'] !== 'active') {
+            http_response_code(404);
+            return ['message' => 'Active lost report not found.'];
+        }
+
+        return $this->updateLostReport((int) $report['report_id'], ['status' => 'cancelled']);
     }
     
 

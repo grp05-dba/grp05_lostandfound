@@ -10,6 +10,7 @@ require_once __DIR__ . '/../src/controllers/adminController.php';
 require_once __DIR__ . '/../src/controllers/publicController.php';
 
 require_once __DIR__ . '/../src/services/itemService.php';
+require_once __DIR__ . '/../src/services/searchService.php';
 require_once __DIR__ . '/../src/services/categoryService.php';
 require_once __DIR__ . '/../src/services/smsService.php';
 require_once __DIR__ . '/../src/services/emailService.php';

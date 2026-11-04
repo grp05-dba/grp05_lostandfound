@@ -18,6 +18,23 @@ class PotentialMatchRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getByReportCode(string $reportCode): array {
+        $stmt = $this->connection->prepare(
+            "SELECT potential_matches.match_id, potential_matches.similarity_score, potential_matches.created_at,
+                items.item_id, items.title, items.description, items.location_found, items.date_found, items.time_found
+            FROM potential_matches
+            INNER JOIN lost_reports ON potential_matches.report_id = lost_reports.report_id
+            INNER JOIN items ON potential_matches.item_id = items.item_id
+            WHERE lost_reports.report_code = :reportCode
+                AND lost_reports.status = 'active'
+                AND items.status = 'unclaimed'
+            ORDER BY potential_matches.similarity_score DESC, potential_matches.created_at DESC"
+        );
+        $stmt->execute(['reportCode' => $reportCode]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function create(int $reportId, int $itemId, float $similarityScore): bool {
         $stmt = $this->connection->prepare(
             'INSERT INTO potential_matches (report_id, item_id, similarity_score)

@@ -49,10 +49,3 @@ VALUES (
 INSERT INTO potential_matches (report_id, item_id)
 VALUES (1,1);
 
-
--- New columns were added to the potential_matches table, so we need to update the existing record to include values for those columns.
-ALTER TABLE potential_matches
-ADD COLUMN similarity_score NUMERIC(5, 2) NOT NULL DEFAULT 0
-    CHECK (similarity_score >= 0 AND similarity_score <= 100),
-ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-

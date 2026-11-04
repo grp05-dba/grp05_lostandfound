@@ -3,10 +3,14 @@
 class ClaimService {
     private ClaimRepository $claimRepository;
     private ItemRepository $itemRepository;
+    private SMSService $smsService;
+    private EmailService $emailService;
 
     public function __construct(PDO $connection) {
         $this->claimRepository = new ClaimRepository($connection);
         $this->itemRepository = new ItemRepository($connection);
+        $this->smsService = new SMSService();
+        $this->emailService = new EmailService();
     }
 
     public function getAllClaims(): array {
@@ -54,6 +58,39 @@ class ClaimService {
         }
 
         $success = $this->claimRepository->update($claimId, $data);
+
+        if ($success && array_key_exists('status', $data) && $data['status'] !== $claim['status']) {
+            $updatedClaim = $this->claimRepository->getById($claimId);
+
+            if (
+                $updatedClaim &&
+                $updatedClaim['contact_preference'] === 'sms' &&
+                !empty($updatedClaim['phone_number'])
+            ) {
+                if ($updatedClaim['status'] === 'approved') {
+                    $smsResult = $this->smsService->sendSMSClaimApproval($updatedClaim);
+                    error_log('TextBee claim approval response: ' . json_encode($smsResult));
+                } elseif ($updatedClaim['status'] === 'rejected') {
+                    $smsResult = $this->smsService->sendSMSClaimRejection($updatedClaim);
+                    error_log('TextBee claim rejection response: ' . json_encode($smsResult));
+                }
+            }
+
+            if (
+                $updatedClaim &&
+                $updatedClaim['contact_preference'] === 'email' &&
+                !empty($updatedClaim['email'])
+            ) {
+                if ($updatedClaim['status'] === 'approved') {
+                    $emailResult = $this->emailService->sendEmailClaimApproval($updatedClaim);
+                    error_log('EmailJS claim approval response: ' . json_encode($emailResult));
+                } elseif ($updatedClaim['status'] === 'rejected') {
+                    $emailResult = $this->emailService->sendEmailClaimRejection($updatedClaim);
+                    error_log('EmailJS claim rejection response: ' . json_encode($emailResult));
+                }
+            }
+        }
+
         return RequestUtils::handleUpdateFailure($success);
     }
 
@@ -85,7 +122,29 @@ class ClaimService {
             contact_preference: $data['contact_preference'] ?? 'email'
         );
 
-        return RequestUtils::handleCreateFailure($this->claimRepository->create($claim));
+        $success = $this->claimRepository->create($claim);
+
+        if (!$success) {
+            return RequestUtils::handleCreateFailure(false);
+        }
+
+        if ($claim->getContactPreference() === 'sms' && !empty($claim->getPhoneNumber())) {
+            $createdClaim = $this->claimRepository->getByCode($claim->getClaimCode());
+
+            if ($createdClaim) {
+                $smsResult = $this->smsService->sendSMSClaimCreation($createdClaim);
+                error_log('TextBee claim creation response: ' . json_encode($smsResult));
+            }
+        } elseif ($claim->getContactPreference() === 'email' && !empty($claim->getEmail())) {
+            $createdClaim = $this->claimRepository->getByCode($claim->getClaimCode());
+
+            if ($createdClaim) {
+                $emailResult = $this->emailService->sendEmailClaimCreation($createdClaim);
+                error_log('EmailJS claim creation response: ' . json_encode($emailResult));
+            }
+        }
+
+        return RequestUtils::handleCreateFailure(true);
     }
 
     public function getClaimByCode(string $code): array {

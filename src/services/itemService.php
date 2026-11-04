@@ -20,6 +20,10 @@ class ItemService {
         return $this->itemRepository->getAll();
     }
 
+    public function getAllUnclaimedItems(): array {
+        return $this->itemRepository->getAllUnclaimedItems();
+    }
+
     public function getItemById(int $id): array {
         $success = $this->itemRepository->getById($id);
         return RequestUtils::handleFindFailure($success) ?? $success;
