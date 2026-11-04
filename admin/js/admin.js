@@ -449,8 +449,7 @@
       const imgs = Array.isArray(r.images) ? r.images : [];
       const gallery = imgs.length
         ? '<div class="item-image-manager">' + imgs.map((img) => {
-            const url = img.url || "";
-            const src = url.startsWith("http") ? url : PUBLIC.replace("/api/public", "") + url;
+            const src = ADMIN + "/items/images/" + encodeURIComponent(img.image_id);
             return '<figure><button type="button" class="image-preview-trigger" data-view-image="' + safe(src) + '" aria-label="View image larger"><img src="' + safe(src) + '" alt="Found item photo"></button><button type="button" class="button button-light" data-delete-item-image="' + safe(img.image_id) + '" data-item-id="' + safe(r.item_id) + '">Delete image</button></figure>';
           }).join("") + "</div>"
         : '<p class="image-empty">No images uploaded for this item.</p>';
