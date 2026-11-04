@@ -19,6 +19,12 @@ class LostReportRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getByCode(string $code): array|false {
+        $stmt = $this->connection->prepare('SELECT * FROM lost_reports WHERE report_code = :code');
+        $stmt->execute(['code' => $code]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function codeExists(string $code): bool {
         $stmt = $this->connection->prepare('SELECT 1 FROM lost_reports WHERE report_code = :code');
         $stmt->execute(['code' => $code]);
@@ -40,15 +46,17 @@ class LostReportRepository {
         return $stmt->execute([...$data, 'reportId' => $reportId]);
     }
 
-    public function create(LostReport $report): bool {
-        $stmt = $this->connection->prepare('INSERT INTO lost_reports (
-            report_code, category_id, title, description, location_lost, date_lost,
-            time_lost, full_name, student_number, email, phone_number
-        ) VALUES (
-            :reportCode, :categoryId, :title, :description, :locationLost, :dateLost,
-            :timeLost, :fullName, :studentNumber, :email, :phoneNumber
-        )');
-        return $stmt->execute([
+    public function create(LostReport $report): array|false {
+        $stmt = $this->connection->prepare(
+            'INSERT INTO lost_reports (
+                report_code, category_id, title, description, location_lost, date_lost,
+                time_lost, full_name, student_number, email, phone_number
+            ) VALUES (
+                :reportCode, :categoryId, :title, :description, :locationLost, :dateLost,
+                :timeLost, :fullName, :studentNumber, :email, :phoneNumber
+            ) RETURNING *');
+            
+        $stmt->execute([
             'reportCode' => $report->getReportCode(),
             'categoryId' => $report->getCategoryId(),
             'title' => $report->getTitle(),
@@ -61,5 +69,7 @@ class LostReportRepository {
             'email' => $report->getEmail(),
             'phoneNumber' => $report->getPhoneNumber()
         ]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

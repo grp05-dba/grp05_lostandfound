@@ -77,10 +77,19 @@ class ClaimService {
         return RequestUtils::handleCreateFailure($this->claimRepository->create($claim));
     }
 
+    public function getClaimByCode(string $code): array {
+        $success = $this->claimRepository->getByCode($code);
+        return RequestUtils::handleFindFailure($success) ?? $success;
+    }
+
+    
+    // Private helper methods --------------------------------
     private function generateClaimCode(): string {
         do {
             $code = 'CLM-' . date('Y') . '-' . random_int(100000, 999999);
         } while ($this->claimRepository->codeExists($code));
         return $code;
     }
+
+    
 }

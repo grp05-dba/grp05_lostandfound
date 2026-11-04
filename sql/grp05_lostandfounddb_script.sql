@@ -51,5 +51,7 @@ CREATE TABLE claims (
 CREATE TABLE potential_matches (
     match_id SERIAL PRIMARY KEY,
     report_id INT REFERENCES lost_reports(report_id) ON DELETE CASCADE,
-    item_id INT REFERENCES items(item_id) ON DELETE CASCADE
+    item_id INT REFERENCES items(item_id) ON DELETE CASCADE,
+    similarity_score NUMERIC(5, 2) NOT NULL DEFAULT 0 CHECK (similarity_score >= 0 AND similarity_score <= 100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

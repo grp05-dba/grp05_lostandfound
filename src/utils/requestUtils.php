@@ -23,12 +23,19 @@ class RequestUtils {
         return ['message' => 'Resource created successfully.'];
     }
 
-    public static function handleUpdateFailure(bool $success): array {
+    public static function handleUpdateFailure(bool $success, ?bool $matchesRefreshed = null): array {
         if (!$success) {
             http_response_code(500);
             return ['message' => 'Failed to update resource.'];
         }
-        return ['message' => 'Resource updated successfully.'];
+
+        $response = ['message' => 'Resource updated successfully.'];
+
+        if ($matchesRefreshed !== null) {
+            $response['potential_matches_refreshed'] = $matchesRefreshed;
+        }
+
+        return $response;
     }
 
     public static function validatePatchFields(array $data, string $entityClass): ?array {

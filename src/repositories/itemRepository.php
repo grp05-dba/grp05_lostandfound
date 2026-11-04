@@ -56,10 +56,20 @@ class ItemRepository {
 
         if(empty($updates)) return false; 
 
-        $sql = 'UPDATE items SET ' . implode(', ', $updates) . ' WHERE item_id = :itemId';
-
-        $stmt = $this->connection->prepare($sql);
+        $stmt = $this->connection->prepare('UPDATE items SET ' . implode(', ', $updates) . ' WHERE item_id = :itemId');
 
         return $stmt->execute([...$data, 'itemId' => $itemId]);
+    }
+
+    public function getEligibleItems(string $dateLost): array {
+        $stmt = $this->connection->prepare('SELECT * FROM items WHERE status = :status AND date_found >= :dateLost');
+        $stmt->execute(['status' => 'unclaimed', 'dateLost' => $dateLost]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAllUnclaimedItems(): array {
+        $stmt = $this->connection->prepare('SELECT * FROM items WHERE status = :status');
+        $stmt->execute(['status' => 'unclaimed']);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

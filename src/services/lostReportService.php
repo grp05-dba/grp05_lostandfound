@@ -4,9 +4,12 @@ class LostReportService {
     private LostReportRepository $lostReportRepository;
     private CategoryRepository $categoryRepository;
 
+    private PotentialMatchService $potentialMatchService;
+
     public function __construct(PDO $connection) {
         $this->lostReportRepository = new LostReportRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
+        $this->potentialMatchService = new PotentialMatchService($connection);
     }
 
     public function getAllLostReports(): array {
@@ -52,7 +55,17 @@ class LostReportService {
         }
 
         $success = $this->lostReportRepository->update($reportId, $data);
-        return RequestUtils::handleUpdateFailure($success);
+        $matchesRefreshed = false;
+
+        if ($success && $this->hasMatchingFieldsChanged($data, $report)) {
+            $updatedReport = $this->lostReportRepository->getById($reportId);
+            if ($updatedReport) {
+                $this->potentialMatchService->deleteByReportId($reportId);
+                $this->potentialMatchService->findPotentialMatches($updatedReport);
+                $matchesRefreshed = true;
+            }
+        }
+        return RequestUtils::handleUpdateFailure($success, $matchesRefreshed);
     }
 
     public function createLostReport(array $data): array {
@@ -84,13 +97,44 @@ class LostReportService {
             phone_number: ($data['phone_number'] ?? '') === '' ? null : $data['phone_number']
         );
 
-        return RequestUtils::handleCreateFailure($this->lostReportRepository->create($report));
-    }
+        $createdReport = $this->lostReportRepository->create($report);
 
+        if (!$createdReport) {
+            return RequestUtils::handleCreateFailure(false);
+        }
+
+        $this->potentialMatchService->findPotentialMatches($createdReport);
+        return RequestUtils::handleCreateFailure(true);
+    }
+    
+    public function getLostReportByCode(string $code): array {
+        $success = $this->lostReportRepository->getByCode($code);
+        return RequestUtils::handleFindFailure($success) ?? $success;
+    }
+    
+
+    // Private helper methods --------------------------------
     private function generateReportCode(): string {
         do {
             $code = 'LR-' . date('Y') . '-' . random_int(100000, 999999);
         } while ($this->lostReportRepository->codeExists($code));
         return $code;
+    }
+
+    private function hasMatchingFieldsChanged(array $data, array $existingReport): bool {
+        $matchingFields = [
+            'title',
+            'description',
+            'location_lost',
+            'date_lost',
+            'category_id'
+        ];
+
+        foreach ($matchingFields as $field) {
+            if (array_key_exists($field, $data) && $data[$field] != $existingReport[$field]) {
+                return true;
+            }
+        }
+        return false;
     }
 }
