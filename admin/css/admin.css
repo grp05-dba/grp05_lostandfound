@@ -1197,3 +1197,48 @@ tbody tr:last-child td {
     cursor: pointer;
 }
 .item-edit-form { margin: 8px 0 18px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+
+.tracked-claim-item, .admin-claimed-item {
+    margin: 14px 0;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+}
+.tracked-claim-item h4, .admin-claimed-item h3 {
+    margin: 0 0 10px;
+    color: var(--ink);
+}
+.tracked-claim-item-card, .admin-claimed-item-card {
+    display: grid;
+    grid-template-columns: minmax(100px, 145px) minmax(0, 1fr);
+    gap: 14px;
+    align-items: start;
+}
+.tracked-claim-item-photo, .admin-claimed-item-card .image-preview-trigger,
+.tracked-claim-item-empty, .admin-claimed-item-empty {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 110px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f0f1f4;
+    cursor: zoom-in;
+}
+.tracked-claim-item-photo img, .admin-claimed-item-card img {
+    display: block;
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+.tracked-claim-item-empty, .admin-claimed-item-empty { cursor: default; color: var(--muted); font-size: 11px; }
+.tracked-claim-item-card b, .admin-claimed-item-card b { color: var(--ink); }
+.tracked-claim-item-card p, .admin-claimed-item-card p { margin: 5px 0; color: var(--muted); font-size: 11px; }
+.tracked-claim-item-card dl { display: grid; grid-template-columns: 100px 1fr; gap: 5px 8px; margin: 9px 0 0; font-size: 10px; }
+.tracked-claim-item-card dt { color: var(--muted); }
+.tracked-claim-item-card dd { margin: 0; color: var(--ink); }
+@media(max-width:520px) {
+  .tracked-claim-item-card, .admin-claimed-item-card { grid-template-columns: 1fr; }
+}
