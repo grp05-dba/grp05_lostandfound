@@ -523,9 +523,6 @@
     }
   }
 
-  function isClaimStatus(statusValue) {
-    return ["pending", "approved", "rejected"].includes(statusValue);
-  }
   async function patch(endpoint, id, data) {
     await request(endpoint + "/" + id, {
       method: "PATCH",
