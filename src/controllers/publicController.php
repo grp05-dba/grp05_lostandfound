@@ -48,6 +48,20 @@ class PublicController {
 
         
         //Potential match endpoints-------------------------------------
+        if ($method === 'DELETE' && preg_match('#^/api/public/lost-reports/matches/([^/]+)/([0-9]+)$#', $path, $matchRoute)) {
+            $result = $this->potentialMatchService->deleteByReportCodeAndMatchId(
+                rawurldecode($matchRoute[1]),
+                (int) $matchRoute[2]
+            );
+
+            if (isset($result['message']) && $result['message'] === 'Potential match not found.') {
+                http_response_code(404);
+            }
+
+            echo json_encode($result);
+            return;
+        }
+
         if ($method === 'GET' && str_starts_with($path, '/api/public/lost-reports/matches/')) {
             $reportCode = str_replace('/api/public/lost-reports/matches/', '', $path);
             echo json_encode($this->potentialMatchService->getPotentialMatchesByReportCode($reportCode));
