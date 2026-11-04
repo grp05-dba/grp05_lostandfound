@@ -5,12 +5,14 @@ class PotentialMatchService {
     private ItemRepository $itemRepository;
     private LostReportRepository $lostReportRepository;
     private SMSService $smsService;
+    private EmailService $emailService;
 
     public function __construct(PDO $connection) {
         $this->potentialMatchRepository = new PotentialMatchRepository($connection);
         $this->itemRepository = new ItemRepository($connection);
         $this->lostReportRepository = new LostReportRepository($connection);
         $this->smsService = new SMSService();
+        $this->emailService = new EmailService();
     }
 
     public function getAllPotentialMatches(): array {
@@ -76,19 +78,22 @@ class PotentialMatchService {
                     round($score, 2)
                 )) {
                 $matchesSaved++;
-                $this->sendPotentialMatchSMS($report, $item);
+                $this->notifyPotentialMatch($report, $item);
             }
         }
         return $matchesSaved;
     }
 
-    private function sendPotentialMatchSMS(array $lostReport, array $item): void {
-        if (($lostReport['contact_preference'] ?? null) !== 'sms' || empty($lostReport['phone_number'])) {
-            return;
-        }
+    private function notifyPotentialMatch(array $lostReport, array $item): void {
+        $contactPreference = $lostReport['contact_preference'] ?? null;
 
-        $result = $this->smsService->sendSMS($lostReport, $item);
-        error_log('TextBee SMS response: ' . json_encode($result));
+        if ($contactPreference === 'sms' && !empty($lostReport['phone_number'])) {
+            $result = $this->smsService->sendSMS($lostReport, $item);
+            error_log('TextBee SMS response: ' . json_encode($result));
+        } elseif ($contactPreference === 'email' && !empty($lostReport['email'])) {
+            $result = $this->emailService->sendEmail($lostReport, $item);
+            error_log('EmailJS response: ' . json_encode($result));
+        }
     }
 
     public function hasMatchingFieldsChanged(array $data, array $existingData): bool {

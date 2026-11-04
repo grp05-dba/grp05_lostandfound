@@ -1,7 +1,7 @@
 <?php
 
 class EmailJSClient {
-    private function request(string $method, string $endpoint, ?array $postData = null): array {
+    private function request(string $method, string $endpoint, string $template_id, ?array $postData = null): array {
         $env = parse_ini_file(__DIR__ . '/../../.env');
 
         $baseUrl = $env['EMAILJS_BASE_URL'];
@@ -10,7 +10,7 @@ class EmailJSClient {
 
         $data = [
             'service_id' => $env['EMAILJS_SERVICE_ID'],
-            'template_id' => $env['EMAILJS_TEMPLATE_ID'],
+            'template_id' => $template_id,
             'user_id' => $env['EMAILJS_PUBLIC_KEY'],
         ];
 
@@ -52,7 +52,7 @@ class EmailJSClient {
         ];
     }
 
-    public function sendEmail(array $data): array {
-        return $this->request('POST', '/api/v1.0/email/send', $data);
+    public function sendEmail(string $template_id, array $data): array {
+        return $this->request('POST', '/api/v1.0/email/send', $template_id, $data);
     }
 }
