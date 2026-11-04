@@ -439,11 +439,23 @@
     if (kind === "item") {
       const fields = ["item_id", "title", "category_id", "description", "location_found", "date_found", "time_found", "status"];
       $("#detail-title").textContent = "Found item details";
-      let html = '<div class="detail-grid">' + fields
+      const html = '<div class="detail-grid">' + fields
         .filter((k) => r[k] !== undefined && r[k] !== null && r[k] !== "")
         .map((k) => "<b>" + safe(k.replaceAll("_", " ")) + "</b><span>" + safe(k === "category_id" ? category(r[k]) : r[k]) + "</span>")
         .join("") + "</div>";
-      $("#detail-content").innerHTML = html;
+      const imgs = Array.isArray(r.images) ? r.images : [];
+      const gallery = imgs.length
+        ? '<div class="item-image-manager">' + imgs.map((img) => {
+            const url = img.url || "";
+            const src = url.startsWith("http") ? url : PUBLIC.replace("/api/public", "") + url;
+            return '<figure><img src="' + safe(src) + '" alt="Found item photo"><button type="button" class="button button-light" data-delete-item-image="' + safe(img.image_id) + '" data-item-id="' + safe(r.item_id) + '">Delete image</button></figure>';
+          }).join("") + "</div>"
+        : '<p class="image-empty">No images uploaded for this item.</p>';
+      $("#detail-content").innerHTML = gallery + html +
+        '<form id="item-image-upload" class="form-grid image-upload-form" data-item-id="' + safe(r.item_id) + '" enctype="multipart/form-data">' +
+        '<label class="field field-wide upload-field"><span>Add images <small>Up to 5 images total · JPG, PNG or WebP · max 5 MB each</small></span>' +
+        '<input name="images[]" type="file" accept="image/jpeg,image/png,image/webp" multiple><span class="file-list">Select additional item photos.</span></label>' +
+        '<div class="form-message field-wide" role="status"></div><div class="form-actions field-wide"><button class="button button-primary" type="submit">Upload images</button></div></form>';
       $("#detail-dialog").showModal();
       return;
     }
@@ -533,7 +545,29 @@
     toast("Record updated");
     await loadAll();
   }
-  document.addEventListener("submit", (e) => {
+  document.addEventListener("submit", async (e) => {
+    const imageForm = e.target.closest("#item-image-upload");
+    if (imageForm) {
+      e.preventDefault();
+      const input = imageForm.elements["images[]"];
+      const files = Array.from(input.files || []);
+      const itemId = imageForm.dataset.itemId;
+      const current = state.items.find((item) => String(item.item_id) === String(itemId));
+      if (!files.length) { msg(imageForm, "Choose at least one image to upload.", true); return; }
+      if (files.length + (current?.images?.length || 0) > 5) { msg(imageForm, "An item can have up to 5 images in total.", true); return; }
+      if (files.some((file) => !["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size < 1 || file.size > 5 * 1024 * 1024)) { msg(imageForm, "Use valid JPG, PNG or WebP images up to 5 MB each.", true); return; }
+      const button = $('button[type="submit"]', imageForm);
+      button.disabled = true;
+      msg(imageForm, "Uploading images…");
+      try {
+        const result = await request(ADMIN + "/items/" + itemId + "/images", { method: "POST", body: new FormData(imageForm) });
+        toast(result.message || "Images uploaded");
+        await loadAll();
+        detail("item", itemId);
+      } catch (error) { msg(imageForm, error.message, true); }
+      finally { button.disabled = false; }
+      return;
+    }
     const form = e.target.closest("#record-edit-form");
     if (form) {
       e.preventDefault();
@@ -544,6 +578,16 @@
     const close = e.target.closest("[data-close]");
     if (close) {
       close.closest("dialog").close();
+      return;
+    }
+    const deleteImage = e.target.closest("[data-delete-item-image]");
+    if (deleteImage) {
+      const { itemId, deleteItemImage } = deleteImage.dataset;
+      if (!window.confirm("Delete this image from the found item?")) return;
+      deleteImage.disabled = true;
+      request(ADMIN + "/items/" + itemId + "/images/" + deleteItemImage, { method: "DELETE" })
+        .then(async (result) => { toast(result.message || "Image deleted"); await loadAll(); detail("item", itemId); })
+        .catch((error) => { toast(error.message); deleteImage.disabled = false; });
       return;
     }
     const nav = e.target.closest("[data-view]");
