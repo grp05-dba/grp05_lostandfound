@@ -81,11 +81,9 @@
     );
   }
   function image(item) {
-    const u = item.images?.[0]?.url || "";
-    return u
-      ? u.startsWith("http")
-        ? u
-        : PUBLIC.replace("/api/public", "") + u
+    const first = item.images?.[0];
+    return first?.image_id
+      ? ADMIN + "/items/images/" + encodeURIComponent(first.image_id)
       : "";
   }
   function fillForm() {
@@ -474,9 +472,12 @@
 
     const imgs = Array.isArray(r.images) ? r.images : [];
     const imageHtml = imgs.length ? '<div class="detail-images">' + imgs.map((x) => {
-      const u = x.url || "";
-      const base = u.startsWith("/api/admin/") ? ADMIN.replace("/api/admin", "") : PUBLIC.replace("/api/public", "");
-      return '<img src="' + safe(u.startsWith("http") ? u : base + u) + '" alt="Attached image">';
+      const src = x.image_id
+        ? ADMIN + (isClaim ? "/claims/images/" : "/lost-reports/images/") + encodeURIComponent(x.image_id)
+        : "";
+      return src
+        ? '<button type="button" class="image-preview-trigger" data-view-image="' + safe(src) + '" aria-label="View attached image larger"><img src="' + safe(src) + '" alt="Attached image"></button>'
+        : "";
     }).join("") + "</div>" : "";
 
     $("#detail-content").innerHTML =
