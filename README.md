@@ -9,6 +9,8 @@ Install the following before running the project:
 - **Git** — for version control and working with branches.
 - **API testing tool** — Postman or Thunder Client.
 - **Code editor** — such as VS Code.
+- **TextBee account (optional)** — required to configure and test SMS notifications.
+- **EmailJS account (optional)** — required to configure and test email notifications.
 
 You may use a Windows PHP installation or a development environment such as XAMPP, provided the PHP version being used by the project has PostgreSQL support enabled.
 
