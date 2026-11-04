@@ -399,7 +399,7 @@
     }
   });
   function editableField(name, value, kind) {
-    const label = name.replaceAll("_", " ").replace(/\\b\\w/g, (c) => c.toUpperCase());
+    const label = name.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
     const val = value ?? "";
     if (name === "status") {
       const options = kind === "claim"
@@ -536,7 +536,14 @@
     toast("Record updated");
     await loadAll();
   }
-  document.addEventListener("submit", (e) => {\n    const form = e.target.closest("#record-edit-form");\n    if (form) {\n      e.preventDefault();\n      submitRecordEdit(form);\n    }\n  });\n  document.addEventListener("click", (e) => {
+  document.addEventListener("submit", (e) => {
+    const form = e.target.closest("#record-edit-form");
+    if (form) {
+      e.preventDefault();
+      submitRecordEdit(form);
+    }
+  });
+  document.addEventListener("click", (e) => {
     const nav = e.target.closest("[data-view]");
     if (nav) view(nav.dataset.view);
     const go = e.target.closest("[data-view-go]");
