@@ -398,154 +398,133 @@
       btn.disabled = false;
     }
   });
-  async function detail(kind, id) {
-    const rows =
-        { item: state.items, reports: state.reports, claims: state.claims }[
-          kind
-        ] || [],
-      r = rows.find(
-        (x) =>
-          String(
-            x[
-              { item: "item_id", report: "report_id", claim: "claim_id" }[kind]
-            ],
-          ) === String(id),
-      );
-    if (!r) return;
-    const labels = {
-      item: "Found item",
-      report: "Lost report",
-      claim: "Claim request",
-    };
-    const fields =
-      kind === "item"
-        ? [
-            "item_id",
-            "title",
-            "category_id",
-            "description",
-            "location_found",
-            "date_found",
-            "time_found",
-            "status",
-          ]
-        : kind === "report"
-          ? [
-              "report_code",
-              "full_name",
-              "student_number",
-              "email",
-              "phone_number",
-              "title",
-              "description",
-              "location_lost",
-              "date_lost",
-              "time_lost",
-              "status",
-            ]
-          : [
-              "claim_code",
-              "full_name",
-              "student_number",
-              "email",
-              "phone_number",
-              "item_id",
-              "status",
-              "created_at",
-            ];
-    $("#detail-title").textContent = labels[kind] + " details";
-    let html =
-      '<div class="detail-grid">' +
-      fields
-        .filter((k) => r[k] !== undefined && r[k] !== null && r[k] !== "")
-        .map(
-          (k) =>
-            "<b>" +
-            safe(k.replaceAll("_", " ")) +
-            "</b><span>" +
-            safe(k === "category_id" ? category(r[k]) : r[k]) +
-            "</span>",
-        )
-        .join("") +
-      "</div>";
-    const imgs = Array.isArray(r.images) ? r.images : [];
-    if (imgs.length)
-      html +=
-        '<div class="detail-images">' +
-        imgs
-          .map((x) => {
-            const u = x.url || "",
-              base = u.startsWith("/api/admin/")
-                ? ADMIN.replace("/api/admin", "")
-                : PUBLIC.replace("/api/public", "");
-            return (
-              '<img src="' +
-              safe(u.startsWith("http") ? u : base + u) +
-              '" alt="Attached image">'
-            );
-          })
-          .join("") +
-        "</div>";
-    if (kind === "item")
-      html +=
-        '<div class="detail-actions"><button class="button button-light" data-status-item="claimed" data-id="' +
-        safe(id) +
-        '">Mark claimed</button><button class="button button-light" data-status-item="archived" data-id="' +
-        safe(id) +
-        '">Archive item</button></div>';
-    if (kind === "report" && r.status === "active")
-      html +=
-        '<div class="detail-actions"><button class="button button-light" data-status-report="resolved" data-id="' +
-        safe(id) +
-        '">Mark resolved</button><button class="button button-light" data-status-report="cancelled" data-id="' +
-        safe(id) +
-        '">Cancel report</button></div>';
-    if (kind === "claim" && r.status === "pending")
-      html +=
-        '<div class="detail-actions"><button class="button button-primary" data-status-claim="approved" data-id="' +
-        safe(id) +
-        '">Approve after verification</button><button class="button button-light" data-status-claim="rejected" data-id="' +
-        safe(id) +
-        '">Reject claim</button></div>';
-    if (kind === "report" && r.report_code) {
-      html +=
-        '<section class="admin-matches"><h3>Automatically identified potential matches</h3><div class="loading">Checking matching found items…</div></section>';
+  function editableField(name, value, kind) {
+    const label = name.replaceAll("_", " ").replace(/\\b\\w/g, (c) => c.toUpperCase());
+    const val = value ?? "";
+    if (name === "status") {
+      const options = kind === "claim"
+        ? [["pending", "Pending"], ["approved", "Approved"], ["rejected", "Rejected"]]
+        : [["active", "Active"], ["resolved", "Resolved"], ["cancelled", "Cancelled"]];
+      return '<label class="field"><span>' + label + ' *</span><select name="status" required>' +
+        options.map(([v, text]) => '<option value="' + v + '"' + (String(val) === v ? " selected" : "") + '>' + text + '</option>').join("") +
+        '</select></label>';
     }
-    $("#detail-content").innerHTML = html;
+    if (name === "contact_preference") {
+      return '<label class="field"><span>' + label + ' *</span><select name="' + name + '" required>' +
+        ["email", "sms"].map((v) => '<option value="' + v + '"' + (String(val) === v ? " selected" : "") + '>' + v.toUpperCase() + '</option>').join("") +
+        '</select></label>';
+    }
+    if (name === "category_id") {
+      return '<label class="field"><span>Category *</span><select name="category_id" required>' +
+        state.categories.map((c) => '<option value="' + safe(c.category_id) + '"' + (String(val) === String(c.category_id) ? " selected" : "") + '>' + safe(c.name) + '</option>').join("") +
+        '</select></label>';
+    }
+    const types = { email: "email", phone_number: "tel", date_lost: "date", time_lost: "time", item_id: "number" };
+    const type = types[name] || "text";
+    const required = ["item_id", "full_name", "student_number", "category_id", "title", "description"].includes(name);
+    const max = { full_name: 150, student_number: 50, email: 150, phone_number: 50, title: 255, location_lost: 255 }[name];
+    const attrs = (max ? ' maxlength="' + max + '"' : "") + (name === "item_id" ? ' min="1"' : "");
+    if (name === "description") {
+      return '<label class="field field-wide"><span>' + label + (required ? ' *' : '') + '</span><textarea name="' + name + '" rows="3"' + (required ? ' required' : '') + '>' + safe(val) + '</textarea></label>';
+    }
+    return '<label class="field"><span>' + label + (required ? ' *' : '') + '</span><input name="' + name + '" type="' + type + '" value="' + safe(val) + '"' + attrs + (required ? ' required' : '') + '></label>';
+  }
+
+  async function detail(kind, id) {
+    const rows = { item: state.items, report: state.reports, claim: state.claims }[kind] || [];
+    const key = { item: "item_id", report: "report_id", claim: "claim_id" }[kind];
+    const r = rows.find((x) => String(x[key]) === String(id));
+    if (!r) return;
+
+    if (kind === "item") {
+      const fields = ["item_id", "title", "category_id", "description", "location_found", "date_found", "time_found", "status"];
+      $("#detail-title").textContent = "Found item details";
+      let html = '<div class="detail-grid">' + fields
+        .filter((k) => r[k] !== undefined && r[k] !== null && r[k] !== "")
+        .map((k) => "<b>" + safe(k.replaceAll("_", " ")) + "</b><span>" + safe(k === "category_id" ? category(r[k]) : r[k]) + "</span>")
+        .join("") + "</div>";
+      $("#detail-content").innerHTML = html;
+      $("#detail-dialog").showModal();
+      return;
+    }
+
+    const isClaim = kind === "claim";
+    const fields = isClaim
+      ? ["status", "item_id", "full_name", "student_number", "email", "phone_number", "contact_preference"]
+      : ["status", "category_id", "title", "description", "location_lost", "date_lost", "time_lost", "full_name", "student_number", "email", "phone_number", "contact_preference"];
+    const code = isClaim ? (r.claim_code || "Claim #" + r.claim_id) : (r.report_code || "Report #" + r.report_id);
+    $("#detail-title").textContent = isClaim ? "Verify claim · " + code : "Review lost report · " + code;
+
+    const imgs = Array.isArray(r.images) ? r.images : [];
+    const imageHtml = imgs.length ? '<div class="detail-images">' + imgs.map((x) => {
+      const u = x.url || "";
+      const base = u.startsWith("/api/admin/") ? ADMIN.replace("/api/admin", "") : PUBLIC.replace("/api/public", "");
+      return '<img src="' + safe(u.startsWith("http") ? u : base + u) + '" alt="Attached image">';
+    }).join("") + "</div>" : "";
+
+    $("#detail-content").innerHTML =
+      imageHtml +
+      '<form id="record-edit-form" class="form-grid" data-kind="' + kind + '" data-id="' + safe(id) + '">' +
+      fields.map((name) => editableField(name, r[name], kind)).join("") +
+      '<div class="form-message field-wide" role="status"></div>' +
+      '<div class="form-actions field-wide"><button type="button" class="button button-light" data-close>Cancel</button>' +
+      '<button class="button button-primary" type="submit">' + (isClaim ? "Save verification" : "Save review") + '</button></div></form>' +
+      (!isClaim && r.report_code ? '<section class="admin-matches"><h3>Automatically identified potential matches</h3><div class="loading">Checking matching found items…</div></section>' : "");
     $("#detail-dialog").showModal();
-    if (kind === "report" && r.report_code) {
+
+    if (!isClaim && r.report_code) {
       const panel = $(".admin-matches", "#detail-content");
       try {
-        const matches = await request(
-          ADMIN + "/lost-reports/matches/" + encodeURIComponent(r.report_code),
-        );
-        panel.innerHTML =
-          "<h3>Automatically identified potential matches</h3>" +
+        const matches = await request(ADMIN + "/lost-reports/matches/" + encodeURIComponent(r.report_code));
+        panel.innerHTML = "<h3>Automatically identified potential matches</h3>" +
           (Array.isArray(matches) && matches.length
-            ? '<div class="admin-match-list">' +
-              matches
-                .map(
-                  (m) =>
-                    "<article><b>" +
-                    safe(m.title || "Found item") +
-                    "</b><span>" +
-                    safe(m.location_found || "Campus") +
-                    " · " +
-                    safe(date(m.date_found)) +
-                    "</span><small>" +
-                    safe(m.description || "") +
-                    "</small></article>",
-                )
-                .join("") +
-              "</div>"
+            ? '<div class="admin-match-list">' + matches.map((m) =>
+                "<article><b>" + safe(m.title || "Found item") + "</b><span>" +
+                safe(m.location_found || "Campus") + " · " + safe(date(m.date_found)) +
+                "</span><small>" + safe(m.description || "") + "</small></article>").join("") + "</div>"
             : "<p>No potential matches are currently recorded for this report.</p>");
       } catch (error) {
-        panel.innerHTML =
-          "<h3>Automatically identified potential matches</h3><p>Unable to load potential matches: " +
-          safe(error.message) +
-          "</p>";
+        panel.innerHTML = "<h3>Automatically identified potential matches</h3><p>Unable to load potential matches: " + safe(error.message) + "</p>";
       }
     }
+  }
+
+  async function submitRecordEdit(form) {
+    const kind = form.dataset.kind;
+    const id = form.dataset.id;
+    const data = Object.fromEntries(new FormData(form).entries());
+    if (kind === "claim") {
+      data.item_id = Number(data.item_id);
+      data.email = data.email.trim() || null;
+      data.phone_number = data.phone_number.trim() || null;
+    } else {
+      data.category_id = Number(data.category_id);
+      for (const field of ["location_lost", "date_lost", "time_lost", "email", "phone_number"]) {
+        data[field] = data[field].trim() || null;
+      }
+    }
+    const button = $('button[type="submit"]', form);
+    button.disabled = true;
+    msg(form, "Saving changes…");
+    try {
+      const endpoint = kind === "claim" ? ADMIN + "/claims/update" : ADMIN + "/lost-reports/update";
+      await request(endpoint + "/" + id, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      $("#detail-dialog").close();
+      toast(isClaimStatus(data.status) ? "Record updated" : "Record updated");
+      await loadAll();
+    } catch (error) {
+      msg(form, error.message, true);
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  function isClaimStatus(statusValue) {
+    return ["pending", "approved", "rejected"].includes(statusValue);
   }
   async function patch(endpoint, id, data) {
     await request(endpoint + "/" + id, {
@@ -557,7 +536,7 @@
     toast("Record updated");
     await loadAll();
   }
-  document.addEventListener("click", (e) => {
+  document.addEventListener("submit", (e) => {\n    const form = e.target.closest("#record-edit-form");\n    if (form) {\n      e.preventDefault();\n      submitRecordEdit(form);\n    }\n  });\n  document.addEventListener("click", (e) => {
     const nav = e.target.closest("[data-view]");
     if (nav) view(nav.dataset.view);
     const go = e.target.closest("[data-view-go]");
