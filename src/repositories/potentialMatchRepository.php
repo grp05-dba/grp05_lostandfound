@@ -22,7 +22,7 @@ class PotentialMatchRepository {
         $stmt = $this->connection->prepare(
             'INSERT INTO potential_matches (report_id, item_id, similarity_score)
             VALUES (:reportId, :itemId, :similarityScore)
-            ON CONFLICT (report_id, item_id) DO NOTHING');
+            ');
 
         return $stmt->execute([
             'reportId' => $reportId,
@@ -34,5 +34,10 @@ class PotentialMatchRepository {
     public function deleteByReportId(int $reportId): bool {
         $stmt = $this->connection->prepare('DELETE FROM potential_matches WHERE report_id = :reportId');
         return $stmt->execute(['reportId' => $reportId]);
+    }
+
+    public function deleteByItemId(int $itemId): bool {
+        $stmt = $this->connection->prepare('DELETE FROM potential_matches WHERE item_id = :itemId');
+        return $stmt->execute(['itemId' => $itemId]);
     }
 }

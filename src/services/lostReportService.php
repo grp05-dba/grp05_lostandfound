@@ -52,17 +52,27 @@ class LostReportService {
                 http_response_code(400);
                 return ['message' => 'Invalid status provided. Allowed values: active, resolved, cancelled.'];
             }
+
         }
 
         $success = $this->lostReportRepository->update($reportId, $data);
-        $matchesRefreshed = false;
+        $matchesRefreshed = 0;
 
-        if ($success && $this->hasMatchingFieldsChanged($data, $report)) {
+        if ($success) {
             $updatedReport = $this->lostReportRepository->getById($reportId);
+
             if ($updatedReport) {
-                $this->potentialMatchService->deleteByReportId($reportId);
-                $this->potentialMatchService->findPotentialMatches($updatedReport);
-                $matchesRefreshed = true;
+                if ($updatedReport['status'] !== 'active') {
+                    $this->potentialMatchService->deleteByReportId($reportId);
+                    $matchesRefreshed = 2;
+                } elseif (
+                    $report['status'] !== 'active' ||
+                    $this->potentialMatchService->hasMatchingFieldsChanged($data, $report)
+                ) {
+                    $this->potentialMatchService->deleteByReportId($reportId);
+                    $this->potentialMatchService->findPotentialMatches($updatedReport);
+                    $matchesRefreshed = 1;
+                }
             }
         }
         return RequestUtils::handleUpdateFailure($success, $matchesRefreshed);
@@ -119,22 +129,5 @@ class LostReportService {
             $code = 'LR-' . date('Y') . '-' . random_int(100000, 999999);
         } while ($this->lostReportRepository->codeExists($code));
         return $code;
-    }
-
-    private function hasMatchingFieldsChanged(array $data, array $existingReport): bool {
-        $matchingFields = [
-            'title',
-            'description',
-            'location_lost',
-            'date_lost',
-            'category_id'
-        ];
-
-        foreach ($matchingFields as $field) {
-            if (array_key_exists($field, $data) && $data[$field] != $existingReport[$field]) {
-                return true;
-            }
-        }
-        return false;
     }
 }

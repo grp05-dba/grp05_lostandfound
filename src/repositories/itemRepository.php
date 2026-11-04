@@ -20,7 +20,7 @@ class ItemRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function create(Item $item): bool {
+    public function create(Item $item): array|false {
         $stmt = $this->connection->prepare('INSERT INTO items (
             category_id, 
             title, 
@@ -36,8 +36,9 @@ class ItemRepository {
             :locationFound, 
             :dateFound, 
             :timeFound
-            )');
-        return $stmt->execute([
+            ) RETURNING *');
+
+        $stmt->execute([
             'categoryId' => $item->getCategoryId(),
             'title' => $item->getTitle(),
             'description' => $item->getDescription(),
@@ -45,6 +46,8 @@ class ItemRepository {
             'dateFound' => $item->getDateFound(),
             'timeFound' => $item->getTimeFound()
         ]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function update(int $itemId, array $data): bool {
@@ -62,7 +65,7 @@ class ItemRepository {
     }
 
     public function getEligibleItems(string $dateLost): array {
-        $stmt = $this->connection->prepare('SELECT * FROM items WHERE status = :status AND date_found >= :dateLost');
+        $stmt = $this->connection->prepare('SELECT * FROM items WHERE status = :status AND (date_found IS NULL OR date_found >= :dateLost)');
         $stmt->execute(['status' => 'unclaimed', 'dateLost' => $dateLost]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

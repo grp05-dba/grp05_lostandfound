@@ -2,12 +2,14 @@
 
 class ItemService { 
     private ItemRepository $itemRepository;
-
     private CategoryRepository $categoryRepository;
+
+    private PotentialMatchService $potentialMatchService;
 
     public function __construct(PDO $connection) {
         $this->itemRepository = new ItemRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
+        $this->potentialMatchService = new PotentialMatchService($connection);
     }
 
     public function test(): array{
@@ -48,11 +50,16 @@ class ItemService {
             time_found: $data['time_found']
         );
 
-        $success = $this->itemRepository->create($item);
+        $createdItem = $this->itemRepository->create($item);
 
-        return RequestUtils::handleCreateFailure($success);
+        if (!$createdItem) {
+            return RequestUtils::handleCreateFailure(false);
+        }
+
+        $this->potentialMatchService->findPotentialReports($createdItem);
+        return RequestUtils::handleCreateFailure(true);
     }
-//hehe
+    
     public function updateItem(int $itemId, array $data): array {
         $item = $this->itemRepository->getById($itemId);
         if (!$item) {
@@ -87,7 +94,25 @@ class ItemService {
         }
 
         $success = $this->itemRepository->update($itemId, $data);
+        $matchesRefreshed = 0;
 
-        return RequestUtils::handleUpdateFailure($success);
+        if ($success) {
+            $updatedItem = $this->itemRepository->getById($itemId);
+            
+            if($updatedItem){
+                if ($updatedItem['status'] !== 'unclaimed') {
+                    $this->potentialMatchService->deleteByItemId($itemId);
+                    $matchesRefreshed = 2;
+                } elseif (
+                    $item['status'] !== 'unclaimed' ||
+                    $this->potentialMatchService->hasMatchingFieldsChanged($data, $item)
+                ) {
+                    $this->potentialMatchService->deleteByItemId($itemId);
+                    $this->potentialMatchService->findPotentialReports($updatedItem);
+                    $matchesRefreshed = 1;
+                }
+            }
+        }
+        return RequestUtils::handleUpdateFailure($success, $matchesRefreshed);
     }
 }

@@ -23,7 +23,7 @@ class RequestUtils {
         return ['message' => 'Resource created successfully.'];
     }
 
-    public static function handleUpdateFailure(bool $success, ?bool $matchesRefreshed = null): array {
+    public static function handleUpdateFailure(bool $success, ?int $matchesRefreshed = null): array {
         if (!$success) {
             http_response_code(500);
             return ['message' => 'Failed to update resource.'];
@@ -32,7 +32,11 @@ class RequestUtils {
         $response = ['message' => 'Resource updated successfully.'];
 
         if ($matchesRefreshed !== null) {
-            $response['potential_matches_refreshed'] = $matchesRefreshed;
+            if ($matchesRefreshed === 1) {
+                $response['potential_matches_status'] = ' Potential matches refreshed.';
+            } elseif ($matchesRefreshed === 2) {
+                $response['potential_matches_status'] = ' Potential matches deleted due to report status change.';
+            }
         }
 
         return $response;
