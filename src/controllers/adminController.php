@@ -63,6 +63,12 @@ class AdminController {
             return;
         }
 
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/images/')) {
+            $imageId = (int) str_replace('/api/admin/lost-reports/images/', '', $path);
+            $this->sendImage('lost-reports', $imageId);
+            return;
+        }
+
         if ($method === 'GET' && str_starts_with($path, '/api/admin/claims/images/')) {
             $imageId = (int) str_replace('/api/admin/claims/images/', '', $path);
             $image = $this->imageService->getImageFile('claims', $imageId);
