@@ -297,10 +297,23 @@
     const form = $("#claim-form");
     form.reset();
     form.elements.item_id.value = item.item_id;
+    const categoryName =
+      item.category_name ||
+      state.categories.find((category) => String(category.category_id) === String(item.category_id))?.name ||
+      "Found property";
+    const photoUrl = imageUrl(item);
+    $("#claim-item-preview").innerHTML =
+      (photoUrl
+        ? '<button type="button" class="claim-item-photo" data-preview-image="' + esc(photoUrl) + '" aria-label="View item photo larger"><img src="' + esc(photoUrl) + '" alt="' + esc(item.title || "Found item") + '"></button>'
+        : '<div class="claim-item-photo claim-item-photo-empty">No photo available</div>') +
+      '<div class="claim-item-info"><span class="eyebrow eyebrow-dark">ITEM YOU ARE CLAIMING</span>' +
+      '<h3>' + esc(item.title || "Found item") + '</h3>' +
+      '<p class="claim-item-category">' + esc(categoryName) + '</p>' +
+      '<p>' + esc(item.description || "No description provided.") + '</p>' +
+      '<dl><dt>Location found</dt><dd>' + esc(item.location_found || "Not specified") + '</dd>' +
+      '<dt>Date found</dt><dd>' + esc(item.date_found || "Not available") + '</dd></dl></div>';
     $("#claim-item-summary").textContent =
-      "You are requesting: " +
-      (item.title || "Found item") +
-      ". Bring your physical Student ID during pickup.";
+      "Confirm that this is the item you intend to claim, then provide your details.";
     $(".file-list", form).textContent =
       "Upload your Student ID or clear proof of ownership.";
     message(form, "");
