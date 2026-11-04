@@ -142,7 +142,9 @@ The admin server uses `DB_USER` and `DB_PASSWORD`. The public server uses `DB_PU
 
 ### Optional notification integrations
 
-TextBee and EmailJS are not required to run the core API, create records, browse/search items, or test the database. Their credentials are needed only to demonstrate SMS and email notifications.
+TextBee and EmailJS are not required to start the API or use its core database features, such as creating records, browsing/searching items, and testing database operations. Their credentials are only needed to deliver SMS and email notifications.
+
+Some create, status-update, and potential-match flows automatically attempt a notification according to the user's contact preference. Without valid provider settings, the notification will not be delivered and PHP may emit warnings, but the database operation is performed before the notification attempt.
 
 To enable notifications, create accounts with [TextBee](https://textbee.dev/) and [EmailJS](https://www.emailjs.com/), then configure these values in `.env`:
 
