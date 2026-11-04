@@ -197,7 +197,7 @@
       ? '<div class="public-item-gallery">' + gallery.map((entry) => {
           const url = entry.url || "";
           const src = url.startsWith("http") ? url : window.location.origin + url;
-          return '<img src="' + esc(src) + '" alt="' + esc(item.title || "Found item") + ' photo">';
+          return '<button type="button" class="public-image-preview-trigger" data-preview-image="' + esc(src) + '" aria-label="View photo larger"><img src="' + esc(src) + '" alt="' + esc(item.title || "Found item") + ' photo"></button>';
         }).join("") + "</div>"
       : '<div class="public-item-no-image">No photo available</div>';
     const category = item.category_name || state.categories.find((c) => String(c.category_id) === String(item.category_id))?.name || "Found property";
@@ -501,6 +501,12 @@
       openDialog(b.dataset.open);
     }),
   );
+  document.addEventListener("click", (event) => {
+    const imageTrigger = event.target.closest("[data-preview-image]");
+    if (!imageTrigger) return;
+    $("#public-image-preview").src = imageTrigger.dataset.previewImage;
+    openDialog("public-image-preview-dialog");
+  });
   document
     .querySelectorAll("[data-close]")
     .forEach((b) => b.addEventListener("click", closeDialogs));
