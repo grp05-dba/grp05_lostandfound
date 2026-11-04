@@ -389,6 +389,21 @@
             ];
       const result = $("#track-result");
       let extra = "";
+      if (kind === "claim" && data.claimed_item && !data.claimed_item.message) {
+        const item = data.claimed_item;
+        const itemImage = imageUrl(item);
+        extra =
+          '<section class="tracked-claim-item"><h4>Item being claimed</h4>' +
+          '<div class="tracked-claim-item-card">' +
+          (itemImage
+            ? '<button type="button" class="tracked-claim-item-photo" data-preview-image="' + esc(itemImage) + '" aria-label="View claimed item photo larger"><img src="' + esc(itemImage) + '" alt="' + esc(item.title || "Claimed item") + '"></button>'
+            : '<div class="tracked-claim-item-photo tracked-claim-item-empty">No photo available</div>') +
+          '<div><b>' + esc(item.title || "Found item") + '</b>' +
+          '<p>' + esc(item.category_name || "Found property") + '</p>' +
+          '<p>' + esc(item.description || "No description provided.") + '</p>' +
+          '<dl><dt>Location found</dt><dd>' + esc(item.location_found || "Not specified") + '</dd>' +
+          '<dt>Date found</dt><dd>' + esc(item.date_found || "Not available") + '</dd></dl></div></div></section>';
+      }
       if (kind === "lost") {
         try {
           const matches = await request(
@@ -456,7 +471,7 @@
         "</dl>" +
         (kind === "lost"
           ? extra
-          : "<p>Bring your physical Student ID and reference code to the Lost & Found office for in-person verification.</p>") +
+          : extra + "<p>Bring your physical Student ID and reference code to the Lost & Found office for in-person verification.</p>") +
         cancel;
       result.hidden = false;
       message(form, "Submission found.");
