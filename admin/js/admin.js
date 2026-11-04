@@ -404,7 +404,9 @@
     if (name === "status") {
       const options = kind === "claim"
         ? [["pending", "Pending"], ["approved", "Approved"], ["rejected", "Rejected"]]
-        : [["active", "Active"], ["resolved", "Resolved"], ["cancelled", "Cancelled"]];
+        : kind === "item"
+          ? [["unclaimed", "Unclaimed"], ["claimed", "Claimed"], ["archived", "Archived"]]
+          : [["active", "Active"], ["resolved", "Resolved"], ["cancelled", "Cancelled"]];
       return '<label class="field"><span>' + label + ' *</span><select name="status" required>' +
         options.map(([v, text]) => '<option value="' + v + '"' + (String(val) === v ? " selected" : "") + '>' + text + '</option>').join("") +
         '</select></label>';
@@ -414,14 +416,19 @@
         ["email", "sms"].map((v) => '<option value="' + v + '"' + (String(val) === v ? " selected" : "") + '>' + v.toUpperCase() + '</option>').join("") +
         '</select></label>';
     }
+    if (name === "location_found") {
+      return '<label class="field"><span>Location found *</span><select name="location_found" required>' +
+        LOCATIONS.map((v) => '<option value="' + safe(v) + '"' + (String(val) === v ? " selected" : "") + '>' + safe(v) + '</option>').join("") +
+        '</select></label>';
+    }
     if (name === "category_id") {
       return '<label class="field"><span>Category *</span><select name="category_id" required>' +
         state.categories.map((c) => '<option value="' + safe(c.category_id) + '"' + (String(val) === String(c.category_id) ? " selected" : "") + '>' + safe(c.name) + '</option>').join("") +
         '</select></label>';
     }
-    const types = { email: "email", phone_number: "tel", date_lost: "date", time_lost: "time", item_id: "number" };
+    const types = { email: "email", phone_number: "tel", date_lost: "date", time_lost: "time", date_found: "date", time_found: "time", item_id: "number" };
     const type = types[name] || "text";
-    const required = ["item_id", "full_name", "student_number", "category_id", "title", "description"].includes(name);
+    const required = ["item_id", "full_name", "student_number", "category_id", "title", "description", "date_found", "time_found"].includes(name);
     const max = { full_name: 150, student_number: 50, email: 150, phone_number: 50, title: 255, location_lost: 255 }[name];
     const attrs = (max ? ' maxlength="' + max + '"' : "") + (name === "item_id" ? ' min="1"' : "");
     if (name === "description") {
@@ -437,21 +444,20 @@
     if (!r) return;
 
     if (kind === "item") {
-      const fields = ["item_id", "title", "category_id", "description", "location_found", "date_found", "time_found", "status"];
-      $("#detail-title").textContent = "Found item details";
-      const html = '<div class="detail-grid">' + fields
-        .filter((k) => r[k] !== undefined && r[k] !== null && r[k] !== "")
-        .map((k) => "<b>" + safe(k.replaceAll("_", " ")) + "</b><span>" + safe(k === "category_id" ? category(r[k]) : r[k]) + "</span>")
-        .join("") + "</div>";
+      const fields = ["category_id", "title", "description", "location_found", "date_found", "time_found", "status"];
+      $("#detail-title").textContent = "Edit found item · #" + r.item_id;
       const imgs = Array.isArray(r.images) ? r.images : [];
       const gallery = imgs.length
         ? '<div class="item-image-manager">' + imgs.map((img) => {
             const url = img.url || "";
             const src = url.startsWith("http") ? url : PUBLIC.replace("/api/public", "") + url;
-            return '<figure><img src="' + safe(src) + '" alt="Found item photo"><button type="button" class="button button-light" data-delete-item-image="' + safe(img.image_id) + '" data-item-id="' + safe(r.item_id) + '">Delete image</button></figure>';
+            return '<figure><button type="button" class="image-preview-trigger" data-view-image="' + safe(src) + '" aria-label="View image larger"><img src="' + safe(src) + '" alt="Found item photo"></button><button type="button" class="button button-light" data-delete-item-image="' + safe(img.image_id) + '" data-item-id="' + safe(r.item_id) + '">Delete image</button></figure>';
           }).join("") + "</div>"
         : '<p class="image-empty">No images uploaded for this item.</p>';
-      $("#detail-content").innerHTML = gallery + html +
+      $("#detail-content").innerHTML = gallery +
+        '<form id="record-edit-form" class="form-grid item-edit-form" data-kind="item" data-id="' + safe(r.item_id) + '">' +
+        fields.map((name) => editableField(name, r[name], "item")).join("") +
+        '<div class="form-message field-wide" role="status"></div><div class="form-actions field-wide"><button type="button" class="button button-light" data-close>Cancel</button><button class="button button-primary" type="submit">Save item changes</button></div></form>' +
         '<form id="item-image-upload" class="form-grid image-upload-form" data-item-id="' + safe(r.item_id) + '" enctype="multipart/form-data">' +
         '<label class="field field-wide upload-field"><span>Add images <small>Up to 5 images total · JPG, PNG or WebP · max 5 MB each</small></span>' +
         '<input name="images[]" type="file" accept="image/jpeg,image/png,image/webp" multiple><span class="file-list">Select additional item photos.</span></label>' +
@@ -505,7 +511,9 @@
     const kind = form.dataset.kind;
     const id = form.dataset.id;
     const data = Object.fromEntries(new FormData(form).entries());
-    if (kind === "claim") {
+    if (kind === "item") {
+      data.category_id = Number(data.category_id);
+    } else if (kind === "claim") {
       data.item_id = Number(data.item_id);
       data.email = data.email.trim() || null;
       data.phone_number = data.phone_number.trim() || null;
@@ -519,7 +527,7 @@
     button.disabled = true;
     msg(form, "Saving changes…");
     try {
-      const endpoint = kind === "claim" ? ADMIN + "/claims/update" : ADMIN + "/lost-reports/update";
+      const endpoint = kind === "item" ? ADMIN + "/items/update" : kind === "claim" ? ADMIN + "/claims/update" : ADMIN + "/lost-reports/update";
       await request(endpoint + "/" + id, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -578,6 +586,12 @@
     const close = e.target.closest("[data-close]");
     if (close) {
       close.closest("dialog").close();
+      return;
+    }
+    const previewImage = e.target.closest("[data-view-image]");
+    if (previewImage) {
+      $("#image-preview").src = previewImage.dataset.viewImage;
+      $("#image-preview-dialog").showModal();
       return;
     }
     const deleteImage = e.target.closest("[data-delete-item-image]");
