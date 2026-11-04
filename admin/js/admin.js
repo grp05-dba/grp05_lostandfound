@@ -456,7 +456,7 @@
         '<label class="field field-wide upload-field"><span>Add images <small>Up to 5 images total · JPG, PNG or WebP · max 5 MB each</small></span>' +
         '<input name="images[]" type="file" accept="image/jpeg,image/png,image/webp" multiple><span class="file-list">Select additional item photos.</span></label>' +
         '<div class="form-message field-wide" role="status"></div><div class="form-actions field-wide"><button class="button button-primary" type="submit">Upload images</button></div></form>';
-      $("#detail-dialog").showModal();
+      if (!$("#detail-dialog").open) $("#detail-dialog").showModal();
       return;
     }
 
