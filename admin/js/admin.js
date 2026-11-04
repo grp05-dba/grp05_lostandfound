@@ -464,6 +464,14 @@
     }
 
     const isClaim = kind === "claim";
+    let claimedItem = null;
+    if (isClaim && r.item_id) {
+      try {
+        claimedItem = await request(ADMIN + "/items/" + encodeURIComponent(r.item_id));
+      } catch (error) {
+        claimedItem = null;
+      }
+    }
     const fields = isClaim
       ? ["status", "item_id", "full_name", "student_number", "email", "phone_number", "contact_preference"]
       : ["status", "category_id", "title", "description", "location_lost", "date_lost", "time_lost", "full_name", "student_number", "email", "phone_number", "contact_preference"];
@@ -480,7 +488,16 @@
         : "";
     }).join("") + "</div>" : "";
 
+    const claimedItemHtml = isClaim && claimedItem && !claimedItem.message
+      ? '<section class="admin-claimed-item"><h3>Item being claimed</h3><div class="admin-claimed-item-card">' +
+        (claimedItem.images?.[0]?.image_id
+          ? '<button type="button" class="image-preview-trigger" data-view-image="' + safe(ADMIN + "/items/images/" + encodeURIComponent(claimedItem.images[0].image_id)) + '" aria-label="View claimed item photo larger"><img src="' + safe(ADMIN + "/items/images/" + encodeURIComponent(claimedItem.images[0].image_id)) + '" alt="Claimed item"></button>'
+          : '<div class="admin-claimed-item-empty">No photo available</div>') +
+        '<div><b>' + safe(claimedItem.title || "Found item") + '</b><p>' + safe(claimedItem.description || "No description provided.") + '</p>' +
+        '<small>' + safe(claimedItem.location_found || "Location not specified") + ' · ' + safe(date(claimedItem.date_found)) + '</small></div></div></section>'
+      : "";
     $("#detail-content").innerHTML =
+      claimedItemHtml +
       imageHtml +
       '<form id="record-edit-form" class="form-grid" data-kind="' + kind + '" data-id="' + safe(id) + '">' +
       fields.map((name) => editableField(name, r[name], kind)).join("") +
