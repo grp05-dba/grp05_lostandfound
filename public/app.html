@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101d35">
+  <title>PUP-SPOT | Lost & Found</title>
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="app.html" aria-label="PUP-SPOT home">
+      <span class="brand-mark">P</span>
+      <span>PUP<span class="brand-accent">-SPOT</span><small>LOST & FOUND</small></span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="#report">Report an item</a>
+      <a href="#found">Found items</a>
+    </nav>
+    <span class="campus-tag">CAMPUS COMMUNITY</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">A LITTLE HELP GOES A LONG WAY</p>
+        <h1>Lost something?<br><span>Let's bring it home.</span></h1>
+        <p class="hero-description">Report a missing belonging or help someone reconnect with an item they found. Every report makes our campus community a little better.</p>
+        <a class="primary-link" href="#report">Make a report <span aria-hidden="true">↗</span></a>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="hero-icon">⌕</div>
+        <span class="float-card card-one">FOUND <b>✓</b></span>
+        <span class="float-card card-two">REUNITED <b>♥</b></span>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="How it works">
+      <div><span class="stat-number">01</span><span><b>Report</b><small>Share the details</small></span></div>
+      <div><span class="stat-number">02</span><span><b>Connect</b><small>Help find a match</small></span></div>
+      <div><span class="stat-number">03</span><span><b>Reunite</b><small>Get belongings back</small></span></div>
+    </section>
+
+    <section class="content-section" id="report">
+      <div class="section-heading">
+        <div><p class="eyebrow">GET STARTED</p><h2>Make a report</h2></div>
+        <p>Choose the report that matches your situation. Fields marked with * are required.</p>
+      </div>
+      <div class="report-layout">
+        <aside class="report-aside">
+          <span class="aside-icon">✦</span>
+          <h3>Help your item<br>find its way back.</h3>
+          <p>Provide clear details and at least one photo. A useful photo can make it easier to identify the right item.</p>
+          <div class="aside-note"><b>Photo requirements</b><span>1–5 images · JPEG, PNG or WebP · up to 5 MB each</span></div>
+        </aside>
+        <div class="form-panel">
+          <div class="form-tabs" role="tablist" aria-label="Report type">
+            <button class="tab active" id="lost-tab" type="button" role="tab" aria-selected="true" aria-controls="lost-panel">I lost an item</button>
+            <button class="tab" id="found-tab" type="button" role="tab" aria-selected="false" aria-controls="found-panel">I found an item</button>
+          </div>
+
+          <form id="lost-form" class="report-form" role="tabpanel" aria-labelledby="lost-tab">
+            <div class="form-intro"><h3>Lost item report</h3><p>Tell us what went missing and how we can reach you.</p></div>
+            <div class="field-grid">
+              <label class="field full">Item name *<input name="title" maxlength="255" placeholder="e.g. Black wireless earbuds" required></label>
+              <label class="field">Category *<select name="category_id" class="category-select" required><option value="">Loading categories…</option></select></label>
+              <label class="field">Last seen at *<select name="location_lost" class="location-select" required><option value="">Choose a location</option><option value="LOCATION_PENDING">Location options to be announced</option></select></label>
+              <label class="field">Date lost<input name="date_lost" type="date"></label>
+              <label class="field">Approximate time<input name="time_lost" type="time"></label>
+              <label class="field full">Description *<textarea name="description" rows="3" placeholder="Add identifying details, color, brand, or other useful information." required></textarea></label>
+            </div>
+            <div class="form-divider"></div>
+            <h4>Your contact details</h4>
+            <div class="field-grid">
+              <label class="field">Full name *<input name="full_name" maxlength="150" autocomplete="name" required></label>
+              <label class="field">Student number *<input name="student_number" maxlength="50" required></label>
+              <label class="field">Email address *<input name="email" type="email" maxlength="150" autocomplete="email" required></label>
+              <label class="field">Phone number<input name="phone_number" type="tel" maxlength="50" autocomplete="tel"></label>
+              <label class="field">Preferred contact method *<select name="contact_preference" required><option value="email">Email</option><option value="sms">SMS</option></select></label>
+            </div>
+            <div class="form-divider"></div>
+            <label class="field">Photos of the missing item *<span class="field-hint">Upload at least one photo to submit your report.</span><input class="photo-input" name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple required></label>
+            <div class="photo-preview" id="lost-preview" aria-live="polite"></div>
+            <button class="submit-button" type="submit">Submit lost item report <span>→</span></button>
+          </form>
+
+          <form id="found-form" class="report-form hidden" role="tabpanel" aria-labelledby="found-tab">
+            <div class="form-intro"><h3>Found item report</h3><p>Record the item you found so its owner can identify it.</p></div>
+            <div class="field-grid">
+              <label class="field full">Item name *<input name="title" maxlength="255" placeholder="e.g. Blue student ID holder" required></label>
+              <label class="field">Category *<select name="category_id" class="category-select" required><option value="">Loading categories…</option></select></label>
+              <label class="field">Found at *<select name="location_found" class="location-select" required><option value="">Choose a location</option><option value="LOCATION_PENDING">Location options to be announced</option></select></label>
+              <label class="field">Date found *<input name="date_found" type="date" required></label>
+              <label class="field">Time found *<input name="time_found" type="time" required></label>
+              <label class="field full">Description *<textarea name="description" rows="3" placeholder="Describe the item and any identifying details." required></textarea></label>
+            </div>
+            <div class="form-divider"></div>
+            <label class="field">Photos of the found item *<span class="field-hint">Upload at least one photo to submit your report.</span><input class="photo-input" name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple required></label>
+            <div class="photo-preview" id="found-preview" aria-live="polite"></div>
+            <button class="submit-button" type="submit">Submit found item <span>→</span></button>
+          </form>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section found-section" id="found">
+      <div class="section-heading">
+        <div><p class="eyebrow">RECENTLY REPORTED</p><h2>Found on campus</h2></div>
+        <button class="text-button" id="refresh-items" type="button">Refresh list ↻</button>
+      </div>
+      <div class="item-grid" id="item-list"><p class="empty-state">Loading found items…</p></div>
+    </section>
+  </main>
+
+  <footer><a class="brand footer-brand" href="app.html"><span class="brand-mark">P</span><span>PUP<span class="brand-accent">-SPOT</span><small>LOST & FOUND</small></span></a><p>Look out for one another. Your campus community is here to help.</p></footer>
+</body>
+</html>
