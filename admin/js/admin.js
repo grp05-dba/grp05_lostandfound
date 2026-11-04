@@ -541,6 +541,11 @@
     }
   });
   document.addEventListener("click", (e) => {
+    const close = e.target.closest("[data-close]");
+    if (close) {
+      close.closest("dialog").close();
+      return;
+    }
     const nav = e.target.closest("[data-view]");
     if (nav) view(nav.dataset.view);
     const go = e.target.closest("[data-view-go]");
