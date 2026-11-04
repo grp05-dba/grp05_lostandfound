@@ -1508,3 +1508,18 @@ a {
     #track-result .tracked-claim-item-card { grid-template-columns: 1fr; gap: 11px; }
     #track-result .tracked-claim-item-photo { height: 180px; }
 }
+
+
+/* Actions for potential matches shown in public report tracking */
+#track-result .match-card .match-delete-button {
+    margin: 7px 0 0 6px;
+}
+#track-result .match-card .match-delete-button:disabled {
+    opacity: .55;
+    cursor: wait;
+}
+@media (max-width: 520px) {
+    #track-result .match-card .match-delete-button {
+        margin-left: 0;
+    }
+}
