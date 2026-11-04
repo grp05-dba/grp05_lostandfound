@@ -89,6 +89,17 @@ class AdminController {
         }
 
         //Item endpoints-------------------------------------
+        if ($method === 'POST' && preg_match('#^/api/admin/items/(\\d+)/images$#', $path, $matches)) {
+            $result = $this->itemService->addItemImages((int) $matches[1], $_FILES['images'] ?? []);
+            echo json_encode($result);
+            return;
+        }
+
+        if ($method === 'DELETE' && preg_match('#^/api/admin/items/(\\d+)/images/(\\d+)$#', $path, $matches)) {
+            $result = $this->itemService->deleteItemImage((int) $matches[1], (int) $matches[2]);
+            echo json_encode($result);
+            return;
+        }
         if ($method === 'GET' && $path === '/api/admin/items') {
             echo json_encode($this->itemService->getAllItems());
             return;
