@@ -40,10 +40,7 @@ class RequestUtils {
 
         if ($matchesRefreshed !== null) {
             if ($matchesRefreshed === 1) {
-                $response['potential_matches_status'] = self::formatPotentialMatchesStatus(
-                    'Potential matches refreshed.',
-                    $matchesSaved ?? 0
-                );
+                $response['potential_matches_status'] = self::formatPotentialMatchesStatus('Potential matches refreshed.', $matchesSaved ?? 0);
             } elseif ($matchesRefreshed === 2) {
                 $response['potential_matches_status'] = 'Potential matches deleted because this resource is no longer eligible.';
             } else {
@@ -56,7 +53,7 @@ class RequestUtils {
 
     private static function formatPotentialMatchesStatus(string $message, int $matchesSaved): string {
         if ($matchesSaved === 0) {
-            return $message . ' (No matches found.)';
+            return "$message (No matches found.)";
         }
 
         $matchLabel = 'matches';
@@ -64,7 +61,7 @@ class RequestUtils {
             $matchLabel = 'match';
         }
 
-        return $message . ' (' . $matchesSaved . ' ' . $matchLabel . ' saved.)';
+        return "$message ($matchesSaved $matchLabel saved.)";
     }
 
     public static function validatePatchFields(array $data, string $entityClass): ?array {

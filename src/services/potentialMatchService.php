@@ -4,11 +4,13 @@ class PotentialMatchService {
     private PotentialMatchRepository $potentialMatchRepository;
     private ItemRepository $itemRepository;
     private LostReportRepository $lostReportRepository;
+    private SMSService $smsService;
 
     public function __construct(PDO $connection) {
         $this->potentialMatchRepository = new PotentialMatchRepository($connection);
         $this->itemRepository = new ItemRepository($connection);
         $this->lostReportRepository = new LostReportRepository($connection);
+        $this->smsService = new SMSService();
     }
 
     public function getAllPotentialMatches(): array {
@@ -74,10 +76,19 @@ class PotentialMatchService {
                     round($score, 2)
                 )) {
                 $matchesSaved++;
+                $this->sendPotentialMatchSMS($report, $item);
             }
         }
-
         return $matchesSaved;
+    }
+
+    private function sendPotentialMatchSMS(array $lostReport, array $item): void {
+        if (($lostReport['contact_preference'] ?? null) !== 'sms' || empty($lostReport['phone_number'])) {
+            return;
+        }
+
+        $result = $this->smsService->sendSMS($lostReport, $item);
+        error_log('TextBee SMS response: ' . json_encode($result));
     }
 
     public function hasMatchingFieldsChanged(array $data, array $existingData): bool {

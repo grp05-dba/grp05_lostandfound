@@ -55,4 +55,12 @@ class TextBeeClient {
     public function getGatewayDevices(): array {
         return $this->request('GET', '/api/v1/gateway/devices');
     }
+
+    public function sendSMS(string $message, string $recipient): array {
+        $data = [
+            'message' => $message,
+            'recipients' => [$recipient] //Allows batch sending, but we only send to one recipient at a time here for now. maybe update in the future
+        ];
+        return $this->request('POST', '/api/v1/gateway/send-sms', $data);
+    }
 }
