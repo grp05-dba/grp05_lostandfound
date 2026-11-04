@@ -32,7 +32,7 @@ require_once __DIR__ . '/../src/entities/claim.php';
 require_once __DIR__ . '/../src/utils/requestUtils.php';
 
 try {
-    $connection = Connection::getPublicConnection();
+    $connection = Connection::getAdminConnection();
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Database connection failed']);
@@ -45,8 +45,7 @@ $path = $_SERVER['REQUEST_URI'];
 
 if (str_starts_with($path, '/api/public/')) {
     $controller = new PublicController($connection);
-}
-else {
+} else {
     http_response_code(404);
     echo json_encode(['error' => 'Endpoint not found']);
     exit;

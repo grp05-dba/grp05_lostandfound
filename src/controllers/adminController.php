@@ -57,6 +57,18 @@ class AdminController {
             return;
         }
 
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/items/images/')) {
+            $imageId = (int) str_replace('/api/admin/items/images/', '', $path);
+            $this->sendImage('items', $imageId);
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/images/')) {
+            $imageId = (int) str_replace('/api/admin/lost-reports/images/', '', $path);
+            $this->sendImage('lost-reports', $imageId);
+            return;
+        }
+
         if ($method === 'GET' && str_starts_with($path, '/api/admin/claims/images/')) {
             $imageId = (int) str_replace('/api/admin/claims/images/', '', $path);
             $image = $this->imageService->getImageFile('claims', $imageId);
@@ -89,6 +101,17 @@ class AdminController {
         }
 
         //Item endpoints-------------------------------------
+        if ($method === 'POST' && preg_match('#^/api/admin/items/(\\d+)/images$#', $path, $matches)) {
+            $result = $this->itemService->addItemImages((int) $matches[1], $_FILES['images'] ?? []);
+            echo json_encode($result);
+            return;
+        }
+
+        if ($method === 'DELETE' && preg_match('#^/api/admin/items/(\\d+)/images/(\\d+)$#', $path, $matches)) {
+            $result = $this->itemService->deleteItemImage((int) $matches[1], (int) $matches[2]);
+            echo json_encode($result);
+            return;
+        }
         if ($method === 'GET' && $path === '/api/admin/items') {
             echo json_encode($this->itemService->getAllItems());
             return;
@@ -150,5 +173,20 @@ class AdminController {
 
         http_response_code(404);
         echo json_encode(['error' => 'Admin endpoint not found']);
+    }
+    private function sendImage(string $entityType, int $imageId): void {
+        $image = $this->imageService->getImageFile($entityType, $imageId);
+
+        if (!$image) {
+            http_response_code(404);
+            echo json_encode(['message' => 'Image not found.']);
+            return;
+        }
+
+        header('Content-Type: ' . $image['mime_type']);
+        header('Content-Length: ' . filesize($image['file_path']));
+        header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: private, max-age=86400');
+        readfile($image['file_path']);
     }
 }

@@ -99,6 +99,51 @@ class ItemService {
         return RequestUtils::handleCreateFailure(true, $matchesSaved);
     }
     
+    public function addItemImages(int $itemId, array $uploads): array {
+        $item = $this->itemRepository->getById($itemId);
+        if (!$item) {
+            http_response_code(404);
+            return ['message' => 'Item not found.'];
+        }
+
+        try {
+            $validatedUploads = $this->imageService->validateUploads($uploads);
+            $existingImages = $this->imageService->getImageUrls('items', $itemId);
+            if (count($existingImages) + count($validatedUploads) > 5) {
+                http_response_code(400);
+                return ['message' => 'An item can have up to 5 images in total.'];
+            }
+
+            $this->connection->beginTransaction();
+            $this->imageService->saveUploads('items', $itemId, $validatedUploads);
+            $this->connection->commit();
+            return ['message' => 'Item images uploaded successfully.', 'images' => $this->imageService->getImageUrls('items', $itemId)];
+        } catch (InvalidArgumentException $error) {
+            if ($this->connection->inTransaction()) $this->connection->rollBack();
+            http_response_code(400);
+            return ['message' => $error->getMessage()];
+        } catch (Throwable $error) {
+            if ($this->connection->inTransaction()) $this->connection->rollBack();
+            error_log($error->getMessage());
+            http_response_code(500);
+            return ['message' => 'Failed to upload item images.'];
+        }
+    }
+
+    public function deleteItemImage(int $itemId, int $imageId): array {
+        if (!$this->itemRepository->getById($itemId)) {
+            http_response_code(404);
+            return ['message' => 'Item not found.'];
+        }
+
+        if (!$this->imageService->deleteImageForEntity('items', $itemId, $imageId)) {
+            http_response_code(404);
+            return ['message' => 'Image not found for this item.'];
+        }
+
+        return ['message' => 'Item image deleted successfully.'];
+    }
+
     public function updateItem(int $itemId, array $data): array {
         $item = $this->itemRepository->getById($itemId);
         if (!$item) {

@@ -65,7 +65,13 @@ class PublicController {
         }
 
         if ($method === 'POST' && $path === '/api/public/claims/view') {
-            echo json_encode($this->claimService->getClaimByCode(RequestUtils::getRequestBody()['claim_code']));
+            $claim = $this->claimService->getClaimByCode(RequestUtils::getRequestBody()['claim_code']);
+
+            if (isset($claim['item_id'])) {
+                $claim['claimed_item'] = $this->itemService->getItemById((int) $claim['item_id']);
+            }
+
+            echo json_encode($claim);
             return;
         }
 
