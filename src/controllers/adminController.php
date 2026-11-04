@@ -6,8 +6,7 @@ class AdminController {
     private CategoryService $categoryService;
     private LostReportService $lostReportService;
     private ClaimService $claimService;
-    private PotentialMatchService $potentialMatchService;
-    private ImageService $imageService;
+    private PhotoService $photoService;
     private PDO $connection;
 
     public function __construct(PDO $connection) {
@@ -17,8 +16,7 @@ class AdminController {
         $this->categoryService = new CategoryService($connection);
         $this->lostReportService = new LostReportService($connection);
         $this->claimService = new ClaimService($connection);
-        $this->potentialMatchService = new PotentialMatchService($connection);
-        $this->imageService = new ImageService($connection);
+        $this->photoService = new PhotoService($connection);
     }
 
     public function handleRequest(string $method, string $path): void {
@@ -88,6 +86,30 @@ class AdminController {
             return;
         }
 
+
+        if (preg_match('#^/api/admin/items/(\\d+)/photos/(\\d+)$#', $path, $photoMatches) && $method === 'GET') {
+            $photo = $this->photoService->getPhoto('item', (int) $photoMatches[1], (int) $photoMatches[2]);
+            if (!$photo) { http_response_code(404); echo json_encode(['message' => 'Photo not found.']); return; }
+            header('Content-Type: ' . $photo['mime_type']);
+            header('Content-Disposition: inline; filename="' . basename($photo['file_name']) . '"');
+            $data = $photo['photo_data'];
+            echo is_resource($data) ? stream_get_contents($data) : $data;
+            return;
+        }
+
+        //Item photo endpoints-------------------------------------
+        if (preg_match('#^/api/admin/items/(\\d+)/photos$#', $path, $matches)) {
+            $itemId = (int) $matches[1];
+            if ($method === 'POST') {
+                echo json_encode($this->photoService->addUploadedPhotos('item', $itemId, $_FILES['photos'] ?? []));
+                return;
+            }
+            if ($method === 'GET') {
+                echo json_encode($this->photoService->getPhotos('item', $itemId));
+                return;
+            }
+        }
+
         //Item endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/items') {
             echo json_encode($this->itemService->getAllItems());
@@ -128,6 +150,27 @@ class AdminController {
             return;
         }
 
+
+        //Potential match endpoints-------------------------------------
+        if ($method === 'GET' && $path === '/api/admin/potential-matches') {
+            echo json_encode($this->potentialMatchService->getAllPotentialMatches());
+            return;
+        }
+
+        if ($method === 'POST' && $path === '/api/admin/potential-matches/generate') {
+            echo json_encode(['created' => $this->potentialMatchService->generatePotentialMatches()]);
+            return;
+        }
+
+        if ($method === 'GET' && preg_match('#^/api/admin/potential-matches/report/(\\d+)$#', $path, $matches)) {
+            echo json_encode($this->potentialMatchService->getMatchesForReport((int) $matches[1]));
+            return;
+        }
+
+        if ($method === 'GET' && preg_match('#^/api/admin/potential-matches/item/(\\d+)$#', $path, $matches)) {
+            echo json_encode($this->potentialMatchService->getMatchesForItem((int) $matches[1]));
+            return;
+        }
 
         //Debugging endpoints-------------------------------------
         //Endpoints to get SMS gateway info (textbee integration)

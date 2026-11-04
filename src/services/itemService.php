@@ -4,6 +4,7 @@ class ItemService {
     private PDO $connection;
     private ItemRepository $itemRepository;
     private CategoryRepository $categoryRepository;
+    private PotentialMatchService $potentialMatchService;
 
     private PotentialMatchService $potentialMatchService;
     private ImageService $imageService;
@@ -13,7 +14,6 @@ class ItemService {
         $this->itemRepository = new ItemRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
         $this->potentialMatchService = new PotentialMatchService($connection);
-        $this->imageService = new ImageService($connection);
     }
 
     public function test(): array{
@@ -71,32 +71,16 @@ class ItemService {
             time_found: $data['time_found']
         );
 
-        $savedStorageKeys = [];
+        $success = $this->itemRepository->create($item);
+        if (!$success) return RequestUtils::handleCreateFailure(false);
 
         try {
-            $this->connection->beginTransaction();
-            $createdItem = $this->itemRepository->create($item);
-
-            if (!$createdItem) {
-                $this->connection->rollBack();
-                return RequestUtils::handleCreateFailure(false);
-            }
-
-            $savedStorageKeys = $this->imageService->saveUploads('items', (int) $createdItem['item_id'], $validatedUploads);
-            $this->connection->commit();
-        } catch (Throwable $error) {
-            if ($this->connection->inTransaction()) {
-                $this->connection->rollBack();
-            }
-
-            $this->imageService->deleteStoredFiles($savedStorageKeys);
-            error_log($error->getMessage());
-            http_response_code(500);
-            return ['message' => 'Failed to create item and save its images.'];
+            $this->potentialMatchService->generatePotentialMatches();
+        } catch (Throwable $e) {
+            error_log('Potential matching after item creation failed: ' . $e->getMessage());
         }
 
-        $matchesSaved = $this->potentialMatchService->findPotentialReports($createdItem);
-        return RequestUtils::handleCreateFailure(true, $matchesSaved);
+        return RequestUtils::handleCreateFailure(true);
     }
     
     public function updateItem(int $itemId, array $data): array {

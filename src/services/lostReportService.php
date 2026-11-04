@@ -4,6 +4,7 @@ class LostReportService {
     private PDO $connection;
     private LostReportRepository $lostReportRepository;
     private CategoryRepository $categoryRepository;
+    private PotentialMatchService $potentialMatchService;
 
     private PotentialMatchService $potentialMatchService;
     private SMSService $smsService;
@@ -15,9 +16,6 @@ class LostReportService {
         $this->lostReportRepository = new LostReportRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
         $this->potentialMatchService = new PotentialMatchService($connection);
-        $this->smsService = new SMSService();
-        $this->emailService = new EmailService();
-        $this->imageService = new ImageService($connection);
     }
 
     public function getAllLostReports(): array {
@@ -62,6 +60,11 @@ class LostReportService {
                 http_response_code(400);
                 return ['message' => 'Invalid category_id provided.'];
             }
+        }
+
+        if (array_key_exists('contact_preference', $data) && !in_array($data['contact_preference'], ['email', 'sms'], true)) {
+            http_response_code(400);
+            return ['message' => 'Invalid contact_preference. Allowed values: email, sms.'];
         }
 
         if (array_key_exists('status', $data)) {
@@ -117,10 +120,8 @@ class LostReportService {
         return RequestUtils::handleUpdateFailure($success, $matchesRefreshed, $matchesSaved);
     }
 
-    public function createLostReport(array $data, array $uploads = []): array {
-        $data = RequestUtils::normalizeContactFields($data);
-
-        $validationError = RequestUtils::validateRequiredFields($data, LostReport::class, ['email', 'phone_number', 'contact_preference', 'location_lost', 'date_lost', 'time_lost', 'report_code']);
+    public function createLostReport(array $data): array {
+        $validationError = RequestUtils::validateRequiredFields($data, LostReport::class, ['phone_number', 'location_lost', 'date_lost', 'time_lost', 'report_code', 'contact_preference']);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
@@ -132,11 +133,9 @@ class LostReportService {
         $validationError = RequestUtils::validateDateTimeFields($data);
         if ($validationError) return $validationError;
 
-        try {
-            $validatedUploads = $this->imageService->validateUploads($uploads);
-        } catch (InvalidArgumentException $error) {
+        if (isset($data['contact_preference']) && !in_array($data['contact_preference'], ['email', 'sms'], true)) {
             http_response_code(400);
-            return ['message' => $error->getMessage()];
+            return ['message' => 'Invalid contact_preference. Allowed values: email, sms.'];
         }
 
         if (!$this->categoryRepository->getById($data['category_id'])) {
@@ -154,78 +153,21 @@ class LostReportService {
             time_lost: ($data['time_lost'] ?? '') === '' ? null : $data['time_lost'],
             full_name: $data['full_name'],
             student_number: $data['student_number'],
-            email: $data['email'] ?? null,
-            phone_number: $data['phone_number'] ?? null,
+            email: $data['email'],
+            phone_number: ($data['phone_number'] ?? '') === '' ? null : $data['phone_number'],
             contact_preference: $data['contact_preference'] ?? 'email'
         );
 
-        $savedStorageKeys = [];
+        $success = $this->lostReportRepository->create($report);
+        if (!$success) return RequestUtils::handleCreateFailure(false);
 
         try {
-            $this->connection->beginTransaction();
-            $createdReport = $this->lostReportRepository->create($report);
-
-            if (!$createdReport) {
-                $this->connection->rollBack();
-                return RequestUtils::handleCreateFailure(false);
-            }
-
-            $savedStorageKeys = $this->imageService->saveUploads('lost-reports', (int) $createdReport['report_id'], $validatedUploads);
-            $this->connection->commit();
-        } catch (Throwable $error) {
-            if ($this->connection->inTransaction()) {
-                $this->connection->rollBack();
-            }
-
-            $this->imageService->deleteStoredFiles($savedStorageKeys);
-            error_log($error->getMessage());
-            http_response_code(500);
-            return ['message' => 'Failed to create lost report and save its images.'];
+            $this->potentialMatchService->generatePotentialMatches();
+        } catch (Throwable $e) {
+            error_log('Potential matching after lost report creation failed: ' . $e->getMessage());
         }
 
-        $matchesSaved = $this->potentialMatchService->findPotentialMatches($createdReport);
-
-        if (
-            $createdReport['contact_preference'] === 'sms' &&
-            !empty($createdReport['phone_number'])
-        ) {
-            $smsResult = $this->smsService->sendSMSLostReportCreation($createdReport);
-            error_log('TextBee lost-report creation response: ' . json_encode($smsResult));
-        } elseif (
-            $createdReport['contact_preference'] === 'email' &&
-            !empty($createdReport['email'])
-        ) {
-            $emailResult = $this->emailService->sendEmailLostReportCreation($createdReport);
-            error_log('EmailJS lost-report creation response: ' . json_encode($emailResult));
-        }
-
-        return RequestUtils::handleCreateFailure(true, $matchesSaved);
-    }
-    
-    public function getLostReportByCode(string $code): array {
-        $success = $this->lostReportRepository->getByCode($code);
-
-        if ($success && $success['status'] !== 'active') {
-            http_response_code(404);
-            return ['message' => 'Active lost report not found.'];
-        }
-
-        $failure = RequestUtils::handleFindFailure($success);
-
-        if ($failure) return $failure;
-
-        return $this->imageService->attachImageUrls('lost-reports', [$success], 'report_id')[0];
-    }
-
-    public function cancelLostReportByCode(string $code): array {
-        $report = $this->lostReportRepository->getByCode($code);
-
-        if (!$report || $report['status'] !== 'active') {
-            http_response_code(404);
-            return ['message' => 'Active lost report not found.'];
-        }
-
-        return $this->updateLostReport((int) $report['report_id'], ['status' => 'cancelled']);
+        return RequestUtils::handleCreateFailure(true);
     }
     
 
