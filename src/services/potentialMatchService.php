@@ -28,7 +28,7 @@ class PotentialMatchService {
         $this->potentialMatchRepository->deleteByItemId($itemId);
     }
 
-    public function findPotentialMatches(array $lostReport): void {
+    public function findPotentialMatches(array $lostReport): int {
         $dateLost = $lostReport['date_lost'] ?? null;
 
         if ($dateLost) {
@@ -37,20 +37,24 @@ class PotentialMatchService {
             $items = $this->itemRepository->getAllUnclaimedItems();
         }
 
+        $matchesSaved = 0;
+
         foreach ($items as $item) {
             $score = $this->calculateSimilarity($lostReport, $item);
 
-            if ($score >= 60) {
-                $this->potentialMatchRepository->create(
+            if ($score >= 60 && $this->potentialMatchRepository->create(
                     $lostReport['report_id'],
                     $item['item_id'],
                     round($score, 2)
-                );
+                )) {
+                $matchesSaved++;
             }
         }
+
+        return $matchesSaved;
     }
 
-    public function findPotentialReports(array $item): void {
+    public function findPotentialReports(array $item): int {
         $dateFound = $item['date_found'] ?? null;
 
         if ($dateFound) {
@@ -59,17 +63,21 @@ class PotentialMatchService {
             $reports = $this->lostReportRepository->getAllActiveReports();
         }
 
+        $matchesSaved = 0;
+
         foreach ($reports as $report) {
             $score = $this->calculateSimilarity($report, $item);
 
-            if ($score >= 60) {
-                $this->potentialMatchRepository->create(
+            if ($score >= 60 && $this->potentialMatchRepository->create(
                     $report['report_id'],
                     $item['item_id'],
                     round($score, 2)
-                );
+                )) {
+                $matchesSaved++;
             }
         }
+
+        return $matchesSaved;
     }
 
     public function hasMatchingFieldsChanged(array $data, array $existingData): bool {

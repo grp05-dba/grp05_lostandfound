@@ -25,10 +25,15 @@ class ClaimService {
             return ['message' => 'Claim not found.'];
         }
 
+        $data = RequestUtils::normalizeContactFields($data);
+
         $validationError = RequestUtils::validatePatchFields($data, Claim::class);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateContactPreference($data, $claim);
         if ($validationError) return $validationError;
 
         if (isset($data['item_id'])) {
@@ -53,10 +58,15 @@ class ClaimService {
     }
 
     public function createClaim(array $data): array {
-        $validationError = RequestUtils::validateRequiredFields($data, Claim::class, ['phone_number', 'claim_code']);
+        $data = RequestUtils::normalizeContactFields($data);
+
+        $validationError = RequestUtils::validateRequiredFields($data, Claim::class, ['email', 'phone_number', 'contact_preference', 'claim_code']);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateContactPreference($data);
         if ($validationError) return $validationError;
 
         $item = $this->itemRepository->getById($data['item_id']);
@@ -70,8 +80,9 @@ class ClaimService {
             item_id: $data['item_id'],
             full_name: $data['full_name'],
             student_number: $data['student_number'],
-            email: $data['email'],
-            phone_number: $data['phone_number'] ?? null
+            email: $data['email'] ?? null,
+            phone_number: $data['phone_number'] ?? null,
+            contact_preference: $data['contact_preference'] ?? 'email'
         );
 
         return RequestUtils::handleCreateFailure($this->claimRepository->create($claim));

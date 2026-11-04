@@ -14,16 +14,23 @@ class RequestUtils {
         return null;
     }
 
-    public static function handleCreateFailure(bool $success): array {
+    public static function handleCreateFailure(bool $success, ?int $matchesSaved = null): array {
         if (!$success) {
             http_response_code(500);
             return ['message' => 'Failed to create resource.'];
         }
         http_response_code(201);
-        return ['message' => 'Resource created successfully.'];
+
+        $response = ['message' => 'Resource created successfully.'];
+
+        if ($matchesSaved !== null) {
+            $response['potential_matches_status'] = self::formatPotentialMatchesStatus('Potential matches checked.', $matchesSaved);
+        }
+
+        return $response;
     }
 
-    public static function handleUpdateFailure(bool $success, ?int $matchesRefreshed = null): array {
+    public static function handleUpdateFailure(bool $success, ?int $matchesRefreshed = null, ?int $matchesSaved = null): array {
         if (!$success) {
             http_response_code(500);
             return ['message' => 'Failed to update resource.'];
@@ -33,13 +40,31 @@ class RequestUtils {
 
         if ($matchesRefreshed !== null) {
             if ($matchesRefreshed === 1) {
-                $response['potential_matches_status'] = ' Potential matches refreshed.';
+                $response['potential_matches_status'] = self::formatPotentialMatchesStatus(
+                    'Potential matches refreshed.',
+                    $matchesSaved ?? 0
+                );
             } elseif ($matchesRefreshed === 2) {
-                $response['potential_matches_status'] = ' Potential matches deleted due to report status change.';
+                $response['potential_matches_status'] = 'Potential matches deleted because this resource is no longer eligible.';
+            } else {
+                $response['potential_matches_status'] = 'Potential matches unchanged.';
             }
         }
 
         return $response;
+    }
+
+    private static function formatPotentialMatchesStatus(string $message, int $matchesSaved): string {
+        if ($matchesSaved === 0) {
+            return $message . ' (No matches found.)';
+        }
+
+        $matchLabel = 'matches';
+        if ($matchesSaved === 1) {
+            $matchLabel = 'match';
+        }
+
+        return $message . ' (' . $matchesSaved . ' ' . $matchLabel . ' saved.)';
     }
 
     public static function validatePatchFields(array $data, string $entityClass): ?array {
@@ -95,6 +120,7 @@ class RequestUtils {
         ];
 
         $optionalFields = [
+            'email',
             'phone_number', 
             'location_lost', 
             'date_lost', 
@@ -132,6 +158,45 @@ class RequestUtils {
                 http_response_code(400);
                 return ['message' => 'Invalid phone number provided.'];
             }
+        }
+
+        return null;
+    }
+
+    public static function normalizeContactFields(array $data): array {
+        foreach (['email', 'phone_number'] as $field) {
+            if (array_key_exists($field, $data)) {
+                $data[$field] = is_string($data[$field]) && trim($data[$field]) !== ''
+                    ? trim($data[$field])
+                    : null;
+            }
+        }
+
+        return $data;
+    }
+
+    public static function validateContactPreference(array $data, ?array $existingData = null): ?array {
+        $contactData = self::normalizeContactFields(array_merge($existingData ?? [], $data));
+        $preference = $contactData['contact_preference'] ?? 'email';
+
+        if (!is_string($preference) || !in_array($preference, ['email', 'sms'], true)) {
+            http_response_code(400);
+            return ['message' => 'Invalid contact_preference. Allowed values: email, sms.'];
+        }
+
+        if (empty($contactData['email']) && empty($contactData['phone_number'])) {
+            http_response_code(400);
+            return ['message' => 'Provide an email address or phone number.'];
+        }
+
+        if ($preference === 'email' && empty($contactData['email'])) {
+            http_response_code(400);
+            return ['message' => 'An email address is required for email contact preference.'];
+        }
+
+        if ($preference === 'sms' && empty($contactData['phone_number'])) {
+            http_response_code(400);
+            return ['message' => 'A phone number is required for SMS contact preference.'];
         }
 
         return null;

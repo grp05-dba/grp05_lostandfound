@@ -56,8 +56,8 @@ class ItemService {
             return RequestUtils::handleCreateFailure(false);
         }
 
-        $this->potentialMatchService->findPotentialReports($createdItem);
-        return RequestUtils::handleCreateFailure(true);
+        $matchesSaved = $this->potentialMatchService->findPotentialReports($createdItem);
+        return RequestUtils::handleCreateFailure(true, $matchesSaved);
     }
     
     public function updateItem(int $itemId, array $data): array {
@@ -89,12 +89,13 @@ class ItemService {
             $allowedStatuses = ['unclaimed', 'claimed', 'archived'];
             if (!is_string($data['status']) || !in_array($data['status'], $allowedStatuses, true)) {
                 http_response_code(400);
-                return ['message' => 'Invalid status provided. Allowed values: pending, approved, rejected.'];
+                return ['message' => 'Invalid status provided. Allowed values: unclaimed, claimed, archived.'];
             }
         }
 
         $success = $this->itemRepository->update($itemId, $data);
         $matchesRefreshed = 0;
+        $matchesSaved = null;
 
         if ($success) {
             $updatedItem = $this->itemRepository->getById($itemId);
@@ -108,11 +109,11 @@ class ItemService {
                     $this->potentialMatchService->hasMatchingFieldsChanged($data, $item)
                 ) {
                     $this->potentialMatchService->deleteByItemId($itemId);
-                    $this->potentialMatchService->findPotentialReports($updatedItem);
+                    $matchesSaved = $this->potentialMatchService->findPotentialReports($updatedItem);
                     $matchesRefreshed = 1;
                 }
             }
         }
-        return RequestUtils::handleUpdateFailure($success, $matchesRefreshed);
+        return RequestUtils::handleUpdateFailure($success, $matchesRefreshed, $matchesSaved);
     }
 }

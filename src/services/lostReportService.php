@@ -28,10 +28,15 @@ class LostReportService {
             return ['message' => 'Lost report not found.'];
         }
 
+        $data = RequestUtils::normalizeContactFields($data);
+
         $validationError = RequestUtils::validatePatchFields($data, LostReport::class);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateContactPreference($data, $report);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateDateTimeFields($data);
@@ -57,6 +62,7 @@ class LostReportService {
 
         $success = $this->lostReportRepository->update($reportId, $data);
         $matchesRefreshed = 0;
+        $matchesSaved = null;
 
         if ($success) {
             $updatedReport = $this->lostReportRepository->getById($reportId);
@@ -70,19 +76,24 @@ class LostReportService {
                     $this->potentialMatchService->hasMatchingFieldsChanged($data, $report)
                 ) {
                     $this->potentialMatchService->deleteByReportId($reportId);
-                    $this->potentialMatchService->findPotentialMatches($updatedReport);
+                    $matchesSaved = $this->potentialMatchService->findPotentialMatches($updatedReport);
                     $matchesRefreshed = 1;
                 }
             }
         }
-        return RequestUtils::handleUpdateFailure($success, $matchesRefreshed);
+        return RequestUtils::handleUpdateFailure($success, $matchesRefreshed, $matchesSaved);
     }
 
     public function createLostReport(array $data): array {
-        $validationError = RequestUtils::validateRequiredFields($data, LostReport::class, ['phone_number', 'location_lost', 'date_lost', 'time_lost', 'report_code']);
+        $data = RequestUtils::normalizeContactFields($data);
+
+        $validationError = RequestUtils::validateRequiredFields($data, LostReport::class, ['email', 'phone_number', 'contact_preference', 'location_lost', 'date_lost', 'time_lost', 'report_code']);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateContactPreference($data);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateDateTimeFields($data);
@@ -103,8 +114,9 @@ class LostReportService {
             time_lost: ($data['time_lost'] ?? '') === '' ? null : $data['time_lost'],
             full_name: $data['full_name'],
             student_number: $data['student_number'],
-            email: $data['email'],
-            phone_number: ($data['phone_number'] ?? '') === '' ? null : $data['phone_number']
+            email: $data['email'] ?? null,
+            phone_number: $data['phone_number'] ?? null,
+            contact_preference: $data['contact_preference'] ?? 'email'
         );
 
         $createdReport = $this->lostReportRepository->create($report);
@@ -113,8 +125,8 @@ class LostReportService {
             return RequestUtils::handleCreateFailure(false);
         }
 
-        $this->potentialMatchService->findPotentialMatches($createdReport);
-        return RequestUtils::handleCreateFailure(true);
+        $matchesSaved = $this->potentialMatchService->findPotentialMatches($createdReport);
+        return RequestUtils::handleCreateFailure(true, $matchesSaved);
     }
     
     public function getLostReportByCode(string $code): array {

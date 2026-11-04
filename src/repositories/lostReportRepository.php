@@ -50,10 +50,10 @@ class LostReportRepository {
         $stmt = $this->connection->prepare(
             'INSERT INTO lost_reports (
                 report_code, category_id, title, description, location_lost, date_lost,
-                time_lost, full_name, student_number, email, phone_number
+                time_lost, full_name, student_number, email, phone_number, contact_preference
             ) VALUES (
                 :reportCode, :categoryId, :title, :description, :locationLost, :dateLost,
-                :timeLost, :fullName, :studentNumber, :email, :phoneNumber
+                :timeLost, :fullName, :studentNumber, :email, :phoneNumber, :contactPreference
             ) RETURNING *');
             
         $stmt->execute([
@@ -67,7 +67,8 @@ class LostReportRepository {
             'fullName' => $report->getFullName(),
             'studentNumber' => $report->getStudentNumber(),
             'email' => $report->getEmail(),
-            'phoneNumber' => $report->getPhoneNumber()
+            'phoneNumber' => $report->getPhoneNumber(),
+            'contactPreference' => $report->getContactPreference()
         ]);
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
