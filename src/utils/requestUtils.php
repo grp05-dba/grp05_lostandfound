@@ -6,6 +6,16 @@ class RequestUtils {
         return json_decode($input, true) ?? [];
     }
 
+    public static function getRequestData(): array {
+        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
+
+        if (str_starts_with(strtolower($contentType), 'multipart/form-data')) {
+            return $_POST;
+        }
+
+        return self::getRequestBody();
+    }
+
     public static function handleFindFailure(mixed $success): ?array {
         if (!$success) {
             http_response_code(404);

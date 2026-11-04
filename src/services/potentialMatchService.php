@@ -6,6 +6,7 @@ class PotentialMatchService {
     private LostReportRepository $lostReportRepository;
     private SMSService $smsService;
     private EmailService $emailService;
+    private ImageService $imageService;
 
     public function __construct(PDO $connection) {
         $this->potentialMatchRepository = new PotentialMatchRepository($connection);
@@ -13,6 +14,7 @@ class PotentialMatchService {
         $this->lostReportRepository = new LostReportRepository($connection);
         $this->smsService = new SMSService();
         $this->emailService = new EmailService();
+        $this->imageService = new ImageService($connection);
     }
 
     public function getAllPotentialMatches(): array {
@@ -32,7 +34,8 @@ class PotentialMatchService {
             return $failure;
         }
 
-        return $this->potentialMatchRepository->getByReportCode($reportCode);
+        $matches = $this->potentialMatchRepository->getByReportCode($reportCode);
+        return $this->imageService->attachImageUrls('items', $matches, 'item_id');
     }
 
     public function deleteByReportId(int $reportId): void {

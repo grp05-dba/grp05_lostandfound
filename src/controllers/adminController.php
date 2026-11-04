@@ -5,6 +5,7 @@ class AdminController {
     private SMSService $smsService;
     private LostReportService $lostReportService;
     private ClaimService $claimService;
+    private ImageService $imageService;
     private PDO $connection;
 
     public function __construct(PDO $connection) {
@@ -13,6 +14,7 @@ class AdminController {
         $this->smsService = new SMSService();
         $this->lostReportService = new LostReportService($connection);
         $this->claimService = new ClaimService($connection);
+        $this->imageService = new ImageService($connection);
     }
 
     public function handleRequest(string $method, string $path): void {
@@ -45,6 +47,24 @@ class AdminController {
             return;
         }
 
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/claims/images/')) {
+            $imageId = (int) str_replace('/api/admin/claims/images/', '', $path);
+            $image = $this->imageService->getImageFile('claims', $imageId);
+
+            if (!$image) {
+                http_response_code(404);
+                echo json_encode(['message' => 'Image not found.']);
+                return;
+            }
+
+            header('Content-Type: ' . $image['mime_type']);
+            header('Content-Length: ' . filesize($image['file_path']));
+            header('X-Content-Type-Options: nosniff');
+            header('Cache-Control: private, max-age=86400');
+            readfile($image['file_path']);
+            return;
+        }
+
         if ($method === 'GET' && str_starts_with($path, '/api/admin/claims/')) {
             $id = (int) str_replace('/api/admin/claims/', '', $path);
             echo json_encode($this->claimService->getClaimById($id));
@@ -57,7 +77,6 @@ class AdminController {
             echo json_encode($result);
             return;
         }
-
 
         //Item endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/items') {
@@ -72,7 +91,10 @@ class AdminController {
         }
 
         if ($method === 'POST' && $path === '/api/admin/items/add') {
-            $result = $this->itemService->createItem(RequestUtils::getRequestBody());
+            $result = $this->itemService->createItem(
+                RequestUtils::getRequestData(),
+                $_FILES['images'] ?? []
+            );
             echo json_encode($result);
             return;
         }

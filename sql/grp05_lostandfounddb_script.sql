@@ -63,3 +63,30 @@ CREATE TABLE potential_matches (
     similarity_score NUMERIC(5, 2) NOT NULL DEFAULT 0 CHECK (similarity_score >= 0 AND similarity_score <= 100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 6. ITEM_IMAGES
+CREATE TABLE item_images (
+    item_image_id SERIAL PRIMARY KEY,
+    item_id INT NOT NULL REFERENCES items(item_id) ON DELETE CASCADE,
+    storage_key VARCHAR(100) NOT NULL,
+    mime_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 7. LOST_REPORT_IMAGES
+CREATE TABLE lost_report_images (
+    report_image_id SERIAL PRIMARY KEY,
+    report_id INT NOT NULL REFERENCES lost_reports(report_id) ON DELETE CASCADE,
+    storage_key VARCHAR(100) NOT NULL,
+    mime_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 8. CLAIM_IMAGES
+CREATE TABLE claim_images (
+    claim_image_id SERIAL PRIMARY KEY,
+    claim_id INT NOT NULL REFERENCES claims(claim_id) ON DELETE CASCADE,
+    storage_key VARCHAR(100) NOT NULL,
+    mime_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

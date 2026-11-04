@@ -2,9 +2,11 @@
 
 class SearchService {
     private ItemRepository $itemRepository;
+    private ImageService $imageService;
 
     public function __construct(PDO $connection) {
         $this->itemRepository = new ItemRepository($connection);
+        $this->imageService = new ImageService($connection);
     }
 
     public function searchItems(array $filters): array {
@@ -49,6 +51,7 @@ class SearchService {
         $validationError = RequestUtils::validateDateTimeFields($filters);
         if ($validationError) return $validationError;
 
-        return $this->itemRepository->searchUnclaimed($filters);
+        $items = $this->itemRepository->searchUnclaimed($filters);
+        return $this->imageService->attachImageUrls('items', $items, 'item_id');
     }
 }

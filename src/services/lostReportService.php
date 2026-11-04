@@ -1,28 +1,37 @@
 <?php
 
 class LostReportService {
+    private PDO $connection;
     private LostReportRepository $lostReportRepository;
     private CategoryRepository $categoryRepository;
 
     private PotentialMatchService $potentialMatchService;
     private SMSService $smsService;
     private EmailService $emailService;
+    private ImageService $imageService;
 
     public function __construct(PDO $connection) {
+        $this->connection = $connection;
         $this->lostReportRepository = new LostReportRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
         $this->potentialMatchService = new PotentialMatchService($connection);
         $this->smsService = new SMSService();
         $this->emailService = new EmailService();
+        $this->imageService = new ImageService($connection);
     }
 
     public function getAllLostReports(): array {
-        return $this->lostReportRepository->getAll();
+        $reports = $this->lostReportRepository->getAll();
+        return $this->imageService->attachImageUrls('lost-reports', $reports, 'report_id');
     }
 
     public function getLostReportById(int $id): array {
         $success = $this->lostReportRepository->getById($id);
-        return RequestUtils::handleFindFailure($success) ?? $success;
+        $failure = RequestUtils::handleFindFailure($success);
+
+        if ($failure) return $failure;
+
+        return $this->imageService->attachImageUrls('lost-reports', [$success], 'report_id')[0];
     }
 
     public function updateLostReport(int $reportId, array $data): array {
@@ -108,7 +117,7 @@ class LostReportService {
         return RequestUtils::handleUpdateFailure($success, $matchesRefreshed, $matchesSaved);
     }
 
-    public function createLostReport(array $data): array {
+    public function createLostReport(array $data, array $uploads = []): array {
         $data = RequestUtils::normalizeContactFields($data);
 
         $validationError = RequestUtils::validateRequiredFields($data, LostReport::class, ['email', 'phone_number', 'contact_preference', 'location_lost', 'date_lost', 'time_lost', 'report_code']);
@@ -122,6 +131,13 @@ class LostReportService {
 
         $validationError = RequestUtils::validateDateTimeFields($data);
         if ($validationError) return $validationError;
+
+        try {
+            $validatedUploads = $this->imageService->validateUploads($uploads);
+        } catch (InvalidArgumentException $error) {
+            http_response_code(400);
+            return ['message' => $error->getMessage()];
+        }
 
         if (!$this->categoryRepository->getById($data['category_id'])) {
             http_response_code(400);
@@ -143,10 +159,28 @@ class LostReportService {
             contact_preference: $data['contact_preference'] ?? 'email'
         );
 
-        $createdReport = $this->lostReportRepository->create($report);
+        $savedStorageKeys = [];
 
-        if (!$createdReport) {
-            return RequestUtils::handleCreateFailure(false);
+        try {
+            $this->connection->beginTransaction();
+            $createdReport = $this->lostReportRepository->create($report);
+
+            if (!$createdReport) {
+                $this->connection->rollBack();
+                return RequestUtils::handleCreateFailure(false);
+            }
+
+            $savedStorageKeys = $this->imageService->saveUploads('lost-reports', (int) $createdReport['report_id'], $validatedUploads);
+            $this->connection->commit();
+        } catch (Throwable $error) {
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
+
+            $this->imageService->deleteStoredFiles($savedStorageKeys);
+            error_log($error->getMessage());
+            http_response_code(500);
+            return ['message' => 'Failed to create lost report and save its images.'];
         }
 
         $matchesSaved = $this->potentialMatchService->findPotentialMatches($createdReport);
@@ -176,7 +210,11 @@ class LostReportService {
             return ['message' => 'Active lost report not found.'];
         }
 
-        return RequestUtils::handleFindFailure($success) ?? $success;
+        $failure = RequestUtils::handleFindFailure($success);
+
+        if ($failure) return $failure;
+
+        return $this->imageService->attachImageUrls('lost-reports', [$success], 'report_id')[0];
     }
 
     public function cancelLostReportByCode(string $code): array {
