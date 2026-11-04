@@ -20,24 +20,25 @@ class ItemRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function create(Item $item): bool {
+    public function create(Item $item): int|false {
         $stmt = $this->connection->prepare('INSERT INTO items (
-            category_id, 
-            title, 
-            description, 
-            location_found, 
-            date_found, 
+            category_id,
+            title,
+            description,
+            location_found,
+            date_found,
             time_found
-            ) 
+            )
             VALUES (
-            :categoryId, 
-            :title, 
-            :description, 
-            :locationFound, 
-            :dateFound, 
+            :categoryId,
+            :title,
+            :description,
+            :locationFound,
+            :dateFound,
             :timeFound
-            )');
-        return $stmt->execute([
+            )
+            RETURNING item_id');
+        $success = $stmt->execute([
             'categoryId' => $item->getCategoryId(),
             'title' => $item->getTitle(),
             'description' => $item->getDescription(),
@@ -45,6 +46,8 @@ class ItemRepository {
             'dateFound' => $item->getDateFound(),
             'timeFound' => $item->getTimeFound()
         ]);
+
+        return $success ? (int) $stmt->fetchColumn() : false;
     }
 
     public function update(int $itemId, array $data): bool {
@@ -54,10 +57,9 @@ class ItemRepository {
             $updates[] = "$field = :$field";
         }
 
-        if(empty($updates)) return false; 
+        if (empty($updates)) return false;
 
         $sql = 'UPDATE items SET ' . implode(', ', $updates) . ' WHERE item_id = :itemId';
-
         $stmt = $this->connection->prepare($sql);
 
         return $stmt->execute([...$data, 'itemId' => $itemId]);
