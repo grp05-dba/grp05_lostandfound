@@ -157,7 +157,7 @@
               safe(i.status) +
               '</span></td><td><button class="row-action" data-detail="item" data-id="' +
               safe(i.item_id) +
-              '">View details</button></td></tr>',
+              '">Edit item</button></td></tr>',
           )
           .join("")
       : '<tr><td colspan="6" class="empty-row">No inventory records match your search.</td></tr>';
