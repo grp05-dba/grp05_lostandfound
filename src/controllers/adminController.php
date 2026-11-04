@@ -3,8 +3,10 @@
 class AdminController {
     private ItemService $itemService;
     private SMSService $smsService;
+    private CategoryService $categoryService;
     private LostReportService $lostReportService;
     private ClaimService $claimService;
+    private PotentialMatchService $potentialMatchService;
     private ImageService $imageService;
     private PDO $connection;
 
@@ -12,8 +14,10 @@ class AdminController {
         $this->connection = $connection;
         $this->itemService = new ItemService($connection);
         $this->smsService = new SMSService();
+        $this->categoryService = new CategoryService($connection);
         $this->lostReportService = new LostReportService($connection);
         $this->claimService = new ClaimService($connection);
+        $this->potentialMatchService = new PotentialMatchService($connection);
         $this->imageService = new ImageService($connection);
     }
 
@@ -24,6 +28,12 @@ class AdminController {
         //Lost report endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/lost-reports') {
             echo json_encode($this->lostReportService->getAllLostReports());
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/matches/')) {
+            $reportCode = str_replace('/api/admin/lost-reports/matches/', '', $path);
+            echo json_encode($this->potentialMatchService->getPotentialMatchesByReportCode($reportCode));
             return;
         }
 
@@ -103,6 +113,18 @@ class AdminController {
             $itemId = (int) str_replace('/api/admin/items/update/', '', $path);
             $result = $this->itemService->updateItem($itemId, RequestUtils::getRequestBody());
             echo json_encode($result);
+            return;
+        }
+
+        // Category endpoints-------------------------------------
+        if ($method === 'GET' && $path === '/api/admin/categories') {
+            echo json_encode($this->categoryService->getAllCategories());
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/categories/')) {
+            $id = (int) str_replace('/api/admin/categories/', '', $path);
+            echo json_encode($this->categoryService->getCategoryById($id));
             return;
         }
 

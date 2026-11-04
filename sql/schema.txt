@@ -1,45 +1,81 @@
+Database: grp05_lostandfounddb
+Schema: public
+
 CATEGORIES
-category_id PK
-name
+- category_id SERIAL PRIMARY KEY
+- name VARCHAR(100) NOT NULL
 
 ITEMS
-item_id PK
-category_id FK
-title
-description
-location_found
-date_found
-time_found
-status
-
-CLAIMS
-claim_id PK
-claim_code UQ
-item_id FK
-full_name
-student_number
-email
-phone_number NULL
-status
-created_at
+- item_id SERIAL PRIMARY KEY
+- category_id INT REFERENCES categories(category_id) ON DELETE SET NULL
+- title VARCHAR(255) NOT NULL
+- description TEXT NULL
+- location_found VARCHAR(255) NULL
+- date_found DATE NULL
+- time_found TIME NULL
+- status VARCHAR(50) DEFAULT 'unclaimed'
+	CHECK (status IN ('unclaimed', 'claimed', 'archived'))
 
 LOST_REPORTS
-report_id PK
-report_code UQ
-category_id FK
-title
-description
-location_lost NULL
-date_lost NULL
-time_lost NULL
-full_name
-student_number
-email NULL
-phone_number NULL
-status
-created_at
+- report_id SERIAL PRIMARY KEY
+- report_code VARCHAR(50) UNIQUE NOT NULL
+- category_id INT REFERENCES categories(category_id) ON DELETE SET NULL
+- title VARCHAR(255) NOT NULL
+- description TEXT NULL
+- location_lost VARCHAR(255) NULL
+- date_lost DATE NULL
+- time_lost TIME NULL
+- full_name VARCHAR(150) NOT NULL
+- student_number VARCHAR(50) NULL
+- email VARCHAR(150) NULL
+- phone_number VARCHAR(50) NULL
+- contact_preference VARCHAR(10) NOT NULL DEFAULT 'email'
+	CHECK (contact_preference IN ('email', 'sms'))
+- status VARCHAR(50) DEFAULT 'active'
+	CHECK (status IN ('active', 'resolved', 'cancelled'))
+- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+- CHECK (email IS NOT NULL OR phone_number IS NOT NULL)
+
+CLAIMS
+- claim_id SERIAL PRIMARY KEY
+- claim_code VARCHAR(50) UNIQUE NOT NULL
+- item_id INT REFERENCES items(item_id) ON DELETE CASCADE
+- full_name VARCHAR(150) NOT NULL
+- student_number VARCHAR(50) NULL
+- email VARCHAR(150) NULL
+- phone_number VARCHAR(50) NULL
+- contact_preference VARCHAR(10) NOT NULL DEFAULT 'email'
+	CHECK (contact_preference IN ('email', 'sms'))
+- status VARCHAR(50) DEFAULT 'pending'
+	CHECK (status IN ('pending', 'approved', 'rejected'))
+- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+- CHECK (email IS NOT NULL OR phone_number IS NOT NULL)
 
 POTENTIAL_MATCHES
-match_id PK
-report_id FK
-item_id FK
+- match_id SERIAL PRIMARY KEY
+- report_id INT REFERENCES lost_reports(report_id) ON DELETE CASCADE
+- item_id INT REFERENCES items(item_id) ON DELETE CASCADE
+- similarity_score NUMERIC(5, 2) NOT NULL DEFAULT 0
+	CHECK (similarity_score >= 0 AND similarity_score <= 100)
+- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+ITEM_IMAGES
+- item_image_id SERIAL PRIMARY KEY
+- item_id INT NOT NULL REFERENCES items(item_id) ON DELETE CASCADE
+- storage_key VARCHAR(100) NOT NULL
+- mime_type VARCHAR(50) NOT NULL
+- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+LOST_REPORT_IMAGES
+- report_image_id SERIAL PRIMARY KEY
+- report_id INT NOT NULL REFERENCES lost_reports(report_id) ON DELETE CASCADE
+- storage_key VARCHAR(100) NOT NULL
+- mime_type VARCHAR(50) NOT NULL
+- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+CLAIM_IMAGES
+- claim_image_id SERIAL PRIMARY KEY
+- claim_id INT NOT NULL REFERENCES claims(claim_id) ON DELETE CASCADE
+- storage_key VARCHAR(100) NOT NULL
+- mime_type VARCHAR(50) NOT NULL
+- created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
