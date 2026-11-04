@@ -155,6 +155,8 @@ Some create, status-update, and potential-match flows automatically attempt a no
 
 To enable notifications, create accounts with [TextBee](https://textbee.dev/) and [EmailJS](https://www.emailjs.com/), then configure these values in `.env`:
 
+**Prefer not to set up the notification providers yourself?** Configuring TextBee and EmailJS can take some time. Contact me directly and I can provide the notification-provider configuration for local development. Do not post private configuration values publicly or commit them to the repository.
+
 ```ini
 TEXTBEE_API_KEY=your_textbee_api_key
 TEXTBEE_BASE_URL=https://api.textbee.dev
