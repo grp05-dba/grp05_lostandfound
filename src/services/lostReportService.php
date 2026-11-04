@@ -38,7 +38,6 @@ class LostReportService {
 
         if (isset($data['category_id'])) {
             $category = $this->categoryRepository->getById((int) $data['category_id']);
-
             if (!$category) {
                 http_response_code(400);
                 return ['message' => 'Invalid category_id provided.'];
@@ -97,8 +96,8 @@ class LostReportService {
             contact_preference: $data['contact_preference'] ?? 'email'
         );
 
-        $success = $this->lostReportRepository->create($report);
-        if (!$success) return RequestUtils::handleCreateFailure(false);
+        $reportId = $this->lostReportRepository->create($report);
+        if ($reportId === false) return RequestUtils::handleCreateFailure(false);
 
         try {
             $this->potentialMatchService->generatePotentialMatches();
@@ -106,7 +105,10 @@ class LostReportService {
             error_log('Potential matching after lost report creation failed: ' . $e->getMessage());
         }
 
-        return RequestUtils::handleCreateFailure(true);
+        return array_merge(RequestUtils::handleCreateFailure(true), [
+            'report_id' => $reportId,
+            'report_code' => $report->getReportCode()
+        ]);
     }
 
     private function generateReportCode(): string {
