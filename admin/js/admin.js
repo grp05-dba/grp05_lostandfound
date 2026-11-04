@@ -1,10 +1,6 @@
 (() => {
   const ADMIN = window.location.origin + "/api/admin",
-    PUBLIC =
-      window.location.protocol +
-      "//" +
-      window.location.hostname +
-      ":8000/api/public";
+    PUBLIC = ADMIN.replace("/api/admin", "/api/public");
   const LOCATIONS = [
     "Library",
     "Computer Laboratory",
