@@ -1415,3 +1415,96 @@ a {
     .claim-item-preview { grid-template-columns: 1fr; }
     .claim-item-photo, .claim-item-photo img { height: 175px; max-height: 175px; }
 }
+
+
+/* Claimed item block in the public submission tracking result */
+#track-result .tracked-claim-item {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 18px 0;
+    padding: 16px;
+    border: 1px solid var(--line, #e3e5eb);
+    border-radius: 12px;
+    background: #f8f9fb;
+    text-align: left;
+}
+#track-result .tracked-claim-item h4 {
+    margin: 0 0 13px;
+    color: var(--ink, #202431);
+    font-size: 13px;
+    font-weight: 800;
+}
+#track-result .tracked-claim-item-card {
+    display: grid;
+    grid-template-columns: minmax(112px, 150px) minmax(0, 1fr);
+    align-items: start;
+    gap: 16px;
+    min-width: 0;
+}
+#track-result .tracked-claim-item-photo {
+    display: block;
+    width: 100%;
+    height: 132px;
+    min-height: 132px;
+    padding: 0;
+    border: 0;
+    border-radius: 9px;
+    overflow: hidden;
+    background: #eceef2;
+}
+#track-result button.tracked-claim-item-photo { cursor: zoom-in; }
+#track-result .tracked-claim-item-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+#track-result .tracked-claim-item-empty {
+    display: grid;
+    place-items: center;
+    color: #777d89;
+    font-size: 11px;
+    cursor: default;
+}
+#track-result .tracked-claim-item-card > div:last-child { min-width: 0; }
+#track-result .tracked-claim-item-card b {
+    display: block;
+    margin: 0 0 5px;
+    color: var(--ink, #202431);
+    font-size: 15px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+#track-result .tracked-claim-item-card p {
+    margin: 5px 0;
+    color: var(--muted, #697080);
+    font-size: 12px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+#track-result .tracked-claim-item-card p:first-of-type {
+    color: var(--ink, #343a48);
+    font-weight: 700;
+}
+#track-result .tracked-claim-item-card dl {
+    display: grid;
+    grid-template-columns: minmax(88px, 105px) minmax(0, 1fr);
+    gap: 6px 10px;
+    margin: 12px 0 0;
+    font-size: 11px;
+    line-height: 1.45;
+}
+#track-result .tracked-claim-item-card dt { color: var(--muted, #697080); }
+#track-result .tracked-claim-item-card dd {
+    min-width: 0;
+    margin: 0;
+    color: var(--ink, #202431);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+@media (max-width: 520px) {
+    #track-result .tracked-claim-item { padding: 12px; }
+    #track-result .tracked-claim-item-card { grid-template-columns: 1fr; gap: 11px; }
+    #track-result .tracked-claim-item-photo { height: 180px; }
+}
