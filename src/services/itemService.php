@@ -1,13 +1,19 @@
 <?php
 
 class ItemService { 
+    private PDO $connection;
     private ItemRepository $itemRepository;
-
     private CategoryRepository $categoryRepository;
 
+    private PotentialMatchService $potentialMatchService;
+    private ImageService $imageService;
+
     public function __construct(PDO $connection) {
+        $this->connection = $connection;
         $this->itemRepository = new ItemRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
+        $this->potentialMatchService = new PotentialMatchService($connection);
+        $this->imageService = new ImageService($connection);
     }
 
     public function test(): array{
@@ -15,15 +21,25 @@ class ItemService {
     }
 
     public function getAllItems(): array {
-        return $this->itemRepository->getAll();
+        $items = $this->itemRepository->getAll();
+        return $this->imageService->attachImageUrls('items', $items, 'item_id');
+    }
+
+    public function getAllUnclaimedItems(): array {
+        $items = $this->itemRepository->getAllUnclaimedItems();
+        return $this->imageService->attachImageUrls('items', $items, 'item_id');
     }
 
     public function getItemById(int $id): array {
         $success = $this->itemRepository->getById($id);
-        return RequestUtils::handleFindFailure($success) ?? $success;
+        $failure = RequestUtils::handleFindFailure($success);
+
+        if ($failure) return $failure;
+
+        return $this->imageService->attachImageUrls('items', [$success], 'item_id')[0];
     }
 
-    public function createItem(array $data): array {
+    public function createItem(array $data, array $uploads = []): array {
         $validationError = RequestUtils::validateRequiredFields($data, Item::class);
         if ($validationError) return $validationError;
 
@@ -32,6 +48,13 @@ class ItemService {
 
         $validationError = RequestUtils::validateDateTimeFields($data);
         if ($validationError) return $validationError;
+
+        try {
+            $validatedUploads = $this->imageService->validateUploads($uploads);
+        } catch (InvalidArgumentException $error) {
+            http_response_code(400);
+            return ['message' => $error->getMessage()];
+        }
 
         $category = $this->categoryRepository->getById((int) $data['category_id']);
         if (!$category) {
@@ -48,11 +71,34 @@ class ItemService {
             time_found: $data['time_found']
         );
 
-        $success = $this->itemRepository->create($item);
+        $savedStorageKeys = [];
 
-        return RequestUtils::handleCreateFailure($success);
+        try {
+            $this->connection->beginTransaction();
+            $createdItem = $this->itemRepository->create($item);
+
+            if (!$createdItem) {
+                $this->connection->rollBack();
+                return RequestUtils::handleCreateFailure(false);
+            }
+
+            $savedStorageKeys = $this->imageService->saveUploads('items', (int) $createdItem['item_id'], $validatedUploads);
+            $this->connection->commit();
+        } catch (Throwable $error) {
+            if ($this->connection->inTransaction()) {
+                $this->connection->rollBack();
+            }
+
+            $this->imageService->deleteStoredFiles($savedStorageKeys);
+            error_log($error->getMessage());
+            http_response_code(500);
+            return ['message' => 'Failed to create item and save its images.'];
+        }
+
+        $matchesSaved = $this->potentialMatchService->findPotentialReports($createdItem);
+        return RequestUtils::handleCreateFailure(true, $matchesSaved);
     }
-//hehe
+    
     public function updateItem(int $itemId, array $data): array {
         $item = $this->itemRepository->getById($itemId);
         if (!$item) {
@@ -78,8 +124,35 @@ class ItemService {
             }
         }
 
-        $success = $this->itemRepository->update($itemId, $data);
+        if (array_key_exists('status', $data)) {
+            $allowedStatuses = ['unclaimed', 'claimed', 'archived'];
+            if (!is_string($data['status']) || !in_array($data['status'], $allowedStatuses, true)) {
+                http_response_code(400);
+                return ['message' => 'Invalid status provided. Allowed values: unclaimed, claimed, archived.'];
+            }
+        }
 
-        return RequestUtils::handleUpdateFailure($success);
+        $success = $this->itemRepository->update($itemId, $data);
+        $matchesRefreshed = 0;
+        $matchesSaved = null;
+
+        if ($success) {
+            $updatedItem = $this->itemRepository->getById($itemId);
+            
+            if($updatedItem){
+                if ($updatedItem['status'] !== 'unclaimed') {
+                    $this->potentialMatchService->deleteByItemId($itemId);
+                    $matchesRefreshed = 2;
+                } elseif (
+                    $item['status'] !== 'unclaimed' ||
+                    $this->potentialMatchService->hasMatchingFieldsChanged($data, $item)
+                ) {
+                    $this->potentialMatchService->deleteByItemId($itemId);
+                    $matchesSaved = $this->potentialMatchService->findPotentialReports($updatedItem);
+                    $matchesRefreshed = 1;
+                }
+            }
+        }
+        return RequestUtils::handleUpdateFailure($success, $matchesRefreshed, $matchesSaved);
     }
 }

@@ -28,10 +28,14 @@ CREATE TABLE lost_reports (
     time_lost TIME,
     full_name VARCHAR(150) NOT NULL,
     student_number VARCHAR(50),
-    email VARCHAR(150) NOT NULL,
+    email VARCHAR(150),
     phone_number VARCHAR(50),
+    contact_preference VARCHAR(10) NOT NULL DEFAULT 'email' CHECK (contact_preference IN ('email', 'sms')),
     status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'resolved', 'cancelled')),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_lost_reports_contact
+    CHECK (email IS NOT NULL OR phone_number IS NOT NULL);
 );
 
 -- 4. CLAIMS
@@ -41,15 +45,48 @@ CREATE TABLE claims (
     item_id INT REFERENCES items(item_id) ON DELETE CASCADE,
     full_name VARCHAR(150) NOT NULL,
     student_number VARCHAR(50),
-    email VARCHAR(150) NOT NULL,
+    email VARCHAR(150),
     phone_number VARCHAR(50),
+    contact_preference VARCHAR(10) NOT NULL DEFAULT 'email' CHECK (contact_preference IN ('email', 'sms')),
     status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT chk_claims_contact
+    CHECK (email IS NOT NULL OR phone_number IS NOT NULL);
 );
 
 -- 5. POTENTIAL_MATCHES
 CREATE TABLE potential_matches (
     match_id SERIAL PRIMARY KEY,
     report_id INT REFERENCES lost_reports(report_id) ON DELETE CASCADE,
-    item_id INT REFERENCES items(item_id) ON DELETE CASCADE
+    item_id INT REFERENCES items(item_id) ON DELETE CASCADE,
+    similarity_score NUMERIC(5, 2) NOT NULL DEFAULT 0 CHECK (similarity_score >= 0 AND similarity_score <= 100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 6. ITEM_IMAGES
+CREATE TABLE item_images (
+    item_image_id SERIAL PRIMARY KEY,
+    item_id INT NOT NULL REFERENCES items(item_id) ON DELETE CASCADE,
+    storage_key VARCHAR(100) NOT NULL,
+    mime_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 7. LOST_REPORT_IMAGES
+CREATE TABLE lost_report_images (
+    report_image_id SERIAL PRIMARY KEY,
+    report_id INT NOT NULL REFERENCES lost_reports(report_id) ON DELETE CASCADE,
+    storage_key VARCHAR(100) NOT NULL,
+    mime_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 8. CLAIM_IMAGES
+CREATE TABLE claim_images (
+    claim_image_id SERIAL PRIMARY KEY,
+    claim_id INT NOT NULL REFERENCES claims(claim_id) ON DELETE CASCADE,
+    storage_key VARCHAR(100) NOT NULL,
+    mime_type VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

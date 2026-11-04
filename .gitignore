@@ -2,3 +2,9 @@
 sql/grp05_lostandfounddb_role_creation_script.sql
 public/send-sms.php
 public/test.php
+/storage/items/*
+!/storage/items/.gitkeep
+/storage/lost-reports/*
+!/storage/lost-reports/.gitkeep
+/storage/claims/*
+!/storage/claims/.gitkeep

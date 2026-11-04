@@ -48,3 +48,4 @@ VALUES (
 
 INSERT INTO potential_matches (report_id, item_id)
 VALUES (1,1);
+

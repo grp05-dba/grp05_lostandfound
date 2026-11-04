@@ -19,6 +19,12 @@ class ClaimRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getByCode(string $code): array|false {
+        $stmt = $this->connection->prepare('SELECT * FROM claims WHERE claim_code = :code');
+        $stmt->execute(['code' => $code]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function codeExists(string $code): bool {
         $stmt = $this->connection->prepare('SELECT 1 FROM claims WHERE claim_code = :code');
         $stmt->execute(['code' => $code]);
@@ -27,8 +33,8 @@ class ClaimRepository {
 
     public function create(Claim $claim): bool {
         $stmt = $this->connection->prepare(
-            'INSERT INTO claims (claim_code, item_id, full_name, student_number, email, phone_number) 
-            SELECT :claimCode, item_id, :fullName, :studentNumber, :email, :phoneNumber
+            'INSERT INTO claims (claim_code, item_id, full_name, student_number, email, phone_number, contact_preference) 
+            SELECT :claimCode, item_id, :fullName, :studentNumber, :email, :phoneNumber, :contactPreference
             FROM items WHERE item_id = :itemId AND status = :status');
         $success = $stmt->execute([
             'claimCode' => $claim->getClaimCode(),
@@ -37,8 +43,24 @@ class ClaimRepository {
             'studentNumber' => $claim->getStudentNumber(),
             'email' => $claim->getEmail(),
             'phoneNumber' => $claim->getPhoneNumber(),
+            'contactPreference' => $claim->getContactPreference(),
             'status' => 'unclaimed'
         ]);
         return $success && $stmt->rowCount() === 1;
+    }
+
+    public function update(int $claimId, array $data): bool {
+        $updates = [];
+
+        foreach ($data as $field => $value) {
+            $updates[] = "$field = :$field";
+        }
+
+        if(empty($updates)) return false;
+
+        $sql = 'UPDATE claims SET ' . implode(', ', $updates) . ' WHERE claim_id = :claimId';
+        $stmt = $this->connection->prepare($sql);
+
+        return $stmt->execute([...$data, 'claimId' => $claimId]);
     }
 }
