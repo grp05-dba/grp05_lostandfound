@@ -126,6 +126,9 @@
     rows.forEach((item) => {
       const card = document.createElement("article");
       card.className = "item-card";
+      card.tabIndex = 0;
+      card.setAttribute("role", "button");
+      card.setAttribute("aria-label", "View details for " + (item.title || "found item"));
       const img = imageUrl(item);
       card.innerHTML =
         '<div class="item-image">' +
@@ -153,7 +156,14 @@
         "</span><span>◷ " +
         esc(item.date_found || "Date unavailable") +
         '</span></div><button class="button button-primary claim-button" type="button">Claim this item <span>↗</span></button></div>';
-      $(".claim-button", card).addEventListener("click", () => openClaim(item));
+      $(".claim-button", card).addEventListener("click", (event) => { event.stopPropagation(); openClaim(item); });
+      card.addEventListener("click", () => openItemDetails(item));
+      card.addEventListener("keydown", (event) => {
+        if (event.target === card && (event.key === "Enter" || event.key === " ")) {
+          event.preventDefault();
+          openItemDetails(item);
+        }
+      });
       grid.append(card);
     });
   }
@@ -180,6 +190,31 @@
   function openDialog(id) {
     const d = document.getElementById(id);
     if (d && !d.open) d.showModal();
+  }
+  function openItemDetails(item) {
+    const gallery = Array.isArray(item.images) ? item.images : [];
+    const images = gallery.length
+      ? '<div class="public-item-gallery">' + gallery.map((entry) => {
+          const url = entry.url || "";
+          const src = url.startsWith("http") ? url : window.location.origin + url;
+          return '<img src="' + esc(src) + '" alt="' + esc(item.title || "Found item") + ' photo">';
+        }).join("") + "</div>"
+      : '<div class="public-item-no-image">No photo available</div>';
+    const category = item.category_name || state.categories.find((c) => String(c.category_id) === String(item.category_id))?.name || "Found property";
+    $("#item-detail-content").innerHTML = images +
+      '<div class="public-item-detail"><span class="item-category">' + esc(category) + '</span><h3>' + esc(item.title || "Found item") + '</h3>' +
+      '<p>' + esc(item.description || "No description provided.") + '</p><dl>' +
+      '<dt>Location found</dt><dd>' + esc(item.location_found || "Not specified") + '</dd>' +
+      '<dt>Date found</dt><dd>' + esc(item.date_found || "Not available") + '</dd>' +
+      '<dt>Time found</dt><dd>' + esc(item.time_found || "Not available") + '</dd>' +
+      '<dt>Status</dt><dd><span class="status-pill">Unclaimed</span></dd></dl>' +
+      '<button type="button" class="button button-primary" id="detail-claim-button">Claim this item <span>↗</span></button></div>';
+    $("#item-detail-title").textContent = item.title || "Found item details";
+    $("#detail-claim-button").addEventListener("click", () => {
+      closeDialogs();
+      openClaim(item);
+    });
+    openDialog("item-detail-dialog");
   }
   function closeDialogs() {
     document.querySelectorAll("dialog[open]").forEach((d) => d.close());
