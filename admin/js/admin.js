@@ -514,7 +514,7 @@
         body: JSON.stringify(data),
       });
       $("#detail-dialog").close();
-      toast(isClaimStatus(data.status) ? "Record updated" : "Record updated");
+      toast("Record updated");
       await loadAll();
     } catch (error) {
       msg(form, error.message, true);
