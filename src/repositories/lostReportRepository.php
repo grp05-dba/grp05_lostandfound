@@ -32,7 +32,7 @@ class LostReportRepository {
             $updates[] = "$field = :$field";
         }
 
-        if(empty($updates)) return false;
+        if (empty($updates)) return false;
 
         $sql = 'UPDATE lost_reports SET ' . implode(', ', $updates) . ' WHERE report_id = :reportId';
         $stmt = $this->connection->prepare($sql);
@@ -40,15 +40,15 @@ class LostReportRepository {
         return $stmt->execute([...$data, 'reportId' => $reportId]);
     }
 
-    public function create(LostReport $report): bool {
+    public function create(LostReport $report): int|false {
         $stmt = $this->connection->prepare('INSERT INTO lost_reports (
             report_code, category_id, title, description, location_lost, date_lost,
             time_lost, full_name, student_number, email, phone_number, contact_preference
         ) VALUES (
             :reportCode, :categoryId, :title, :description, :locationLost, :dateLost,
             :timeLost, :fullName, :studentNumber, :email, :phoneNumber, :contactPreference
-        )');
-        return $stmt->execute([
+        ) RETURNING report_id');
+        $success = $stmt->execute([
             'reportCode' => $report->getReportCode(),
             'categoryId' => $report->getCategoryId(),
             'title' => $report->getTitle(),
@@ -62,5 +62,7 @@ class LostReportRepository {
             'phoneNumber' => $report->getPhoneNumber(),
             'contactPreference' => $report->getContactPreference()
         ]);
+
+        return $success ? (int) $stmt->fetchColumn() : false;
     }
 }
