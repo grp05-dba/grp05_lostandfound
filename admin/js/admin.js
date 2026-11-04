@@ -419,6 +419,17 @@
         LOCATIONS.map((v) => '<option value="' + safe(v) + '"' + (String(val) === v ? " selected" : "") + '>' + safe(v) + '</option>').join("") +
         '</select></label>';
     }
+    if (name === "location_lost") {
+      const currentLocation = String(val);
+      const hasExistingLocation = LOCATIONS.includes(currentLocation);
+      return '<label class="field"><span>Location lost</span><select name="location_lost">' +
+        '<option value="">Choose campus location</option>' +
+        (!hasExistingLocation && currentLocation
+          ? '<option value="' + safe(currentLocation) + '" selected>' + safe(currentLocation) + ' (previously entered)</option>'
+          : '') +
+        LOCATIONS.map((v) => '<option value="' + safe(v) + '"' + (currentLocation === v ? " selected" : "") + '>' + safe(v) + '</option>').join("") +
+        '</select></label>';
+    }
     if (name === "category_id") {
       return '<label class="field"><span>Category *</span><select name="category_id" required>' +
         state.categories.map((c) => '<option value="' + safe(c.category_id) + '"' + (String(val) === String(c.category_id) ? " selected" : "") + '>' + safe(c.name) + '</option>').join("") +
