@@ -57,6 +57,12 @@ class AdminController {
             return;
         }
 
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/items/images/')) {
+            $imageId = (int) str_replace('/api/admin/items/images/', '', $path);
+            $this->sendImage('items', $imageId);
+            return;
+        }
+
         if ($method === 'GET' && str_starts_with($path, '/api/admin/claims/images/')) {
             $imageId = (int) str_replace('/api/admin/claims/images/', '', $path);
             $image = $this->imageService->getImageFile('claims', $imageId);
@@ -161,5 +167,20 @@ class AdminController {
 
         http_response_code(404);
         echo json_encode(['error' => 'Admin endpoint not found']);
+    }
+    private function sendImage(string $entityType, int $imageId): void {
+        $image = $this->imageService->getImageFile($entityType, $imageId);
+
+        if (!$image) {
+            http_response_code(404);
+            echo json_encode(['message' => 'Image not found.']);
+            return;
+        }
+
+        header('Content-Type: ' . $image['mime_type']);
+        header('Content-Length: ' . filesize($image['file_path']));
+        header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: private, max-age=86400');
+        readfile($image['file_path']);
     }
 }
