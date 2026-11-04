@@ -3,6 +3,7 @@
 class AdminController {
     private ItemService $itemService;
     private SMSService $smsService;
+    private CategoryService $categoryService;
     private LostReportService $lostReportService;
     private ClaimService $claimService;
     private PhotoService $photoService;
@@ -12,6 +13,7 @@ class AdminController {
         $this->connection = $connection;
         $this->itemService = new ItemService($connection);
         $this->smsService = new SMSService();
+        $this->categoryService = new CategoryService($connection);
         $this->lostReportService = new LostReportService($connection);
         $this->claimService = new ClaimService($connection);
         $this->photoService = new PhotoService($connection);
@@ -24,6 +26,12 @@ class AdminController {
         //Lost report endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/lost-reports') {
             echo json_encode($this->lostReportService->getAllLostReports());
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/matches/')) {
+            $reportCode = str_replace('/api/admin/lost-reports/matches/', '', $path);
+            echo json_encode($this->potentialMatchService->getPotentialMatchesByReportCode($reportCode));
             return;
         }
 
@@ -44,6 +52,24 @@ class AdminController {
         //Claim endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/claims') {
             echo json_encode($this->claimService->getAllClaims());
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/claims/images/')) {
+            $imageId = (int) str_replace('/api/admin/claims/images/', '', $path);
+            $image = $this->imageService->getImageFile('claims', $imageId);
+
+            if (!$image) {
+                http_response_code(404);
+                echo json_encode(['message' => 'Image not found.']);
+                return;
+            }
+
+            header('Content-Type: ' . $image['mime_type']);
+            header('Content-Length: ' . filesize($image['file_path']));
+            header('X-Content-Type-Options: nosniff');
+            header('Cache-Control: private, max-age=86400');
+            readfile($image['file_path']);
             return;
         }
 
@@ -97,7 +123,10 @@ class AdminController {
         }
 
         if ($method === 'POST' && $path === '/api/admin/items/add') {
-            $result = $this->itemService->createItem(RequestUtils::getRequestBody());
+            $result = $this->itemService->createItem(
+                RequestUtils::getRequestData(),
+                $_FILES['images'] ?? []
+            );
             echo json_encode($result);
             return;
         }
@@ -106,6 +135,18 @@ class AdminController {
             $itemId = (int) str_replace('/api/admin/items/update/', '', $path);
             $result = $this->itemService->updateItem($itemId, RequestUtils::getRequestBody());
             echo json_encode($result);
+            return;
+        }
+
+        // Category endpoints-------------------------------------
+        if ($method === 'GET' && $path === '/api/admin/categories') {
+            echo json_encode($this->categoryService->getAllCategories());
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/categories/')) {
+            $id = (int) str_replace('/api/admin/categories/', '', $path);
+            echo json_encode($this->categoryService->getCategoryById($id));
             return;
         }
 

@@ -1,23 +1,35 @@
 <?php
 
 class LostReportService {
+    private PDO $connection;
     private LostReportRepository $lostReportRepository;
     private CategoryRepository $categoryRepository;
     private PotentialMatchService $potentialMatchService;
 
+    private PotentialMatchService $potentialMatchService;
+    private SMSService $smsService;
+    private EmailService $emailService;
+    private ImageService $imageService;
+
     public function __construct(PDO $connection) {
+        $this->connection = $connection;
         $this->lostReportRepository = new LostReportRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
         $this->potentialMatchService = new PotentialMatchService($connection);
     }
 
     public function getAllLostReports(): array {
-        return $this->lostReportRepository->getAll();
+        $reports = $this->lostReportRepository->getAll();
+        return $this->imageService->attachImageUrls('lost-reports', $reports, 'report_id');
     }
 
     public function getLostReportById(int $id): array {
         $success = $this->lostReportRepository->getById($id);
-        return RequestUtils::handleFindFailure($success) ?? $success;
+        $failure = RequestUtils::handleFindFailure($success);
+
+        if ($failure) return $failure;
+
+        return $this->imageService->attachImageUrls('lost-reports', [$success], 'report_id')[0];
     }
 
     public function updateLostReport(int $reportId, array $data): array {
@@ -27,10 +39,15 @@ class LostReportService {
             return ['message' => 'Lost report not found.'];
         }
 
+        $data = RequestUtils::normalizeContactFields($data);
+
         $validationError = RequestUtils::validatePatchFields($data, LostReport::class);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateContactPreference($data, $report);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateDateTimeFields($data);
@@ -56,10 +73,51 @@ class LostReportService {
                 http_response_code(400);
                 return ['message' => 'Invalid status provided. Allowed values: active, resolved, cancelled.'];
             }
+
         }
 
         $success = $this->lostReportRepository->update($reportId, $data);
-        return RequestUtils::handleUpdateFailure($success);
+        $matchesRefreshed = 0;
+        $matchesSaved = null;
+
+        if ($success) {
+            $updatedReport = $this->lostReportRepository->getById($reportId);
+
+            if ($updatedReport) {
+                if (
+                    $report['status'] !== 'cancelled' &&
+                    $updatedReport['status'] === 'cancelled' &&
+                    $updatedReport['contact_preference'] === 'sms' &&
+                    !empty($updatedReport['phone_number'])
+                ) {
+                    $smsResult = $this->smsService->sendSMSLostReportCancellation($updatedReport);
+                    error_log('TextBee lost-report cancellation response: ' . json_encode($smsResult));
+                }
+
+                if (
+                    $report['status'] !== 'cancelled' &&
+                    $updatedReport['status'] === 'cancelled' &&
+                    $updatedReport['contact_preference'] === 'email' &&
+                    !empty($updatedReport['email'])
+                ) {
+                    $emailResult = $this->emailService->sendEmailLostReportCancellation($updatedReport);
+                    error_log('EmailJS lost-report cancellation response: ' . json_encode($emailResult));
+                }
+
+                if ($updatedReport['status'] !== 'active') {
+                    $this->potentialMatchService->deleteByReportId($reportId);
+                    $matchesRefreshed = 2;
+                } elseif (
+                    $report['status'] !== 'active' ||
+                    $this->potentialMatchService->hasMatchingFieldsChanged($data, $report)
+                ) {
+                    $this->potentialMatchService->deleteByReportId($reportId);
+                    $matchesSaved = $this->potentialMatchService->findPotentialMatches($updatedReport);
+                    $matchesRefreshed = 1;
+                }
+            }
+        }
+        return RequestUtils::handleUpdateFailure($success, $matchesRefreshed, $matchesSaved);
     }
 
     public function createLostReport(array $data): array {
@@ -67,6 +125,9 @@ class LostReportService {
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateGeneralFields($data);
+        if ($validationError) return $validationError;
+
+        $validationError = RequestUtils::validateContactPreference($data);
         if ($validationError) return $validationError;
 
         $validationError = RequestUtils::validateDateTimeFields($data);
@@ -108,7 +169,9 @@ class LostReportService {
 
         return RequestUtils::handleCreateFailure(true);
     }
+    
 
+    // Private helper methods --------------------------------
     private function generateReportCode(): string {
         do {
             $code = 'LR-' . date('Y') . '-' . random_int(100000, 999999);

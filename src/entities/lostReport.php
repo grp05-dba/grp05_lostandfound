@@ -10,7 +10,7 @@ class LostReport {
     private ?string $time_lost;
     private string $full_name;
     private string $student_number;
-    private string $email;
+    private ?string $email;
     private ?string $phone_number;
     private string $contact_preference;
     private string $status; //automatically set to "active" when an item is created by POSTGRESQL
@@ -80,7 +80,7 @@ class LostReport {
         return $this->student_number;
     }
 
-    public function getEmail(): string {
+    public function getEmail(): ?string {
         return $this->email;
     }
 

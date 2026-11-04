@@ -9,6 +9,8 @@ Install the following before running the project:
 - **Git** — for version control and working with branches.
 - **API testing tool** — Postman or Thunder Client.
 - **Code editor** — such as VS Code.
+- **TextBee account (optional)** — required to configure and test SMS notifications.
+- **EmailJS account (optional)** — required to configure and test email notifications.
 
 You may use a Windows PHP installation or a development environment such as XAMPP, provided the PHP version being used by the project has PostgreSQL support enabled.
 
@@ -53,12 +55,17 @@ The repository contains the following SQL scripts:
 
 - `sql/grp05_lostandfounddb_script.sql` — creates the database tables and schema.
 - `sql/grp05_lostandfounddb_test_data_script.sql` — inserts test data.
+- `sql/grp05_lostandfounddb_role_creation_sample_script.sql` — creates the application and public database roles and grants their privileges.
 
 Run `grp05_lostandfounddb_script.sql` against the `grp05_lostandfounddb` database first.
 
 After the schema has been created successfully, run `grp05_lostandfounddb_test_data_script.sql` against the same database.
 
 **Important:** Execute the schema script before the test-data script because the test data depends on the tables and relationships defined by the schema.
+
+### Step 4: Create the application database roles
+
+After creating the schema, run `grp05_lostandfounddb_role_creation_sample_script.sql` with a PostgreSQL administrator account. Replace both `enter_your_password_here` placeholders with local passwords before running it. Use the same credentials for `DB_USER` / `DB_PASSWORD` and `DB_PUBLIC_USER` / `DB_PUBLIC_PASSWORD` in `.env`, respectively. Do not commit the passwords.
 
 ## 4. Configure PHP PostgreSQL Support
 
@@ -118,59 +125,85 @@ If you use XAMPP, make sure you configure the `php.ini` belonging to the PHP ins
 
 ## 5. Configure the Environment Variables
 
-The database connection reads its configuration from a `.env` file in the project root.
+The API reads configuration from a `.env` file in the project root. Start by copying the example file:
 
-Create a file named `.env` alongside the `public/`, `src/`, and `sql/` directories.
+```powershell
+Copy-Item .env.example .env
+```
 
-Add the following configuration:
+On macOS/Linux, use `cp .env.example .env` instead.
+
+Set the database values in `.env`:
 
 ```ini
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=grp05_lostandfounddb
-DB_USER=your_postgres_username
-DB_PASSWORD=your_postgres_password
+DB_USER=your_database_user
+DB_PASSWORD=your_database_password
+DB_PUBLIC_USER=your_database_public_user
+DB_PUBLIC_PASSWORD=your_database_public_password
 ```
 
-Replace the username and password with the credentials for your PostgreSQL account.
+The admin server uses `DB_USER` and `DB_PASSWORD`. The public server uses `DB_PUBLIC_USER` and `DB_PUBLIC_PASSWORD`. These must match the PostgreSQL roles and passwords configured for the project. The entry points are separate: `admin/index.php` only accepts `/api/admin/...` requests, and `public/index.php` only accepts `/api/public/...` requests.
 
-For example, if your local PostgreSQL account is named `postgres`, set `DB_USER=postgres` and provide its actual password.
+### Optional notification integrations
+
+TextBee and EmailJS are not required to start the API or use its core database features, such as creating records, browsing/searching items, and testing database operations. Their credentials are only needed to deliver SMS and email notifications.
+
+Some create, status-update, and potential-match flows automatically attempt a notification according to the user's contact preference. Without valid provider settings, the notification will not be delivered and PHP may emit warnings, but the database operation is performed before the notification attempt.
+
+To enable notifications, create accounts with [TextBee](https://textbee.dev/) and [EmailJS](https://www.emailjs.com/), then configure these values in `.env`:
+
+```ini
+TEXTBEE_API_KEY=your_textbee_api_key
+TEXTBEE_BASE_URL=https://api.textbee.dev
+
+EMAILJS_BASE_URL=https://api.emailjs.com
+EMAILJS_SERVICE_ID=your_emailjs_service_id
+EMAILJS_TEMPLATE_ID=your_emailjs_template_id
+EMAILJS_PUBLIC_KEY=your_emailjs_public_key
+```
+
+Configure the EmailJS template to accept the `body` and `email` template parameters sent by the application. Without valid provider settings, notifications cannot be delivered; the core database/API workflows remain usable.
 
 **Important:**
-- Do not commit `.env` to GitHub.
-- Keep database credentials private.
-- Make sure `.env` is listed in `.gitignore`.
-- Do not include real passwords in screenshots, commits, or shared documentation.
+- Never commit `.env` or real database/provider credentials.
+- Keep `.env` local; `.gitignore` should exclude it.
+- Use placeholders only in `.env.example`, screenshots, and shared documentation.
 
-The provided `src/db/db.php` reads these values using `parse_ini_file()` and uses them to create a PDO connection to PostgreSQL.
+`src/db/db.php` reads `.env` with PHP's `parse_ini_file()` and selects the admin or public credentials according to which entry point is handling the request.
 
 ## 6. Run the API
 
-From the project root, run:
+Run each API from the project root in its own terminal. They use different document roots and ports so they can run at the same time.
 
-```powershell
+### Public API
+
+```sh
 php -S 127.0.0.1:8000 -t public
 ```
 
-This starts PHP's built-in development server on port `8000`, using `public/` as the document root.
+Public base URL: `http://127.0.0.1:8000`
 
-Keep the terminal open while testing the API.
+### Admin API
 
-To check that the API is running, send a request using Postman or Thunder Client:
+In a second terminal:
+
+```sh
+php -S 127.0.0.1:8001 -t admin
+```
+
+Admin base URL: `http://127.0.0.1:8001`
+
+Keep both terminals open while using the APIs. For a quick check, send these requests with Postman or Thunder Client:
 
 ```http
-GET http://127.0.0.1:8000/api/admin/test
+GET http://127.0.0.1:8000/api/public/categories
+GET http://127.0.0.1:8001/api/admin/test
 ```
 
-The expected response is similar to:
-
-```json
-{
-  "message": "its working! :D"
-}
-```
-
-If you receive a database connection error, verify the PostgreSQL service, `.env` credentials, database name, and PHP extensions.
+The first request should return the category list; the second should return the API test message. If either reports a database connection error, check the PostgreSQL service, the matching admin/public credentials in `.env`, the database name, and the PHP PostgreSQL extensions.
 
 ## 7. Test the API
 

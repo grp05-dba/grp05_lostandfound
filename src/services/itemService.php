@@ -1,12 +1,16 @@
 <?php
 
 class ItemService { 
+    private PDO $connection;
     private ItemRepository $itemRepository;
-
     private CategoryRepository $categoryRepository;
     private PotentialMatchService $potentialMatchService;
 
+    private PotentialMatchService $potentialMatchService;
+    private ImageService $imageService;
+
     public function __construct(PDO $connection) {
+        $this->connection = $connection;
         $this->itemRepository = new ItemRepository($connection);
         $this->categoryRepository = new CategoryRepository($connection);
         $this->potentialMatchService = new PotentialMatchService($connection);
@@ -17,15 +21,25 @@ class ItemService {
     }
 
     public function getAllItems(): array {
-        return $this->itemRepository->getAll();
+        $items = $this->itemRepository->getAll();
+        return $this->imageService->attachImageUrls('items', $items, 'item_id');
+    }
+
+    public function getAllUnclaimedItems(): array {
+        $items = $this->itemRepository->getAllUnclaimedItems();
+        return $this->imageService->attachImageUrls('items', $items, 'item_id');
     }
 
     public function getItemById(int $id): array {
         $success = $this->itemRepository->getById($id);
-        return RequestUtils::handleFindFailure($success) ?? $success;
+        $failure = RequestUtils::handleFindFailure($success);
+
+        if ($failure) return $failure;
+
+        return $this->imageService->attachImageUrls('items', [$success], 'item_id')[0];
     }
 
-    public function createItem(array $data): array {
+    public function createItem(array $data, array $uploads = []): array {
         $validationError = RequestUtils::validateRequiredFields($data, Item::class);
         if ($validationError) return $validationError;
 
@@ -34,6 +48,13 @@ class ItemService {
 
         $validationError = RequestUtils::validateDateTimeFields($data);
         if ($validationError) return $validationError;
+
+        try {
+            $validatedUploads = $this->imageService->validateUploads($uploads);
+        } catch (InvalidArgumentException $error) {
+            http_response_code(400);
+            return ['message' => $error->getMessage()];
+        }
 
         $category = $this->categoryRepository->getById((int) $data['category_id']);
         if (!$category) {
@@ -61,7 +82,7 @@ class ItemService {
 
         return RequestUtils::handleCreateFailure(true);
     }
-//hehe
+    
     public function updateItem(int $itemId, array $data): array {
         $item = $this->itemRepository->getById($itemId);
         if (!$item) {
@@ -91,12 +112,31 @@ class ItemService {
             $allowedStatuses = ['unclaimed', 'claimed', 'archived'];
             if (!is_string($data['status']) || !in_array($data['status'], $allowedStatuses, true)) {
                 http_response_code(400);
-                return ['message' => 'Invalid status provided. Allowed values: pending, approved, rejected.'];
+                return ['message' => 'Invalid status provided. Allowed values: unclaimed, claimed, archived.'];
             }
         }
 
         $success = $this->itemRepository->update($itemId, $data);
+        $matchesRefreshed = 0;
+        $matchesSaved = null;
 
-        return RequestUtils::handleUpdateFailure($success);
+        if ($success) {
+            $updatedItem = $this->itemRepository->getById($itemId);
+            
+            if($updatedItem){
+                if ($updatedItem['status'] !== 'unclaimed') {
+                    $this->potentialMatchService->deleteByItemId($itemId);
+                    $matchesRefreshed = 2;
+                } elseif (
+                    $item['status'] !== 'unclaimed' ||
+                    $this->potentialMatchService->hasMatchingFieldsChanged($data, $item)
+                ) {
+                    $this->potentialMatchService->deleteByItemId($itemId);
+                    $matchesSaved = $this->potentialMatchService->findPotentialReports($updatedItem);
+                    $matchesRefreshed = 1;
+                }
+            }
+        }
+        return RequestUtils::handleUpdateFailure($success, $matchesRefreshed, $matchesSaved);
     }
 }

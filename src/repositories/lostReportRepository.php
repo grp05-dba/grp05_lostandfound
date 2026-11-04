@@ -19,6 +19,12 @@ class LostReportRepository {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    public function getByCode(string $code): array|false {
+        $stmt = $this->connection->prepare('SELECT * FROM lost_reports WHERE report_code = :code');
+        $stmt->execute(['code' => $code]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function codeExists(string $code): bool {
         $stmt = $this->connection->prepare('SELECT 1 FROM lost_reports WHERE report_code = :code');
         $stmt->execute(['code' => $code]);
@@ -62,5 +68,19 @@ class LostReportRepository {
             'phoneNumber' => $report->getPhoneNumber(),
             'contactPreference' => $report->getContactPreference()
         ]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getEligibleReports(string $dateFound): array {
+        $stmt = $this->connection->prepare('SELECT * FROM lost_reports WHERE status = :status AND (date_lost IS NULL OR date_lost <= :dateFound)');
+        $stmt->execute(['status' => 'active', 'dateFound' => $dateFound]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getAllActiveReports(): array {
+        $stmt = $this->connection->prepare('SELECT * FROM lost_reports WHERE status = :status');
+        $stmt->execute(['status' => 'active']);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
