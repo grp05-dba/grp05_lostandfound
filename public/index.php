@@ -6,7 +6,7 @@ require_once __DIR__ . '/../src/db/db.php';
 require_once __DIR__ . '/../src/integrations/textbeeClient.php';
 require_once __DIR__ . '/../src/integrations/emailJSClient.php';
 
-require_once __DIR__ . '/../src/controllers/adminController.php';
+require_once __DIR__ . '/../src/controllers/publicController.php';
 
 require_once __DIR__ . '/../src/services/itemService.php';
 require_once __DIR__ . '/../src/services/searchService.php';
@@ -43,8 +43,8 @@ $controller = null;
 $method = $_SERVER['REQUEST_METHOD'];
 $path = $_SERVER['REQUEST_URI'];
 
-if (str_starts_with($path, '/api/admin/')) {
-    $controller = new AdminController($connection);
+if (str_starts_with($path, '/api/public/')) {
+    $controller = new PublicController($connection);
 } else {
     http_response_code(404);
     echo json_encode(['error' => 'Endpoint not found']);
