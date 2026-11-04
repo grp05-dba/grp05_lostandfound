@@ -26,7 +26,7 @@ class LostReport {
         ?string $time_lost,
         string $full_name,
         string $student_number,
-        string $email,
+        ?string $email,
         ?string $phone_number,
         string $contact_preference = 'email'
     ) {

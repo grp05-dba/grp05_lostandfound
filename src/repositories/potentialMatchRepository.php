@@ -7,64 +7,54 @@ class PotentialMatchRepository {
         $this->connection = $connection;
     }
 
-    public function createIfNotExists(int $reportId, int $itemId): bool {
-        $stmt = $this->connection->prepare(
-            'INSERT INTO potential_matches (report_id, item_id)
-             VALUES (:reportId, :itemId)
-             ON CONFLICT (report_id, item_id) DO NOTHING'
-        );
-        $stmt->execute(['reportId' => $reportId, 'itemId' => $itemId]);
-        return $stmt->rowCount() === 1;
-    }
-
     public function getAll(): array {
-        $stmt = $this->connection->query(
-            'SELECT pm.match_id, pm.report_id, pm.item_id,
-                    lr.report_code, lr.title AS lost_title,
-                    i.title AS found_title
-             FROM potential_matches pm
-             JOIN lost_reports lr ON lr.report_id = pm.report_id
-             JOIN items i ON i.item_id = pm.item_id
-             ORDER BY pm.match_id DESC'
-        );
+        $stmt = $this->connection->query('SELECT * FROM potential_matches');
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getByReportId(int $reportId): array {
+    public function getById(int $id): array|false {
+        $stmt = $this->connection->prepare('SELECT * FROM potential_matches WHERE match_id = :id');
+        $stmt->execute(['id' => $id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getByReportCode(string $reportCode): array {
         $stmt = $this->connection->prepare(
-            'SELECT pm.match_id, pm.report_id, pm.item_id,
-                    lr.report_code, lr.title AS lost_title,
-                    i.title AS found_title
-             FROM potential_matches pm
-             JOIN lost_reports lr ON lr.report_id = pm.report_id
-             JOIN items i ON i.item_id = pm.item_id
-             WHERE pm.report_id = :reportId
-             ORDER BY pm.match_id DESC'
+            "SELECT potential_matches.match_id, potential_matches.similarity_score, potential_matches.created_at,
+                items.item_id, items.title, items.description, items.location_found, items.date_found, items.time_found
+            FROM potential_matches
+            INNER JOIN lost_reports ON potential_matches.report_id = lost_reports.report_id
+            INNER JOIN items ON potential_matches.item_id = items.item_id
+            WHERE lost_reports.report_code = :reportCode
+                AND lost_reports.status = 'active'
+                AND items.status = 'unclaimed'
+            ORDER BY potential_matches.similarity_score DESC, potential_matches.created_at DESC"
         );
-        $stmt->execute(['reportId' => $reportId]);
+        $stmt->execute(['reportCode' => $reportCode]);
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getByItemId(int $itemId): array {
+    public function create(int $reportId, int $itemId, float $similarityScore): bool {
         $stmt = $this->connection->prepare(
-            'SELECT pm.match_id, pm.report_id, pm.item_id,
-                    lr.report_code, lr.title AS lost_title,
-                    i.title AS found_title
-             FROM potential_matches pm
-             JOIN lost_reports lr ON lr.report_id = pm.report_id
-             JOIN items i ON i.item_id = pm.item_id
-             WHERE pm.item_id = :itemId
-             ORDER BY pm.match_id DESC'
-        );
-        $stmt->execute(['itemId' => $itemId]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            'INSERT INTO potential_matches (report_id, item_id, similarity_score)
+            VALUES (:reportId, :itemId, :similarityScore)
+            ');
+
+        return $stmt->execute([
+            'reportId' => $reportId,
+            'itemId' => $itemId,
+            'similarityScore' => $similarityScore
+        ]);
     }
 
-    public function delete(int $matchId): bool {
-        $stmt = $this->connection->prepare(
-            'DELETE FROM potential_matches WHERE match_id = :matchId'
-        );
-        $stmt->execute(['matchId' => $matchId]);
-        return $stmt->rowCount() === 1;
+    public function deleteByReportId(int $reportId): bool {
+        $stmt = $this->connection->prepare('DELETE FROM potential_matches WHERE report_id = :reportId');
+        return $stmt->execute(['reportId' => $reportId]);
+    }
+
+    public function deleteByItemId(int $itemId): bool {
+        $stmt = $this->connection->prepare('DELETE FROM potential_matches WHERE item_id = :itemId');
+        return $stmt->execute(['itemId' => $itemId]);
     }
 }

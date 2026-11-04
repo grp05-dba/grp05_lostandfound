@@ -6,22 +6,24 @@ require_once __DIR__ . '/../src/db/db.php';
 require_once __DIR__ . '/../src/integrations/textbeeClient.php';
 require_once __DIR__ . '/../src/integrations/emailJSClient.php';
 
-require_once __DIR__ . '/../src/controllers/publicController.php';
+require_once __DIR__ . '/../src/controllers/adminController.php';
 
 require_once __DIR__ . '/../src/services/itemService.php';
 require_once __DIR__ . '/../src/services/searchService.php';
 require_once __DIR__ . '/../src/services/categoryService.php';
 require_once __DIR__ . '/../src/services/smsService.php';
-require_once __DIR__ . '/../src/services/notificationService.php';
+require_once __DIR__ . '/../src/services/emailService.php';
 require_once __DIR__ . '/../src/services/lostReportService.php';
 require_once __DIR__ . '/../src/services/claimService.php';
-require_once __DIR__ . '/../src/services/photoService.php';
+require_once __DIR__ . '/../src/services/potentialMatchService.php';
+require_once __DIR__ . '/../src/services/imageService.php';
 
 require_once __DIR__ . '/../src/repositories/itemRepository.php';
 require_once __DIR__ . '/../src/repositories/categoryRepository.php';
 require_once __DIR__ . '/../src/repositories/lostReportRepository.php';
 require_once __DIR__ . '/../src/repositories/claimRepository.php';
-require_once __DIR__ . '/../src/repositories/photoRepository.php';
+require_once __DIR__ . '/../src/repositories/potentialMatchRepository.php';
+require_once __DIR__ . '/../src/repositories/imageRepository.php';
 
 require_once __DIR__ . '/../src/entities/item.php';
 require_once __DIR__ . '/../src/entities/lostReport.php';
@@ -30,7 +32,7 @@ require_once __DIR__ . '/../src/entities/claim.php';
 require_once __DIR__ . '/../src/utils/requestUtils.php';
 
 try {
-    $connection = Connection::getPublicConnection();
+    $connection = Connection::getAdminConnection();
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Database connection failed']);
@@ -41,10 +43,9 @@ $controller = null;
 $method = $_SERVER['REQUEST_METHOD'];
 $path = $_SERVER['REQUEST_URI'];
 
-if (str_starts_with($path, '/api/public/')) {
-    $controller = new PublicController($connection);
-}
-else {
+if (str_starts_with($path, '/api/admin/')) {
+    $controller = new AdminController($connection);
+} else {
     http_response_code(404);
     echo json_encode(['error' => 'Endpoint not found']);
     exit;

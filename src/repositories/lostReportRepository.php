@@ -46,15 +46,17 @@ class LostReportRepository {
         return $stmt->execute([...$data, 'reportId' => $reportId]);
     }
 
-    public function create(LostReport $report): bool {
-        $stmt = $this->connection->prepare('INSERT INTO lost_reports (
-            report_code, category_id, title, description, location_lost, date_lost,
-            time_lost, full_name, student_number, email, phone_number, contact_preference
-        ) VALUES (
-            :reportCode, :categoryId, :title, :description, :locationLost, :dateLost,
-            :timeLost, :fullName, :studentNumber, :email, :phoneNumber, :contactPreference
-        )');
-        return $stmt->execute([
+    public function create(LostReport $report): array|false {
+        $stmt = $this->connection->prepare(
+            'INSERT INTO lost_reports (
+                report_code, category_id, title, description, location_lost, date_lost,
+                time_lost, full_name, student_number, email, phone_number, contact_preference
+            ) VALUES (
+                :reportCode, :categoryId, :title, :description, :locationLost, :dateLost,
+                :timeLost, :fullName, :studentNumber, :email, :phoneNumber, :contactPreference
+            ) RETURNING *');
+            
+        $stmt->execute([
             'reportCode' => $report->getReportCode(),
             'categoryId' => $report->getCategoryId(),
             'title' => $report->getTitle(),
