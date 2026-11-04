@@ -52,6 +52,18 @@ class ImageRepository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function deleteForEntity(string $entityType, int $entityId, int $imageId): array|false {
+        $imageTable = $this->imageTables[$entityType];
+        $stmt = $this->connection->prepare(
+            "DELETE FROM {$imageTable['table']}
+            WHERE {$imageTable['id']} = :imageId AND {$imageTable['foreign_key']} = :entityId
+            RETURNING storage_key"
+        );
+        $stmt->execute(['imageId' => $imageId, 'entityId' => $entityId]);
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function getById(string $entityType, int $imageId): array|false {
         $imageTable = $this->imageTables[$entityType];
         $stmt = $this->connection->prepare(
