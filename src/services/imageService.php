@@ -158,6 +158,20 @@ class ImageService {
         return $imageRecords;
     }
 
+    public function deleteImageForEntity(string $entityType, int $entityId, int $imageId): bool {
+        if (!array_key_exists($entityType, $this->imageTypes)) {
+            throw new InvalidArgumentException('Invalid image record type.');
+        }
+
+        $deleted = $this->imageRepository->deleteForEntity($entityType, $entityId, $imageId);
+        if (!$deleted) {
+            return false;
+        }
+
+        $this->deleteStoredFiles([$deleted['storage_key']]);
+        return true;
+    }
+
     public function getImageFile(string $entityType, int $imageId): array|false {
         if (!array_key_exists($entityType, $this->imageTypes)) {
             return false;
