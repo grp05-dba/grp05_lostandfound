@@ -1,101 +1,85 @@
 # Local setup
 
-Reviewed against `17dfae5`. Use a disposable local database for the supplied sample script.
+Reviewed against `main` revision `9a803d2` (November 5, 2026). Follow the root [README](../README.md) for the short installation guide; this page adds implementation notes and troubleshooting.
 
 ## Requirements
 
-- Git and access to the private repository.
-- PHP with PDO PostgreSQL support. The existing README requests `pgsql` and `pdo_pgsql`; the integration clients also call PHP cURL functions.
-- PostgreSQL server and a client such as psql or pgAdmin.
-- Postman, Thunder Client, or another HTTP client for requests.
+- Git
+- PHP 8.0 or later
+- PostgreSQL
+- PHP extensions: `pdo_pgsql`, `pgsql` and `curl`
+- A PostgreSQL client such as pgAdmin or `psql`
+- A browser; Postman or another HTTP client is useful for API checks
 
-The previously verified local environment used PHP 8.5.10 and PostgreSQL 18.3. These are tested versions, not declared minimum versions.
+TextBee and EmailJS credentials are optional for local browsing and database-backed workflows. They are required for actual provider notifications.
 
-## Clone and inspect configuration
+Check the PHP CLI installation:
 
 ```powershell
-git clone https://github.com/grp05-dba/grp05_lostandfound.git
-cd grp05_lostandfound
 php -v
 php --ini
 php -m
 ```
 
-The clone directory follows the repository name. The root README's example `lost-and-found-dba` directory is a placeholder and may not match your checkout.
+Make sure the required extensions are enabled in the active CLI `php.ini`.
 
-Enable the required extensions in the PHP configuration used by the CLI:
-
-```ini
-extension=pdo_pgsql
-extension=pgsql
-extension=curl
-```
-
-If your PHP installation uses a separate configuration, supply its path using `php -c "C:\path\to\php.ini"`. Check the module list using the same configuration before starting the server.
-
-## Initialize the database once
-
-Create an empty database named `grp05_lostandfounddb` as the database administrator. Then run:
+## Clone and initialize
 
 ```powershell
-psql -h localhost -p 5432 -U your_database_owner -d postgres -c "CREATE DATABASE grp05_lostandfounddb;"
-psql -h localhost -p 5432 -U your_database_owner -d grp05_lostandfounddb -v ON_ERROR_STOP=1 -f sql/grp05_lostandfounddb_script.sql
-psql -h localhost -p 5432 -U your_database_owner -d grp05_lostandfounddb -v ON_ERROR_STOP=1 -f sql/grp05_lostandfounddb_test_data_script.sql
+git clone https://github.com/grp05-dba/grp05_lostandfound.git
+cd grp05_lostandfound
 ```
 
-Use your own host, port and owner name. Do not rerun CREATE DATABASE if it already exists. The schema script is not an idempotent migration: it uses plain CREATE TABLE statements.
+Create the database `grp05_lostandfounddb`, then run the SQL files in the root README order. The schema script is a fresh database initializer, not a repeatable migration. The optional demo script is designed to replace its own demo records; still use a disposable database for demonstrations and testing.
 
-The sample script contains `TRUNCATE TABLE claims RESTART IDENTITY CASCADE`. It also assumes referenced category/item IDs are 1 and inserts fixed unique report/claim codes. Run it only for a fresh disposable initialization; rerunning it can delete claims and fail on existing records. It is not a backup or maintenance script. See [database details](database.md).
+## Configure `.env`
 
-## Create the ignored environment file
+Copy `.env.example` to `.env` in the repository root. The application reads it using PHP `parse_ini_file()`, so use INI-style key/value lines.
 
-Create `.env` in the repository root. This is an INI-style file read by `parse_ini_file()`, not a shell script:
-
-```ini
-DB_HOST="localhost"
-DB_PORT=5432
-DB_NAME="grp05_lostandfounddb"
-DB_USER="your_application_login"
-DB_PASSWORD="your_local_password"
-TEXTBEE_API_KEY=""
-TEXTBEE_BASE_URL="https://api.textbee.dev"
+```powershell
+Copy-Item .env.example .env
 ```
 
-Set DB_USER to a dedicated application login provisioned by your DBA. The schema script does not create this login or grant its permissions. It needs database CONNECT, schema USAGE and SELECT on the tables for the current retrieval routes. See [role mapping](user-roles.md) before granting access for future writes.
+Set the PostgreSQL host, port, database name, and database credentials to match the roles configured in your local database. The template also includes TextBee and EmailJS settings; leave provider credentials as placeholders if you are not testing notifications.
 
-Database-backed routes do not require a working TextBee account. Constructing the TextBee client does not send a request; its configuration is read when a gateway method is called. Gateway requests require real service configuration. The client appends `/api/v1/gateway/...`, so do not include that path in the base URL.
+Never commit `.env`, provider keys, real passwords, uploaded personal data or database dumps. The repository's `.gitignore` excludes the local environment file.
 
-The separate, currently unwired EmailJS client reads EMAILJS_BASE_URL, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID and EMAILJS_PUBLIC_KEY when called. Obtain their actual values from the team's service configuration; no live email test is implied by local startup.
+**Connection detail to be aware of:** `src/db/db.php` defines both `getAdminConnection()` and `getPublicConnection()`, but both current entry points call `getAdminConnection()`. The `DB_PUBLIC_USER` and `DB_PUBLIC_PASSWORD` values in the template are not currently used by the public entry point. Do not treat the sample public credentials as an active security boundary.
 
-Never commit `.env`, passwords, real service keys or database dumps. The existing `.gitignore` already excludes `.env`.
+## Start both interfaces
 
-## Start and check the API
+Open two terminals in the repository root.
+
+Terminal 1 — public interface and API:
 
 ```powershell
 php -S 127.0.0.1:8000 -t public
 ```
 
-Keep this terminal running. For a separate PHP configuration, put `-c "C:\path\to\php.ini"` before `-S`. Bind locally for development: both public and staff route namespaces share this server.
+Open `http://127.0.0.1:8000/app.html`.
 
-In another terminal:
+Terminal 2 — admin interface and API:
 
 ```powershell
-Invoke-RestMethod http://127.0.0.1:8000/api/admin/test
-Invoke-RestMethod http://127.0.0.1:8000/api/public/categories
+php -S 127.0.0.1:8001 -t admin
 ```
 
-The first response is `{"message":"its working! :D"}`. The second should return a JSON array of database categories. This checks connectivity and retrieval, not the entire application or notification delivery.
+Open `http://127.0.0.1:8001/app.html`.
 
-Stop the development server with Ctrl+C. Keep database shutdown separate from the PHP process.
+Keep both terminals running while testing. Stop each server with Ctrl+C. These commands bind to localhost, which is suitable for local development; do not expose the admin interface to an untrusted network.
 
 ## Troubleshooting
 
 | Symptom | Check |
 | --- | --- |
-| Missing PDO driver | CLI php.ini and pdo_pgsql module |
-| Database connection failed | Host, port, database, login, password, and grants; inspect local PHP log |
-| Table does not exist | Schema ran in the database named in .env |
-| PHP cURL function missing | curl extension in the same CLI configuration |
-| Duplicate key during sample load | Seed data already exists; do not repeatedly rerun the script |
-| Route returns 404 | Exact method and path in [API reference](api.md); query strings affect matching |
-| Browser shows JSON | Expected: this checkout currently serves an API, not a frontend |
+| `php` is not recognized | Install PHP or add its executable directory to PATH |
+| `could not find driver` | Enable `pdo_pgsql` in the active PHP CLI configuration |
+| PostgreSQL connection error | Confirm PostgreSQL is running and check DB host, port, name, username and password |
+| Missing table/relation | Run the schema script in the database named in `.env` |
+| Categories do not appear | Run the necessary-data SQL script after the schema |
+| Images fail to upload | Check PHP upload limits, allowed image type/size and write permission on `storage/` |
+| Image URL returns 404 | Check both the image metadata row and the corresponding file under `storage/` |
+| Notifications fail | Verify TextBee/EmailJS credentials, provider configuration and server logs |
+| Public/admin page cannot load API data | Confirm the matching PHP server is running on the expected port and inspect the browser network response |
+
+A successful local page load or health response does not verify every workflow, notification delivery or production access control.
