@@ -66,7 +66,6 @@ Copy its contents, paste them into the Query Tool, and click **Execute/Refresh**
 
 This script is intended for a clean demo database. Avoid running it repeatedly on a database that already contains its sample records.
 
-
 ## 3. Configure PHP
 
 Check that PHP is installed:
