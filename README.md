@@ -62,19 +62,23 @@ Use a clean demo database. The script manages its own demo records, but it is no
 
 ## 3. Configure PHP
 
+The application requires PHP's `pdo_pgsql` and `pgsql` extensions to communicate with PostgreSQL.
+
+### 3.1 Check your active PHP configuration
+
 Check that PHP is installed:
 
 ~~~bash
 php -v
 ~~~
 
-Check that the required PostgreSQL extensions are enabled:
+Find the `php.ini` file used by your PHP installation:
 
 ~~~bash
 php -m
 ~~~
 
-The output must include:
+Look for the **Loaded Configuration File** entry. Open that `php.ini` file using a text editor.
 
 ~~~text
 pdo_pgsql
