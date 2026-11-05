@@ -35,7 +35,7 @@ CREATE TABLE lost_reports (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT chk_lost_reports_contact
-    CHECK (email IS NOT NULL OR phone_number IS NOT NULL);
+    CHECK (email IS NOT NULL OR phone_number IS NOT NULL)
 );
 
 -- 4. CLAIMS
@@ -52,7 +52,7 @@ CREATE TABLE claims (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT chk_claims_contact
-    CHECK (email IS NOT NULL OR phone_number IS NOT NULL);
+    CHECK (email IS NOT NULL OR phone_number IS NOT NULL)
 );
 
 -- 5. POTENTIAL_MATCHES

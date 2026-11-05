@@ -27,35 +27,45 @@ cd grp05_lostandfound
 
 ## 2. Create and initialize the database
 
-Start PostgreSQL, then create the project database:
+Start PostgreSQL and open **pgAdmin**. Connect to your PostgreSQL server, then follow these steps to create and initialize the project database.
+
+### 2.1 Create the project database
+
+1. In the Object Explorer, right-click **Databases**.
+2. Select **Create → Database**.
+3. Enter `grp05_lostandfounddb` as the database name.
+4. Click **Save**.
+
+Alternatively, you can open the Query Tool and execute:
 
 ```sql
 CREATE DATABASE grp05_lostandfounddb;
 ```
 
-Connect to `grp05_lostandfounddb` and run the SQL scripts in this order:
+### 2.2 Run the database scripts
 
-1. **`sql/grp05_lostandfounddb_script.sql`** — creates the database tables.
-2. **`sql/grp05_lostandfounddb_necessary_data_script.sql`** — inserts the categories required by the application.
-3. **`sql/grp05_lostandfounddb_role_creation_sample_script.sql`** — creates the database roles and grants their permissions.
+After creating the database, select `grp05_lostandfounddb` in the Object Explorer, right-click it, and open **Query Tool**.
 
-The role-creation script must be run by a PostgreSQL administrator. Before running it, replace both occurrences of `enter_your_password_here` with passwords you choose. Keep these passwords private.
+Open each SQL script from the project's `sql/` directory, copy its contents, paste them into the Query Tool, and click **Execute/Refresh** (the lightning bolt icon) to run the queries.
 
-To load optional demonstration records, run **`sql/grp05_lostandfounddb_demo_data_script.sql`** after the schema and necessary data scripts. This script is intended for a clean demo database; do not run it repeatedly on a database that already contains its sample records.
+Execute the scripts in the following order:
 
-You can run the scripts through pgAdmin's Query Tool or with `psql`. For example, from the repository root:
+1. **`sql/grp05_lostandfounddb_script.sql`** — Creates the database tables and their relationships.
+2. **`sql/grp05_lostandfounddb_necessary_data_script.sql`** — Inserts the categories required by the application.
+3. **`sql/grp05_lostandfounddb_role_creation_sample_script.sql`** — Creates the database roles and grants their permissions.
 
-```bash
-psql -U postgres -d grp05_lostandfounddb -f sql/grp05_lostandfounddb_script.sql
-psql -U postgres -d grp05_lostandfounddb -f sql/grp05_lostandfounddb_necessary_data_script.sql
-psql -U postgres -d grp05_lostandfounddb -f sql/grp05_lostandfounddb_role_creation_sample_script.sql
-```
+**Important:** The role-creation script must be executed by a PostgreSQL administrator. Before running it, replace both occurrences of `enter_your_password_here` with passwords of your choice. Keep these passwords private.
 
-Run the optional demo-data script separately only if you want sample records:
+### 2.3 Load optional demonstration data
 
-```bash
-psql -U postgres -d grp05_lostandfounddb -f sql/grp05_lostandfounddb_demo_data_script.sql
-```
+If you want to populate the database with sample records, open the following script in pgAdmin's Query Tool:
+
+**`sql/grp05_lostandfounddb_demo_data_script.sql`**
+
+Copy its contents, paste them into the Query Tool, and click **Execute/Refresh** to run the script.
+
+This script is intended for a clean demo database. Avoid running it repeatedly on a database that already contains its sample records.
+
 
 ## 3. Configure PHP
 
