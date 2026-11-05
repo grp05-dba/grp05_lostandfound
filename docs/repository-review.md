@@ -1,32 +1,43 @@
-# Repository review - October 31, 2026
+# Repository review — November 5, 2026
 
-Source baseline: main revision `17dfae5`. The documentation branch contains this review; application changes are submitted separately for the project lead to merge.
+Source baseline: `main` revision `9a803d2`. This review summarizes the current repository structure and identifies limitations that should remain visible in project documentation.
 
-## Database error response fix - awaiting review
+## Changes since the October 31 documentation baseline
 
-[PR #25](https://github.com/grp05-dba/grp05_lostandfound/pull/25) proposes a two-file fix on `fix/database-error-responses`, commit `9ef91a1`.
+The current main branch has advanced from the earlier retrieval-only API. The public/admin entry points now load separate interfaces and controllers. The source includes report and claim submission/tracking, item creation and updates, report/claim updates, image uploads and retrieval, potential-match generation and removal, and TextBee/EmailJS notification services. The schema has expanded from five tables to eight, adding similarity scores and three image-metadata tables.
 
-The problem was reproduced using temporary local PHP fixtures with error display enabled. A failed connection returned HTTP 200 with plain text. Failed SELECTs, exercised through out-of-range PostgreSQL INTEGER IDs, returned HTTP 200 with non-JSON PHP exception details. Both violate the response contract expected by JSON clients.
+The root README now documents separate local servers:
 
-The proposed change lets the connection exception reach the entry point, which returns HTTP 500 with `{"error":"Database connection failed"}`. PDO exceptions during controller dispatch are logged locally and return HTTP 500 with `{"error":"Database operation failed"}`. It does not add positive-integer checks or alter the lead's requested ID coercion, SQL queries, schema or role model.
+- Public: `php -S 127.0.0.1:8000 -t public`
+- Admin: `php -S 127.0.0.1:8001 -t admin`
 
-Seven targeted HTTP scenarios passed on the proposed revision: two healthy requests, four resource query failures, and one unavailable-connection request. All five failure responses were valid JSON with HTTP 500 and no PDO/SQL/stack details. The existing 36 read-only requests / 69 assertions also passed, as did syntax checks for both changed PHP files. Fixtures, test helpers and raw reports stay outside the repository; no seed reload, data mutation or external message was required.
+## Important implementation findings
 
-This result belongs to PR #25, not main until merged. It handles PDO failures rather than every possible PHP/configuration error. The API and architecture pages continue to describe main's current behavior until the lead accepts the fix.
+### Public database connection
 
-## Work checked before selecting this fix
+`src/db/db.php` defines `getAdminConnection()` and `getPublicConnection()`. However, both `public/index.php` and `admin/index.php` currently call `getAdminConnection()`. The public DB credentials in `.env.example` are not used by the public entry point. This should be corrected and verified before describing the application as enforcing separate public/admin database permissions.
 
-The board had no Todo feature cards ready to pick up. The following work was not claimed or marked complete:
+### Admin access
 
-| Work | Observed coordination state |
-| --- | --- |
-| Claim creation #12, item creation #8, report/item/claim updates #5/#9/#14 | Backlog, explicitly described as not ready |
-| Lost report submission #3 and potential matches #20 | Lead-owned self-managed tasks |
-| TextBee/EmailJS integration #21 | In progress and assigned to sanatorion |
-| Documentation PR #24 | Draft; no new review feedback at the time of inspection |
+The admin page and API are separated by document root and port, but the reviewed entry point/controllers do not show a login or session authorization layer. The separate admin URL is not authentication. Keep the admin server restricted to localhost or a trusted network until access control is implemented.
 
-Previously documented query-string routing and category-write gaps remain deferred. This audit does not treat the older Done category cards as proof that POST/PATCH handlers exist in main. Application authentication, a frontend, integrated entity mapping and cross-group course verification are not declared complete.
+### Potential matches and notifications
 
-## After integration
+PotentialMatchService generates candidates and stores scores at or above its 60-point threshold. The public API can list matches by report code and remove a match by report code plus match ID. Notification calls are made through TextBee/EmailJS services based on contact preference, but actual delivery requires working provider configuration and runtime testing.
 
-When the lead merges PR #25, merge the updated main into the documentation branch using [the branch workflow](branch-workflow.md). Update the [API error contract](api.md), [architecture lifecycle](architecture.md) and [development history](development-history.md) to the actual merged revision, then rerun the relevant read-only checks. Do not merge the application fix into main from this documentation task.
+The demo SQL script inserts sample potential matches directly with illustrative scores. These rows should not be presented as results calculated by the matching service.
+
+### Image uploads
+
+ImageService accepts JPEG, PNG and WebP uploads, limits each image to 5 MB and limits a record to five images. Image bytes are stored in `storage/`; the database stores metadata and storage keys. Backups must include both the database and corresponding storage files.
+
+## Remaining items to verify or improve
+
+- Switch the public entry point to the intended public database connection and verify least-privilege grants.
+- Add and test an authentication/authorization boundary for admin routes before network exposure.
+- Run end-to-end tests for report/claim submission, cancellation, item/report updates, image lifecycle, match refresh/removal and notification behavior.
+- Verify TextBee and EmailJS delivery using approved test credentials and record provider responses.
+- Confirm filesystem permissions, backup/restore procedures and cleanup behavior for image files.
+- Keep the SQL schema, API reference and frontend request behavior synchronized as features change.
+
+This review is based on source inspection, not a fresh runtime test. It does not certify production readiness or course/activity completion.
