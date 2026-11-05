@@ -115,23 +115,6 @@ Follow the instructions for your operating system.
 
 If the entries are not present, add the two `extension=` lines to `php.ini`. Make sure the PostgreSQL extension files are included in PHP's `ext` directory and that `extension_dir` points to that directory.
 
-**Linux (Arch Linux):**
-
-Install the PostgreSQL extension package:
-
-```bash
-sudo pacman -S php-pgsql
-```
-
-Open `/etc/php/php.ini` and uncomment these lines:
-
-```ini
-extension=pdo_pgsql
-extension=pgsql
-```
-
-Save the file and restart any running PHP or web server process.
-
 ## 4. Configure environment variables
 
 Create your local `.env` file from the provided example.
