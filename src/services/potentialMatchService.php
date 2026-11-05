@@ -38,6 +38,21 @@ class PotentialMatchService {
         return $this->imageService->attachImageUrls('items', $matches, 'item_id');
     }
 
+    public function deleteByReportCodeAndMatchId(string $reportCode, int $matchId): array {
+        $report = $this->lostReportRepository->getByCode($reportCode);
+        $failure = RequestUtils::handleFindFailure($report);
+
+        if ($failure) {
+            return $failure;
+        }
+
+        if (!$this->potentialMatchRepository->deleteByIdAndReportCode($matchId, $reportCode)) {
+            return ['message' => 'Potential match not found.'];
+        }
+
+        return ['message' => 'Potential match removed successfully.'];
+    }
+
     public function deleteByReportId(int $reportId): void {
         $this->potentialMatchRepository->deleteByReportId($reportId);
     }

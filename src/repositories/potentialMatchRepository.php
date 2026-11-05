@@ -48,6 +48,23 @@ class PotentialMatchRepository {
         ]);
     }
 
+    public function deleteByIdAndReportCode(int $matchId, string $reportCode): bool {
+        $stmt = $this->connection->prepare(
+            'DELETE FROM potential_matches AS pm
+             USING lost_reports AS lr
+             WHERE pm.report_id = lr.report_id
+                AND lr.report_code = :reportCode
+                AND pm.match_id = :matchId'
+        );
+
+        $stmt->execute([
+            'reportCode' => $reportCode,
+            'matchId' => $matchId
+        ]);
+
+        return $stmt->rowCount() > 0;
+    }
+
     public function deleteByReportId(int $reportId): bool {
         $stmt = $this->connection->prepare('DELETE FROM potential_matches WHERE report_id = :reportId');
         return $stmt->execute(['reportId' => $reportId]);

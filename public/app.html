@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101b35">
+  <meta name="description" content="PUP-SPOT campus lost and found portal">
+  <title>PUP-SPOT | Campus Lost & Found</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <script defer src="js/app.js"></script>
+</head>
+
+<body>
+  <header class="site-header">
+    <a class="brand" href="#home" aria-label="PUP-SPOT home"><span
+        class="brand-mark">P</span><span><b>PUP-SPOT</b><small>PROPERTY OWNERSHIP TRACKER</small></span></a>
+    <nav class="main-nav" aria-label="Main navigation"><a class="active" href="#catalog">Found items</a><a
+        href="#how">How it works</a></nav>
+    <div class="header-actions"><button class="button button-quiet" data-open="track-dialog">Track a
+        submission</button><button class="button button-primary" data-open="report-dialog">Report a lost item
+        <span>↗</span></button></div>
+    <button class="mobile-menu" aria-label="Open menu">☰</button>
+  </header>
+  <main id="home">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-dot"></span> POLYTECHNIC UNIVERSITY OF THE PHILIPPINES</div>
+        <h1>Lost something?<br><em>Let's bring it home.</em></h1>
+        <p class="hero-lede">A little less searching. A little more finding. Browse items turned in around campus or
+          file a report so we can help reconnect you with your property.</p>
+        <div class="hero-actions"><a class="button button-light" href="#catalog">Browse found items
+            <span>↓</span></a><button class="button button-outline-light" data-open="report-dialog">Report a missing
+            item</button></div>
+        <div class="hero-footnote"><span class="shield">✓</span> No student account required · Secure reference-code
+          tracking</div>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <div class="orbit-core"><span>SPOT</span><b>?</b></div>
+        <div class="float-card card-a"><span class="float-icon">⌕</span><span><b>Search</b><small>Find a
+              match</small></span></div>
+        <div class="float-card card-b"><span class="float-icon">✓</span><span><b>Reunite</b><small>Claim in
+              person</small></span></div>
+        <div class="spark spark-a"></div>
+        <div class="spark spark-b"></div>
+      </div>
+    </section>
+    <section class="quick-stats" aria-label="Service highlights">
+      <div><b>01</b><span><strong>Browse freely</strong><small>Explore unclaimed campus finds</small></span></div>
+      <div><b>02</b><span><strong>Report in minutes</strong><small>Tell us what you've misplaced</small></span></div>
+      <div><b>03</b><span><strong>Track by code</strong><small>Check your own submission anytime</small></span></div>
+    </section>
+    <section class="catalog-section" id="catalog">
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow eyebrow-dark">THE FOUND ITEM CATALOG</div>
+          <h2>Recently turned in</h2>
+          <p>Browse the latest items surrendered to the campus Lost & Found office.</p>
+        </div>
+        <div class="catalog-count"><b id="result-count">—</b><span>items available</span></div>
+      </div>
+      <div class="filters"><label class="search-box"><span>⌕</span><input id="search-input" type="search"
+            placeholder="Search item name or description…" autocomplete="off"></label><label
+          class="filter-select"><span>Category</span><select id="category-filter">
+            <option value="">All categories</option>
+          </select></label><label class="filter-select"><span>Date found</span><input id="date-filter"
+            type="date"></label><button class="button button-quiet reset-button" id="reset-filters">Reset
+          filters</button></div>
+      <div class="catalog-status" id="catalog-status" role="status">Loading found items…</div>
+      <div class="item-grid" id="item-grid" aria-live="polite"></div>
+    </section>
+    <section class="help-band" id="how">
+      <div>
+        <div class="eyebrow eyebrow-dark">A SIMPLE, SECURE PROCESS</div>
+        <h2>Found it. Reported it. Reunited.</h2>
+        <p>Students can submit reports without creating an account. Bring your reference code and physical Student ID
+          when visiting the Lost & Found office.</p>
+      </div>
+      <div class="steps">
+        <div><i>1</i><span><b>Search or report</b><small>Look through found items or tell us what went
+              missing.</small></span></div>
+        <div><i>2</i><span><b>Keep your reference code</b><small>Use your code to retrieve your own report or
+              claim.</small></span></div>
+        <div><i>3</i><span><b>Verify and collect</b><small>Campus marshals verify ownership during in-person
+              pickup.</small></span></div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer"><a class="brand brand-footer" href="#home"><span
+        class="brand-mark">P</span><span><b>PUP-SPOT</b><small>PROPERTY OWNERSHIP TRACKER</small></span></a>
+    <p>Campus Lost & Found · Student access without an account</p><a href="#catalog">Back to top ↑</a>
+  </footer>
+
+  <dialog class="modal modal-compact" id="item-detail-dialog">
+    <div class="modal-head">
+      <div>
+        <div class="eyebrow eyebrow-dark">FOUND ITEM DETAILS</div>
+        <h2 id="item-detail-title">Found item</h2>
+        <p>Review the photos and identifying details before requesting a claim.</p>
+      </div><button class="icon-button" data-close aria-label="Close">×</button>
+    </div>
+    <div id="item-detail-content" class="public-item-detail-content"></div>
+  </dialog>
+
+  <dialog class="public-image-preview-dialog" id="public-image-preview-dialog" aria-label="Expanded item photo">
+    <button type="button" class="public-image-preview-close" data-close aria-label="Close image preview">×</button>
+    <img id="public-image-preview" src="" alt="Expanded found item photo">
+  </dialog>
+
+  <dialog class="modal" id="report-dialog">
+    <div class="modal-head">
+      <div>
+        <div class="eyebrow eyebrow-dark">LOST ITEM REPORT</div>
+        <h2>Tell us what went missing</h2>
+        <p>Complete the details below. Fields marked * are required.</p>
+      </div><button class="icon-button" data-close aria-label="Close">×</button>
+    </div>
+    <form id="lost-form" class="form-grid" enctype="multipart/form-data">
+      <label class="field"><span>Category *</span><select name="category_id" class="category-options" required>
+          <option value="">Choose category</option>
+        </select></label>
+      <label class="field"><span>Item title *</span><input name="title" maxlength="255"
+          placeholder="e.g. Blue Hydro Flask" required></label>
+      <label class="field field-wide"><span>Description *</span><textarea name="description" rows="3"
+          placeholder="Brand, color, size, unique marks…" required></textarea></label>
+      <label class="field"><span>Your full name *</span><input name="full_name" maxlength="150" autocomplete="name"
+          required></label>
+      <label class="field"><span>Student number *</span><input name="student_number" maxlength="50"
+          placeholder="e.g. 2024-00000-MN-0" required></label>
+      <label class="field"><span>Email address</span><input name="email" type="email" maxlength="150"
+          placeholder="name@email.com"></label>
+      <label class="field"><span>Phone number</span><input name="phone_number" type="tel" maxlength="50"
+          placeholder="+63…"></label>
+      <label class="field"><span>Preferred contact *</span><select name="contact_preference" required>
+          <option value="email">Email</option>
+          <option value="sms">SMS</option>
+        </select></label>
+      <label class="field"><span>Where did you lose it?</span><select name="location_lost" class="location-options">
+          <option value="">Choose campus location (optional)</option>
+        </select></label>
+      <label class="field"><span>Date lost</span><input name="date_lost" type="date"></label>
+      <label class="field"><span>Approximate time</span><input name="time_lost" type="time"></label>
+      <label class="field field-wide upload-field"><span>Photos of your item * <small>1–5 images · JPG, PNG or WebP ·
+            max 5 MB each</small></span><input name="images[]" type="file" accept="image/jpeg,image/png,image/webp"
+          multiple required><span class="file-list">Choose clear photos that can help identify your item.</span></label>
+      <div class="form-message field-wide" role="status"></div>
+      <div class="form-actions field-wide"><button type="button" class="button button-quiet"
+          data-close>Cancel</button><button class="button button-primary" type="submit">Submit lost report
+          <span>↗</span></button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal modal-compact" id="claim-dialog">
+    <div class="modal-head">
+      <div>
+        <div class="eyebrow eyebrow-dark">CLAIM FOUND PROPERTY</div>
+        <h2>Request this item</h2>
+        <p id="claim-item-summary">Provide your details to start the claim process.</p>
+      </div><button class="icon-button" data-close aria-label="Close">×</button>
+    </div>
+    <form id="claim-form" class="form-grid" enctype="multipart/form-data">
+      <div id="claim-item-preview" class="claim-item-preview field-wide"></div>
+      <input type="hidden" name="item_id"><label class="field field-wide"><span>Full legal name *</span><input
+          name="full_name" maxlength="150" required></label>
+      <label class="field field-wide"><span>Student number *</span><input name="student_number" maxlength="50"
+          required></label>
+      <label class="field"><span>Email address</span><input name="email" type="email" maxlength="150"></label><label
+        class="field"><span>Phone number</span><input name="phone_number" type="tel" maxlength="50"></label>
+      <label class="field"><span>Preferred contact *</span><select name="contact_preference" required>
+          <option value="email">Email</option>
+          <option value="sms">SMS</option>
+        </select></label>
+      <label class="field field-wide upload-field"><span>Student ID / proof of ownership * <small>1–5 images · JPG, PNG
+            or WebP · max 5 MB each</small></span><input name="images[]" type="file"
+          accept="image/jpeg,image/png,image/webp" multiple required><span class="file-list">Upload your Student ID or
+          clear proof of ownership.</span></label>
+      <p class="form-note field-wide">Your claim is a request, not an automatic release. Bring your physical Student ID
+        and claim reference to the Lost & Found office for verification.</p>
+      <div class="form-message field-wide" role="status"></div>
+      <div class="form-actions field-wide"><button type="button" class="button button-quiet"
+          data-close>Cancel</button><button class="button button-primary" type="submit">Send claim request
+          <span>↗</span></button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal modal-compact" id="track-dialog">
+    <div class="modal-head">
+      <div>
+        <div class="eyebrow eyebrow-dark">PRIVATE SUBMISSION LOOKUP</div>
+        <h2>Track your submission</h2>
+        <p>Enter the exact reference code you received. Public browsing of reports and claims is not available.</p>
+      </div><button class="icon-button" data-close aria-label="Close">×</button>
+    </div>
+    <form id="track-form" class="form-grid"><label class="field field-wide"><span>Reference code *</span><input
+          name="code" placeholder="e.g. LST-2026-8921 or CLM-2026-4412" required></label>
+      <div class="field field-wide"><span>Submission type *</span>
+        <div class="choice-row"><label><input type="radio" name="kind" value="lost" checked> Lost
+            report</label><label><input type="radio" name="kind" value="claim"> Claim request</label></div>
+      </div>
+      <div class="form-message field-wide" role="status"></div>
+      <div class="form-actions field-wide"><button type="button" class="button button-quiet"
+          data-close>Close</button><button class="button button-primary" type="submit">Find my submission
+          <span>↗</span></button></div>
+    </form>
+    <div id="track-result" class="track-result" hidden></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+
+</html>

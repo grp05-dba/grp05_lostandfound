@@ -3,8 +3,10 @@
 class AdminController {
     private ItemService $itemService;
     private SMSService $smsService;
+    private CategoryService $categoryService;
     private LostReportService $lostReportService;
     private ClaimService $claimService;
+    private PotentialMatchService $potentialMatchService;
     private ImageService $imageService;
     private PDO $connection;
 
@@ -12,8 +14,10 @@ class AdminController {
         $this->connection = $connection;
         $this->itemService = new ItemService($connection);
         $this->smsService = new SMSService();
+        $this->categoryService = new CategoryService($connection);
         $this->lostReportService = new LostReportService($connection);
         $this->claimService = new ClaimService($connection);
+        $this->potentialMatchService = new PotentialMatchService($connection);
         $this->imageService = new ImageService($connection);
     }
 
@@ -24,6 +28,12 @@ class AdminController {
         //Lost report endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/lost-reports') {
             echo json_encode($this->lostReportService->getAllLostReports());
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/matches/')) {
+            $reportCode = str_replace('/api/admin/lost-reports/matches/', '', $path);
+            echo json_encode($this->potentialMatchService->getPotentialMatchesByReportCode($reportCode));
             return;
         }
 
@@ -44,6 +54,18 @@ class AdminController {
         //Claim endpoints-------------------------------------
         if ($method === 'GET' && $path === '/api/admin/claims') {
             echo json_encode($this->claimService->getAllClaims());
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/items/images/')) {
+            $imageId = (int) str_replace('/api/admin/items/images/', '', $path);
+            $this->sendImage('items', $imageId);
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/images/')) {
+            $imageId = (int) str_replace('/api/admin/lost-reports/images/', '', $path);
+            $this->sendImage('lost-reports', $imageId);
             return;
         }
 
@@ -79,6 +101,17 @@ class AdminController {
         }
 
         //Item endpoints-------------------------------------
+        if ($method === 'POST' && preg_match('#^/api/admin/items/(\\d+)/images$#', $path, $matches)) {
+            $result = $this->itemService->addItemImages((int) $matches[1], $_FILES['images'] ?? []);
+            echo json_encode($result);
+            return;
+        }
+
+        if ($method === 'DELETE' && preg_match('#^/api/admin/items/(\\d+)/images/(\\d+)$#', $path, $matches)) {
+            $result = $this->itemService->deleteItemImage((int) $matches[1], (int) $matches[2]);
+            echo json_encode($result);
+            return;
+        }
         if ($method === 'GET' && $path === '/api/admin/items') {
             echo json_encode($this->itemService->getAllItems());
             return;
@@ -106,6 +139,18 @@ class AdminController {
             return;
         }
 
+        // Category endpoints-------------------------------------
+        if ($method === 'GET' && $path === '/api/admin/categories') {
+            echo json_encode($this->categoryService->getAllCategories());
+            return;
+        }
+
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/categories/')) {
+            $id = (int) str_replace('/api/admin/categories/', '', $path);
+            echo json_encode($this->categoryService->getCategoryById($id));
+            return;
+        }
+
 
         //Debugging endpoints-------------------------------------
         //Endpoints to get SMS gateway info (textbee integration)
@@ -128,5 +173,20 @@ class AdminController {
 
         http_response_code(404);
         echo json_encode(['error' => 'Admin endpoint not found']);
+    }
+    private function sendImage(string $entityType, int $imageId): void {
+        $image = $this->imageService->getImageFile($entityType, $imageId);
+
+        if (!$image) {
+            http_response_code(404);
+            echo json_encode(['message' => 'Image not found.']);
+            return;
+        }
+
+        header('Content-Type: ' . $image['mime_type']);
+        header('Content-Length: ' . filesize($image['file_path']));
+        header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: private, max-age=86400');
+        readfile($image['file_path']);
     }
 }
