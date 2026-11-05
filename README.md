@@ -69,31 +69,110 @@ This script is intended for a clean demo database. Avoid running it repeatedly o
 
 ## 3. Configure PHP
 
+The application requires PHP's `pdo_pgsql` and `pgsql` extensions to communicate with PostgreSQL.
+
+### 3.1 Check your active PHP configuration
+
 Check that PHP is installed:
 
 ```bash
 php -v
 ```
 
-Check that the required PostgreSQL extensions are enabled:
+Find the `php.ini` file used by your PHP installation:
+
+```bash
+php --ini
+```
+
+Look for the **Loaded Configuration File** entry. Open that `php.ini` file using a text editor.
+
+> **Note:** If you use XAMPP, WAMP, or another PHP bundle, make sure you edit the configuration file belonging to that installation. The PHP used by your terminal may use a different `php.ini` from the PHP used by Apache.
+
+### 3.2 Enable the PostgreSQL extensions
+
+Follow the instructions for your operating system.
+
+**Windows (standalone PHP, XAMPP, or WAMP):**
+
+1. Open the active `php.ini` file.
+2. Find the following lines:
+
+   ```ini
+   ;extension=pdo_pgsql
+   ;extension=pgsql
+   ```
+
+3. Remove the leading semicolons:
+
+   ```ini
+   extension=pdo_pgsql
+   extension=pgsql
+   ```
+
+4. Save the file.
+5. If you use Apache through XAMPP or WAMP, restart Apache. For PHP's built-in development server, stop and start the server again.
+
+If the entries are not present, add the two `extension=` lines to `php.ini`. Make sure the PostgreSQL extension files are included in PHP's `ext` directory and that `extension_dir` points to that directory.
+
+**Linux (Arch Linux):**
+
+Install the PostgreSQL extension package:
+
+```bash
+sudo pacman -S php-pgsql
+```
+
+Open `/etc/php/php.ini` and uncomment these lines:
+
+```ini
+extension=pdo_pgsql
+extension=pgsql
+```
+
+Save the file and restart any running PHP or web server process.
+
+**Linux (Debian/Ubuntu):**
+
+Install the PostgreSQL extension package:
+
+```bash
+sudo apt update
+sudo apt install php-pgsql
+```
+
+If you use Apache, restart it:
+
+```bash
+sudo systemctl restart apache2
+```
+
+If you use PHP's built-in development server, stop and start it again.
+
+### 3.3 Verify that the extensions are enabled
+
+Run:
 
 ```bash
 php -m
 ```
 
-The output must include:
+Confirm that both entries appear:
 
 ```text
 pdo_pgsql
 pgsql
 ```
 
-If either extension is missing, enable it in the `php.ini` used by your PHP installation, then run `php -m` again. To locate the active configuration file, run:
+You can also check them individually:
 
 ```bash
-php --ini
+php -r "var_dump(extension_loaded('pdo_pgsql'), extension_loaded('pgsql'));"
 ```
 
+Both values should be `bool(true)`.
+
+If either extension is still missing, make sure you edited the `php.ini` reported by `php --ini` for the PHP executable you are using. If you have multiple PHP installations, the terminal and web server may use different configurations.
 ## 4. Configure environment variables
 
 Create your local `.env` file from the provided example.
