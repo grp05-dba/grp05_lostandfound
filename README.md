@@ -14,7 +14,7 @@ Install the following:
 - **PHP PostgreSQL extensions:** `pdo_pgsql` and `pgsql`
 - A PostgreSQL client such as **pgAdmin** or **psql**
 
-TextBee and EmailJS are optional. They are only needed if you want the application to send SMS and email notifications.
+TextBee and EmailJS are optional. They are only needed if you want the application to send SMS and email notifications. Although setting them up is highly encouraged to experience the application's full functionality, including receiving notifications about potential item matches and claim status updates.
 
 ## 1. Clone the repository
 
@@ -134,40 +134,20 @@ EMAILJS_PUBLIC_KEY=your_emailjs_public_key
 
 See [TextBee](https://textbee.dev/) and [EmailJS](https://www.emailjs.com/) for provider account setup and credentials.
 
+If you want to enable notifications but prefer not to create your own TextBee and EmailJS accounts, you may contact the project maintainer to request access to the project's API credentials.
+
 **Never commit your `.env` file or share real credentials publicly.** The repository's `.gitignore` excludes `.env`.
 
 ## 5. Run the application locally
 
 The project has separate public and admin interfaces. They use ports **8000** and **8001**, respectively.
 
-The PHP built-in server needs a router script so it can serve the interface's static files and forward API requests to the correct PHP entry point. Create a file named `dev-router.php` in the repository root with the following contents:
-
-```php
-<?php
-
-$port = (int) $_SERVER['SERVER_PORT'];
-$documentRoot = $port === 8000
-    ? __DIR__ . '/public'
-    : __DIR__ . '/admin';
-
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
-$file = $documentRoot . $path;
-
-// Let PHP's built-in server serve existing frontend files (HTML, CSS, JS, images).
-if ($path !== '/' && is_file($file)) {
-    return false;
-}
-
-// Forward API requests to the matching entry point.
-require $documentRoot . '/index.php';
-```
-
 Open two terminals from the repository root.
 
 **Terminal 1 — Public interface and API:**
 
 ```bash
-php -S 127.0.0.1:8000 -t public dev-router.php
+php -S 127.0.0.1:8000 -t public
 ```
 
 Open the public interface at:
@@ -177,12 +157,15 @@ Open the public interface at:
 **Terminal 2 — Admin interface and API:**
 
 ```bash
-php -S 127.0.0.1:8001 -t admin dev-router.php
+php -S 127.0.0.1:8001 -t admin
 ```
 
 Open the admin interface at:
 
 - http://127.0.0.1:8001/app.html
+
+While the public interface at:
+- http://127.0.0.1:8000/app.html
 
 Keep both server terminals running while using the application.
 
