@@ -1,54 +1,70 @@
-# Architecture and code responsibilities
+# System architecture
 
-Reviewed against `17dfae5`. The current app is native PHP with PDO and PostgreSQL, without a framework, autoloader or separate router class.
+Reviewed against `main` revision `9a803d2` (November 5, 2026). PUP-SPOT uses native PHP, PostgreSQL and browser-side HTML/CSS/JavaScript. It does not use a PHP application framework.
 
-```mermaid
-flowchart LR
-    Client[HTTP client] --> Entry[public/index.php]
-    Entry --> Controller[AdminController or PublicController]
-    Controller --> Service[Resource service]
-    Service --> Repository[Resource repository]
-    Repository --> DB[(PostgreSQL)]
-    Controller --> SMS[SMSService]
-    SMS --> TextBee[TextBeeClient]
+## High-level structure
+
+```text
+Browser
+  |-- Public UI: public/app.html + public/js/app.js + public/css/
+  |       |-- public/index.php
+  |       |-- PublicController
+  |
+  |-- Admin UI: admin/app.html + admin/js/admin.js + admin/css/
+          |-- admin/index.php
+          |-- AdminController
+
+Controllers -> Services -> Repositories -> PostgreSQL
+                    |             |
+                    |             +-> Image metadata
+                    +-> TextBee / EmailJS integrations
+                    +-> ImageService -> storage/
 ```
+
+The public PHP development server is normally started on port 8000 with `-t public`. The admin server is started separately on port 8001 with `-t admin`. Each folder contains an `app.html` frontend and an `index.php` API entry point.
+
+## Main folders
+
+| Path | Responsibility |
+| --- | --- |
+| `public/` | Public-facing page, styles, JavaScript and public API entry point |
+| `admin/` | Admin-facing page, styles, JavaScript and admin API entry point |
+| `src/controllers/` | Match HTTP methods/paths, call services and return JSON or image responses |
+| `src/services/` | Business rules for items, reports, claims, categories, search, matching, images and notifications |
+| `src/repositories/` | PDO queries and database persistence |
+| `src/entities/` | Item, lost-report and claim data objects |
+| `src/db/` | Read local INI-style environment configuration and create PDO connections |
+| `src/integrations/` | TextBee and EmailJS HTTP clients |
+| `src/utils/` | Request parsing and shared validation/response helpers |
+| `sql/` | Schema, necessary category data, sample role script and demonstration data |
+| `storage/` | Uploaded item, lost-report and claim image files |
+| `docs/` | Maintained project documentation |
 
 ## Request lifecycle
 
-1. The entry point sets the JSON content-type header and requires controller, service, repository, connection and TextBee files.
-2. Connection::getConnection reads the root INI-style .env and opens a PDO PostgreSQL connection. Emulated prepares are disabled.
-3. The entry point reads REQUEST_METHOD and the full REQUEST_URI, chooses the /api/admin/ or /api/public/ namespace and constructs a controller.
-4. A controller matches the path, casts detail IDs to integers, invokes a service and JSON-encodes its result.
-5. Services delegate retrieval to repositories and set a 404 response when a requested record is absent.
-6. Repositories use PDO prepared statements and return associative arrays or false for a missing row.
+1. The browser loads the public or admin HTML page and its local JavaScript/CSS.
+2. JavaScript sends requests to the corresponding API base path and port.
+3. The matching PHP entry point loads the required source files and opens a PostgreSQL PDO connection.
+4. The controller matches the HTTP method and URL path, parses request data and delegates work to a service.
+5. Services validate input, coordinate repository operations, image storage, matching and notification calls.
+6. Repositories execute prepared SQL statements. Services return results which the controller encodes as JSON. Image endpoints stream files using the MIME type recorded in the database.
 
-Connection creation happens before namespace dispatch. Even the health route depends on initial database connectivity. The current connection class logs a PDO exception and terminates with plain text on failure; setting a JSON content-type header does not guarantee every failure body is valid JSON.
+The entry points catch PDO connection errors and return HTTP 500 with a generic JSON message. PDO errors during controller handling are logged server-side and return a generic HTTP 500 JSON response.
 
-## Folder map
+## Data and image handling
 
-| Folder / file | Current responsibility |
-| --- | --- |
-| public/index.php | Bootstrap, connection, namespace dispatch and response header |
-| src/controllers/ | Method/path matching and JSON output |
-| src/services/ | Resource retrieval coordination, missing-record behavior and SMS delegation |
-| src/repositories/ | Prepared SELECT queries and associative-array fetches |
-| src/db/db.php | Local configuration and PDO connection |
-| src/integrations/textbeeClient.php | cURL requests for gateway statistics/devices |
-| src/integrations/emailJSClient.php | Standalone sendEmail client foundation |
-| src/entities/ | Claim, Item and LostReport constructor-based classes |
-| sql/ | Schema, sample SQL and a short schema outline |
-| docs/ | Documentation maintained on the dedicated documentation branch |
+The database stores item, report and claim details, potential-match scores and image metadata. Actual image bytes are stored under `storage/items/`, `storage/lost-reports/` and `storage/claims/`. Database rows keep storage keys and MIME types; API responses expose image URLs rather than filesystem paths.
 
-## Entity and integration status
+ImageService verifies uploaded files, restricts formats to JPEG/PNG/WebP, applies size/count limits and coordinates file operations with database transactions. Storage directories must be writable by the PHP process and must not be exposed as arbitrary user-controlled paths.
 
-The latest refactor adds Claim, Item and LostReport classes with private properties and constructors. They have no public accessors or serialization interface. The current entry point does not require them and repositories still return arrays; the retrieval response does not pass through these entity objects.
+## Matching and notifications
 
-EmailJSClient reads service/template/public-key configuration, builds a JSON POST and calls a configured base URL plus /api/v1.0/email/send. It is not required or called by the current entry point, controllers or services.
+PotentialMatchService compares newly created or relevantly updated items/reports against eligible records. It stores matches meeting the service threshold (60 or higher). When a new found item matches an active report, the service can notify the reporter through the contact method selected on the report. Notification delivery is external and depends on TextBee/EmailJS configuration.
 
-Do not describe these files as completed claim creation, item registration, report submission or email notification workflows. Matching, photo handling, cancellation and the frontend are also not implemented in the inspected request flow.
+The demonstration SQL script inserts illustrative potential-match rows directly. Those pre-seeded records are not evidence that the matching algorithm ran or that notifications were delivered.
 
-## Development boundaries
+## Deployment and security notes
 
-Keep future HTTP handling in controllers, coordination in services and SQL in repositories, following the lead's agreed conventions. Coordinate schema or architecture changes with the lead. This documentation branch changes no PHP or SQL.
+The public and admin interfaces use separate entry points and ports, but the current public entry point calls `getAdminConnection()`. The public DB credentials defined in the environment template are therefore not evidence of an enforced public database role. No user login/authorization middleware is present in the reviewed controllers. Deploy the admin interface behind appropriate network access controls and do not expose it publicly as an authenticated staff system.
 
-For the exact implemented paths and ID conversion behavior, see [API reference](api.md). For constraints the code must respect, see [database reference](database.md).
+For concrete paths and methods, see [API reference](api.md). For database fields and constraints, see [database reference](database.md).
