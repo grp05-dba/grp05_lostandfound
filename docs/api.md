@@ -1,74 +1,86 @@
-# Implemented API reference
+# API reference
 
-Source revision: `17dfae5`. Development base URL: `http://127.0.0.1:8000`. Current database routes accept GET requests and need no request body.
+Reviewed against `main` revision `9a803d2` (November 5, 2026). The API is implemented in `src/controllers/publicController.php` and `src/controllers/adminController.php`, with business logic in `src/services/`.
 
-## Routes
+Local base URLs:
 
-| Method | Path | Successful response |
+- Public interface and API: `http://127.0.0.1:8000`
+- Admin interface and API: `http://127.0.0.1:8001`
+
+All API responses are JSON unless an image endpoint successfully streams an image file. For multipart requests, send form fields and image files using the `images` field name.
+
+## Public API
+
+| Method | Path | Purpose |
 | --- | --- | --- |
-| GET | /api/admin/test | Health message object |
-| GET | /api/admin/items | Array of all found items |
-| GET | /api/admin/items/{id} | One item object |
-| GET | /api/admin/lost-reports | Array of all lost reports |
-| GET | /api/admin/lost-reports/{id} | One lost report object |
-| GET | /api/admin/claims | Array of all claims |
-| GET | /api/admin/claims/{id} | One claim object |
-| GET | /api/public/categories | Array of all categories |
-| GET | /api/public/categories/{id} | One category object |
-| GET | /api/admin/sms/stats | TextBee gateway statistics wrapper |
-| GET | /api/admin/sms/devices | TextBee gateway devices wrapper |
+| GET | `/api/public/items` | List unclaimed found items |
+| GET | `/api/public/items/search` | Search/filter found items using query parameters |
+| GET | `/api/public/items/images/{imageId}` | Retrieve an item image |
+| GET | `/api/public/lost-reports/images/{imageId}` | Retrieve a lost-report image |
+| GET | `/api/public/categories` | List categories |
+| GET | `/api/public/categories/{id}` | Retrieve a category |
+| POST | `/api/public/lost-reports/add` | Submit a lost-item report, optionally with images |
+| POST | `/api/public/lost-reports/view` | Look up a report using `report_code` |
+| POST | `/api/public/lost-reports/cancel` | Request cancellation using `report_code` |
+| GET | `/api/public/lost-reports/matches/{reportCode}` | Retrieve potential matches for a report |
+| DELETE | `/api/public/lost-reports/matches/{reportCode}/{matchId}` | Remove a potential match from a report |
+| POST | `/api/public/claims/add` | Submit a claim, optionally with images |
+| POST | `/api/public/claims/view` | Look up a claim using `claim_code` |
 
-Lists return `[]` when empty. Queries have no ORDER BY, pagination or filtering. Do not depend on a particular record order. Repositories return associative arrays using the table columns in [the data reference](database.md).
+The report and claim tracking endpoints use POST request bodies containing the relevant reference code. The controller reads JSON request bodies for these lookups. Report and claim creation use `RequestUtils::getRequestData()` and may receive uploaded files in `$_FILES['images']`.
 
-For example, a category lookup can return:
+## Admin API
 
-```json
-{"category_id": 1, "name": "test-category"}
-```
-
-Values come from the actual database; sample dates and timestamps are generated when the sample script runs.
-
-## Missing records and routes
-
-| Case | HTTP status | JSON body |
+| Method | Path | Purpose |
 | --- | --- | --- |
-| Item ID not found | 404 | `{"message":"No item found."}` |
-| Report ID not found | 404 | `{"message":"No report found."}` |
-| Claim ID not found | 404 | `{"message":"No claim found."}` |
-| Category ID not found | 404 | `{"error":"Category not found"}` |
-| Unknown admin route / unsupported method there | 404 | `{"error":"Admin endpoint not found"}` |
-| Unknown public route / unsupported method there | 404 | `{"error":"Public endpoint not found"}` |
-| Unknown namespace | 404 | `{"error":"Endpoint not found"}` |
+| GET | `/api/admin/test` | Check that the admin API can respond |
+| GET | `/api/admin/items` | List all found items |
+| GET | `/api/admin/items/{id}` | Retrieve one item |
+| POST | `/api/admin/items/add` | Create an item with optional images |
+| PATCH | `/api/admin/items/update/{id}` | Update item fields |
+| POST | `/api/admin/items/{id}/images` | Add images to an item |
+| DELETE | `/api/admin/items/{id}/images/{imageId}` | Delete an item image |
+| GET | `/api/admin/lost-reports` | List lost reports |
+| GET | `/api/admin/lost-reports/{id}` | Retrieve one lost report |
+| GET | `/api/admin/lost-reports/matches/{reportCode}` | Retrieve potential matches for a report |
+| PATCH | `/api/admin/lost-reports/update/{id}` | Update a lost report |
+| GET | `/api/admin/claims` | List claims |
+| GET | `/api/admin/claims/{id}` | Retrieve one claim |
+| PATCH | `/api/admin/claims/update/{id}` | Update a claim |
+| GET | `/api/admin/items/images/{imageId}` | Retrieve an item image |
+| GET | `/api/admin/lost-reports/images/{imageId}` | Retrieve a lost-report image |
+| GET | `/api/admin/claims/images/{imageId}` | Retrieve a claim image |
+| GET | `/api/admin/categories` | List categories |
+| GET | `/api/admin/categories/{id}` | Retrieve a category |
+| GET | `/api/admin/sms/stats` | Retrieve TextBee gateway statistics |
+| GET | `/api/admin/sms/devices` | Retrieve TextBee gateway devices |
 
-Current controllers return 404 for unsupported methods rather than 405. No POST, PATCH or DELETE handler is present in the reviewed controllers.
+## Request and response behavior
 
-## IDs and paths
+- Controllers remove query strings before matching route paths. The public item-search route parses its query string as filters.
+- Creation and update services validate required/general fields, date/time values, category references and supported status values where applicable. Validation failures return an error message and an HTTP error status.
+- Missing records generally return a JSON message and HTTP 404. Exact message text varies by service.
+- Item/report/claim creation can save image files and their database metadata as part of a transaction. If saving fails, the service rolls back the database transaction and removes files saved during that operation.
+- Image uploads accept JPEG, PNG and WebP. The service limits uploads to five images per record and 5 MB per image. Item image additions also check the total image count.
+- Image responses set the stored MIME type, content length and `X-Content-Type-Options: nosniff`. Admin claim images use private cache headers; item/report images use the configured route behavior.
+- Potential-match generation runs after an item or lost report is created and when relevant item/report fields are updated. The service stores candidates at a similarity score of 60 or higher. Removing a match requires both the report code and match ID.
 
-Controllers use `str_starts_with`, remove the resource prefix and cast the remainder to an integer before calling service methods that accept `int $id`. This follows the existing category implementation and the lead's PR review decision.
+## Notifications
 
-This is coercion rather than strict validation. For a seeded ID 1, `/items/1abc`, `/items/1.5` and `/items/1/extra` all resolve as ID 1. Nonnumeric text converts to 0 and normally produces the resource's missing-record 404. There is no separate positive-integer 400 check.
+TextBee and EmailJS clients are integrated through SMS/email services. The potential-match service selects the notification channel using the report's `contact_preference` and available contact detail. Claim creation also sends a notification through the selected channel. Actual delivery depends on valid credentials, provider availability and the provider response; code integration alone is not proof of delivery.
 
-`public/index.php` passes the full REQUEST_URI into routing. Collection paths containing a query string do not match the exact list routes; query parameters are not implemented. Detail paths may have their suffix coerced to an integer. Oversized IDs and database failures are not covered by a consistent JSON error contract.
+The SMS statistics and devices endpoints are gateway diagnostics. They do not send a message.
 
-## Gateway wrappers
+## Important access-control limitation
 
-The two SMS routes call TextBee GET operations; they do not send SMS. The response object contains:
+The repository has separate public and admin entry points and ports, but the current `public/index.php` calls `Connection::getAdminConnection()`, just like the admin entry point. Do not assume that `DB_PUBLIC_USER` is used for public requests or that separate URLs enforce authorization. There is no login/session authorization layer visible in these controllers. Restrict admin access at the deployment/network level until application authentication and least-privilege database access are implemented.
 
-- `success`: whether the upstream status is 2xx.
-- `status`: upstream HTTP status, or 0 on a connection failure.
-- `response`: decoded JSON or raw upstream body when a response exists.
-- `message`: the connection-failure explanation when no response exists.
+## Source files
 
-The wrapper does not set the API's HTTP response status to the upstream status. A local HTTP 200 therefore does not prove the gateway request succeeded; inspect `success` and `status`.
+- Controllers: `src/controllers/publicController.php`, `src/controllers/adminController.php`
+- Services: `src/services/`
+- Repositories: `src/repositories/`
+- Request parsing/validation: `src/utils/requestUtils.php`
+- Entrypoints: `public/index.php`, `admin/index.php`
 
-EmailJSClient has a sendEmail method, but no reviewed controller route calls it. No email-sending endpoint, automatic notification workflow or real delivery result is documented as working.
-
-## Proposed database error contract - not yet merged
-
-[PR #25](https://github.com/grp05-dba/grp05_lostandfound/pull/25) proposes HTTP 500 JSON responses for connection/query PDO exceptions instead of the current plain-text termination or uncaught exception output. It does not change integer coercion. See [the repository review](repository-review.md) for the reproduction and validation; this proposal is not main's current error contract until merged.
-
-## Access and verification
-
-Administrative claim/report objects include contact information. The admin prefix is a routing convention, not an authorization boundary. There is no login middleware or enforced separate listener in this entry point; keep local demonstrations private. See [roles](user-roles.md).
-
-Use [setup](setup.md) before making read-only requests. Local verification details and their limits are in [development history](development-history.md). Never infer completed create/update workflows from successful retrieval tests.
+Check the controller and service source before relying on an undocumented response field or exact validation rule.
