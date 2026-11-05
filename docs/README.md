@@ -1,20 +1,33 @@
-# PUP-SPOT documentation
+# PUP-SPOT project documentation
 
-Group 5's lost-and-found API documentation. Reviewed October 31, 2026 against application revision `17dfae5` on `main`. These pages describe the checked-in implementation; planned behavior is labeled separately.
+This folder documents the current PUP-SPOT campus Lost and Found system. It was reviewed against `main` revision `9a803d2` (November 5, 2026). The application is a PHP and PostgreSQL project with separate public and admin web interfaces.
 
-| Start here | What it explains |
+## Documentation map
+
+| Page | Contents |
 | --- | --- |
-| [Setup](setup.md) | Clone, database initialization, PHP configuration, and local startup |
-| [API reference](api.md) | Implemented routes, responses, ID conversion, and current limits |
-| [Architecture](architecture.md) | Request flow and responsibilities of each folder |
-| [Database](database.md) | Five tables, constraints, relationships, and seed behavior |
-| [Application and database roles](user-roles.md) | Intended workflows versus permissions actually implemented |
-| [Development history](development-history.md) | Source-backed milestones and verification scope |
-| [Documentation branch workflow](branch-workflow.md) | Commit, push, pull, and merge main into this branch |
-| [Repository review](repository-review.md) | Reproduced error-handling bug, proposed fix, and work awaiting coordination |
+| [Setup](setup.md) | Requirements, database initialization, environment configuration and local startup |
+| [API reference](api.md) | Public and admin routes, request methods, uploads and current behavior |
+| [Architecture](architecture.md) | Frontend/backend structure, request flow and service responsibilities |
+| [Database](database.md) | Eight tables, constraints, image metadata and demo data |
+| [User roles](user-roles.md) | Public/admin responsibilities and current access-control limitations |
+| [Development history](development-history.md) | Recent implementation milestones and documentation baseline |
+| [Repository review](repository-review.md) | Current implementation notes and items that still need verification |
+| [Branch workflow](branch-workflow.md) | How to maintain and publish this documentation branch |
 
-The application currently provides database-backed retrieval and TextBee gateway-information routes. It does not yet provide a frontend, write endpoints, cancellation workflows, or automatic matching. The EmailJS client and entity classes exist as foundations, not completed end-to-end workflows.
+## Current system at a glance
 
-The documentation branch is `docs/project-documentation`. Changes stay under `docs/`; the project lead reviews and merges this branch into `main` when ready. This supersedes the earlier temporary arrangement where course notes were held only outside the repository. Credentials, database dumps, local runtime files, and raw test logs remain outside Git.
+- Public interface: found-item browsing and search, lost-report submission and tracking, claim submission and tracking, and potential-match viewing/removal.
+- Admin interface: item, report and claim review; item creation and updates; report and claim updates; image management; and SMS gateway diagnostics.
+- Backend: native PHP using PDO and PostgreSQL, organized into controllers, services, repositories, entities, integrations and request utilities.
+- Images: JPEG, PNG and WebP uploads are validated and stored under `storage/`; image metadata is kept in PostgreSQL.
+- Potential matching: the service compares newly submitted reports/items and stores candidates that meet its matching threshold. Notifications depend on TextBee/EmailJS configuration and provider availability.
+- Local deployment: run the public interface on port 8000 and the admin interface on port 8001.
 
-The [root setup README](../README.md) and [Activity 2 proposal linked there](../README.md#additional-project-resources) remain unchanged. This documentation does not revise the submitted proposal or certify course completion.
+## Documentation scope
+
+These pages describe behavior found in the repository, not a guarantee that every workflow has been tested in a live deployment. The public entry point currently obtains a database connection through `getAdminConnection()`; the separate public database credentials in the environment template are not used by that entry point. The admin URL is a separate interface, not a substitute for authentication or network access controls.
+
+The root [README](../README.md) remains the quick-start guide. Keep secrets, real provider credentials, local `.env` files, uploaded user data and database dumps out of Git.
+
+Update these pages whenever implementation changes affect routes, schema, setup or user-visible behavior. Record the exact source revision used for each review.
