@@ -132,47 +132,6 @@ extension=pgsql
 
 Save the file and restart any running PHP or web server process.
 
-**Linux (Debian/Ubuntu):**
-
-Install the PostgreSQL extension package:
-
-```bash
-sudo apt update
-sudo apt install php-pgsql
-```
-
-If you use Apache, restart it:
-
-```bash
-sudo systemctl restart apache2
-```
-
-If you use PHP's built-in development server, stop and start it again.
-
-### 3.3 Verify that the extensions are enabled
-
-Run:
-
-```bash
-php -m
-```
-
-Confirm that both entries appear:
-
-```text
-pdo_pgsql
-pgsql
-```
-
-You can also check them individually:
-
-```bash
-php -r "var_dump(extension_loaded('pdo_pgsql'), extension_loaded('pgsql'));"
-```
-
-Both values should be `bool(true)`.
-
-If either extension is still missing, make sure you edited the `php.ini` reported by `php --ini` for the PHP executable you are using. If you have multiple PHP installations, the terminal and web server may use different configurations.
 ## 4. Configure environment variables
 
 Create your local `.env` file from the provided example.
