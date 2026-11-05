@@ -1,41 +1,33 @@
-# Development history and verification
+# Development history and verification notes
 
-Documentation reviewed October 31, 2026 against main revision `17dfae5`. Milestones below come from Git history and local verification records, not an assumption that every planned feature is complete.
+Documentation reviewed November 5, 2026 against `main` revision `9a803d2`. This page records repository milestones and implementation visible in source. It does not claim that every workflow has passed end-to-end testing.
 
-| Date | Revision / event | Result |
+## Recent repository milestones
+
+| Date | Revision / change | Observed result |
 | --- | --- | --- |
-| Oct 27-28 | Early controller, service and repository commits | PDO connectivity, item listing and category retrieval established |
-| Oct 28 | 5fcbccd | SMS service and TextBee gateway-information routes added |
-| Oct 29 | 3a11b92 | Standalone EmailJS client added |
-| Oct 29 | 85f5cea | docs folder introduced |
-| Oct 30 | 2b9346b, merged through PR #23 / 5aaac06 | Five administrative retrieval routes added; lead-requested integer conversion and unsorted queries retained |
-| Oct 30 | 17dfae5 | Controller prefix removal aligned with category style; Claim, Item and LostReport entity classes added |
-| Oct 31 | Repository organization | Repository transferred from sanatorion to grp05-dba; clone instructions now use the organization URL |
-| Oct 31 | Documentation branch | Current setup, API, architecture, schema, role mapping and branch workflow documented for review |
-| Oct 31 | PR #25 / 9ef91a1, pending review | Reproduced database failures returning non-JSON success responses; proposed sanitized JSON 500 responses and verified seven targeted scenarios plus 69 existing assertions |
+| October 27-28 | Initial controller, service and repository work | PDO connectivity, item listing and category retrieval established |
+| October 28 | SMS service and TextBee gateway-information routes | TextBee client/service foundation added |
+| October 29 | EmailJS client | Email integration foundation added |
+| October 29-30 | Admin retrieval routes and entity classes | Staff-side item/report/claim retrieval and Claim, Item and LostReport classes added |
+| October 31 | Documentation folder and documentation branch | Setup, API, architecture, schema and workflow pages were introduced |
+| November 4 | `3718963` — public potential-match removal | Public API gained a DELETE route scoped by report code and match ID |
+| November 5 | `ff6a97e`, `9a803d2` — README setup revisions | Root setup guide updated for the public and admin interfaces on ports 8000 and 8001 |
 
-PR #22, the earlier setup-documentation proposal, was closed without merge. Its content is not a claim about main. Earlier course files were temporarily kept outside the app repo; the lead's later direction places maintained project documentation under docs on its own branch.
+## Current implementation reflected in main
 
-## Verification already performed
+The current repository includes public and admin HTML/JavaScript interfaces; PHP controllers, services and repositories; PostgreSQL schema for items, reports, claims, categories, potential matches and image metadata; upload handling and local file storage; report/claim tracking by reference code; potential-match generation and retrieval/removal; and TextBee/EmailJS integration code.
 
-On October 30, local checks of the merged retrieval implementation passed 29 retrieval requests / 55 assertions and seven baseline requests / 14 assertions. The tests followed the lead's integer-coercion contract rather than asserting strict 400 validation. The empty-list helper passed using a transaction that rolled its temporary deletions back. Raw helper scripts and logs remain outside this documentation branch.
+The public controller supports browsing/search, category retrieval, lost-report creation/view/cancellation, claim creation/view, potential-match retrieval/removal and public image retrieval. The admin controller supports item/report/claim retrieval and selected updates, item creation and image management, categories, image retrieval and TextBee gateway diagnostics.
 
-The local database contained one supplied seed record per table. A separate local DBA rehearsal verified restored row counts/content hashes, constraint metadata, rejection of invalid statuses, permitted SELECT/UPDATE and denied CREATE TABLE for the runtime role. Recovery was performed on disposable copies and left the source database unchanged. This is rehearsal evidence, not completed cross-group Activities 4-6.
+## Verification status and limits
 
-Previous TextBee success-path tests used a local stub. No live SMS or email delivery is verified. The EmailJS client and entity constructors require integration before they become an end-to-end workflow.
+The documentation review checked the current branch's README, entry points, controllers, services, schema and SQL demonstration script. The route inventory and architectural descriptions in this folder are based on those source files.
 
-## Current review limits
+This documentation update is not a substitute for executing the application. It does not certify that database setup succeeds on every machine, all browser workflows work, SMS/email messages are delivered, image uploads work under every PHP configuration, or that admin access is protected in a deployed environment.
 
-On October 31, revision 17dfae5 passed syntax checks for all 18 application PHP files. The separate read-only Postman collections passed 29 retrieval requests / 55 assertions and seven baseline requests / 14 assertions: 36 requests, 69 assertions, zero failures. The docs' 27 relative file links and code-fence pairing were also checked. No sample-data reload, external messaging, schema change or application-code edit was needed for this documentation update.
+The demo SQL script inserts illustrative potential-match scores directly into the database. Those records do not demonstrate that the matching service calculated them. Provider integration code does not establish successful external delivery.
 
-These HTTP checks cover seeded retrieval, missing records, integer coercion, namespace rejection and existing health/category routes. They do not validate the unused entity constructors as an integrated workflow, EmailJS delivery or every error condition. Read the [API](api.md), [architecture](architecture.md) and [schema](database.md) references for the source behavior.
+## Keeping the record current
 
-This documentation does not establish a full working frontend, write flows, matching, notification delivery, independent installation on every group's machine, instructor approval, or midterm completion. Other groups' actual repositories, instructor pairings and required evidence must be obtained and tested.
-
-## AI assistance
-
-OpenAI Codex assisted with source/history inspection, documentation drafting and local verification. Previously submitted PHP retrieval work was tested and reviewed through PR #23. The project lead and team retain responsibility for reviewing the docs, validating claims and explaining their work in the course defense.
-
-## Keeping this history accurate
-
-Add a dated milestone tied to a real commit or test record when main changes. Preserve past results with their dates; do not present a previous test run as evidence for a later untested revision. See [branch workflow](branch-workflow.md) for synchronization and review.
+When main changes, record the commit and date reviewed. Inspect the affected controllers, services, repositories, SQL and frontend scripts. Update route/schema/setup pages as needed and distinguish source inspection from tests actually run. Never present an earlier test result as verification of a later revision.
