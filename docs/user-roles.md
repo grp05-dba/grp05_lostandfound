@@ -1,29 +1,34 @@
-# Application roles and intended database access
+# User roles and access model
 
-Reviewed at `17dfae5`. This maps workflows to intended database privileges for the course; it does not claim the role split is already enforced.
+Reviewed against `main` revision `9a803d2` (November 5, 2026). PUP-SPOT currently has separate public and admin interfaces, but the repository does not show a complete authentication and authorization system.
 
-| Application role | Intended workflow | Intended database access |
+## Interface responsibilities
+
+| Interface | Current purpose | Examples |
 | --- | --- | --- |
-| Student / guest | Browse found items/categories; submit reports/claims; cancel their own submission by reference code | SELECT on permitted public data; scoped INSERT for submissions; cancellation needs a constrained design agreed by the team |
-| Campus staff / marshal | Register found items, manage categories, inspect reports/claims, update statuses | SELECT, INSERT and UPDATE on the specific objects needed; sequence USAGE for generated IDs |
-| DBA / database owner | Initialize schema, provision accounts, maintain objects, back up and restore | Separate administrative account; not the ordinary app login |
+| Public | Student/visitor-facing lost-and-found actions | Browse/search unclaimed items, submit and track lost reports, submit and track claims, view potential matches and remove a potential match from a report |
+| Admin | Staff-facing record management | Review items/reports/claims, create and update items, update reports/claims, manage item images, inspect categories and view TextBee gateway diagnostics |
+| Database administrator | Database provisioning and maintenance | Create the database, run schema/seed scripts, manage roles/privileges, backup and restore |
 
-## Actual implementation
+These are application responsibilities, not proof of authenticated user identities. The public/admin page separation is currently implemented through separate document roots and route prefixes/ports.
 
-There are public and admin route prefixes, but no user-account table, login middleware or enforced split into separate public/admin server instances. Both namespaces are reachable through the same public/index.php. A private-campus deployment remains a concept, not an implemented access boundary.
+## Current implementation details
 
-The DB connection uses one DB_USER value from .env for all requests. The SQL schema script does not create database roles or grants. The actual privileges on another group's installation depend on its DBA configuration.
+- Public interface: `public/app.html`, `public/js/app.js`, `public/index.php`.
+- Admin interface: `admin/app.html`, `admin/js/admin.js`, `admin/index.php`.
+- Both entry points call `Connection::getAdminConnection()`.
+- `Connection::getPublicConnection()` exists and reads `DB_PUBLIC_USER` and `DB_PUBLIC_PASSWORD`, but the public entry point does not currently use it.
+- The reviewed controllers do not implement login/session checks or per-user authorization before admin operations.
+- A separate port or URL is not an access-control mechanism.
 
-The local rehearsal used a dedicated pupspot_runtime login with no SUPERUSER, CREATEDB or CREATEROLE attributes. It had table CRUD, schema USAGE and sequence access. This was local evidence, not a checked-in provisioner or proof of student/staff privilege separation. No credentials belong in these pages.
+## Security guidance
 
-## Verification for Activity 4
+Until authentication and least-privilege connection handling are implemented, run the admin server only on localhost or behind trusted network access controls. Do not publish the admin interface to the public internet. Do not place real credentials in documentation, source files or commits.
 
-For each required project copy, document the chosen role, database, schema, objects, membership and allowed actions. Test database CONNECT, schema USAGE, table/view privileges, sequences, PUBLIC access and default privileges where relevant. Record both permitted and denied operations using the relevant account.
+The database role-creation sample is a starting point for local setup, not proof that the running application uses separate public and admin database roles. Verify the actual grants and the connection method used by each entry point before claiming privilege separation.
 
-Use separate owner/maintenance credentials for administrative work. A successful API request with an unrestricted account does not establish least privilege. The complete permission plan and cross-group evidence depend on the actual project being tested.
+## Suggested verification
 
-## Current workflow coverage
+For a deployment that requires separate privileges, verify the actual database user used by each entry point, database CONNECT, schema USAGE, table and sequence privileges, and denied operations. Test admin route access with and without authentication once an authentication layer exists. Record the exact database role and test results for each environment.
 
-The present API retrieves staff records and public categories. Public found-item browsing, report/claim submissions and cancellations, staff writes, and notification workflows still need implementation or integration. See [API reference](api.md) before attributing a capability to a role.
-
-The original proposal remains unchanged. Any decision about role separation or restrictions should be agreed with the project lead and reflected here after implementation.
+See [setup](setup.md) for environment configuration and [API reference](api.md) for implemented routes.
