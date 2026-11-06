@@ -1,0 +1,4 @@
+   usename   |        datname        | count
+-------------+-----------------------+-------
+ canteen_app | canteen_g05_activity4 |    10
+(1 row)

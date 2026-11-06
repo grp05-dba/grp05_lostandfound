@@ -1,0 +1,236 @@
+[
+  {
+    "name": "unauthenticated-home",
+    "method": "GET",
+    "path": "/",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/login"
+  },
+  {
+    "name": "login-form-admin",
+    "method": "GET",
+    "path": "/login",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "login-admin",
+    "method": "POST",
+    "path": "/login",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/"
+  },
+  {
+    "name": "dashboard-admin",
+    "method": "GET",
+    "path": "/",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "login-form-staff",
+    "method": "GET",
+    "path": "/login",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "login-staff",
+    "method": "POST",
+    "path": "/login",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/"
+  },
+  {
+    "name": "dashboard-staff",
+    "method": "GET",
+    "path": "/",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "login-form-tenant",
+    "method": "GET",
+    "path": "/login",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "login-tenant",
+    "method": "POST",
+    "path": "/login",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/"
+  },
+  {
+    "name": "dashboard-tenant",
+    "method": "GET",
+    "path": "/",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-properties",
+    "method": "GET",
+    "path": "/properties",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-rooms",
+    "method": "GET",
+    "path": "/rooms",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-tenants",
+    "method": "GET",
+    "path": "/tenants",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-leases",
+    "method": "GET",
+    "path": "/leases",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-payments",
+    "method": "GET",
+    "path": "/payments",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-bills",
+    "method": "GET",
+    "path": "/bills",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "tenant-own-leases",
+    "method": "GET",
+    "path": "/leases",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "tenant-own-payments",
+    "method": "GET",
+    "path": "/payments",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "tenant-own-bills",
+    "method": "GET",
+    "path": "/bills",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "tenant-denied-properties",
+    "method": "GET",
+    "path": "/properties",
+    "expected": 403,
+    "actual": 403,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "tenant-denied-rooms",
+    "method": "GET",
+    "path": "/rooms",
+    "expected": 403,
+    "actual": 403,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "tenant-denied-tenants",
+    "method": "GET",
+    "path": "/tenants",
+    "expected": 403,
+    "actual": 403,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "staff-denied-property-create",
+    "method": "POST",
+    "path": "/properties",
+    "expected": 403,
+    "actual": 403,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-property-create",
+    "method": "POST",
+    "path": "/properties",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/properties"
+  },
+  {
+    "name": "admin-property-update",
+    "method": "POST",
+    "path": "/properties/4",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/properties"
+  },
+  {
+    "name": "admin-property-delete",
+    "method": "POST",
+    "path": "/properties/4/delete",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/properties"
+  }
+]

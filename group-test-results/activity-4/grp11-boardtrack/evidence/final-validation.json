@@ -1,0 +1,11 @@
+{
+  "group": "11",
+  "database_checks": 82,
+  "http_checks": 26,
+  "all_passed": true,
+  "secret_scan_files": 18,
+  "relative_links": "all resolve",
+  "seed_counts_restored": true,
+  "source_integrity": "tracked tree clean",
+  "wrong_database_guard": "rejected"
+}

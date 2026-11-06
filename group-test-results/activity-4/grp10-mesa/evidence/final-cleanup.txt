@@ -1,0 +1,14 @@
+       name       | rows
+------------------+------
+ customer         |   51
+ staff            |   10
+ menu_item        |   50
+ restaurant_table |   20
+ orders           |   60
+ order_item       |  167
+ reservation      |   50
+ payment          |   56
+(8 rows)
+
+
+Future probe table/function absent; HTTP services stopped; successful SERIAL increments retained.

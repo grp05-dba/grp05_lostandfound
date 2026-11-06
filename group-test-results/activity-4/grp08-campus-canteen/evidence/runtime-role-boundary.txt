@@ -1,0 +1,15 @@
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; INSERT INTO student(full_name,email,password_hash,role) VALUES ('G05 boundary','g05-boundary@example.invalid','non-login-test-marker','ADMIN') RETURNING student_id,role; ROLLBACK;
+Expected: Allowed
+Exit code: 0
+
+BEGIN
+ student_id | role
+------------+-------
+          5 | ADMIN
+(1 row)
+
+INSERT 0 1
+ROLLBACK

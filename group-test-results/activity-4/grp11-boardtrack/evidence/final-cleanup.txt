@@ -1,0 +1,14 @@
+       name        | rows
+-------------------+------
+ property          |    2
+ room              |    6
+ tenant            |    4
+ lease             |    4
+ payment           |    6
+ utility_bill      |    4
+ app_user          |    3
+ schema_migrations |    1
+(8 rows)
+
+
+Future probe table/function absent; HTTP services stopped; successful SERIAL increments retained.

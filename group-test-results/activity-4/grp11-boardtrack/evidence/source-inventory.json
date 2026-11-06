@@ -1,0 +1,15 @@
+{
+  "group": "11",
+  "source_commit": "242b366936f17324dca7e4435bc1d6abe59b27d7",
+  "seed_counts": {
+    "property": 2,
+    "room": 6,
+    "tenant": 4,
+    "lease": 4,
+    "payment": 6,
+    "utility_bill": 4,
+    "app_user": 3,
+    "schema_migrations": 1
+  },
+  "pdf_review": []
+}

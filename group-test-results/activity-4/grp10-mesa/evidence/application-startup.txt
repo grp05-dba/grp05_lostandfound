@@ -1,0 +1,106 @@
+[Fri Nov  6 20:34:10 2026] PHP 8.5.10 Development Server (http://127.0.0.1:18090) started
+[Fri Nov  6 20:34:10 2026] 127.0.0.1:64282 Accepted
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64282 [200]: GET /health
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64282 Closing
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64286 Accepted
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64286 [200]: GET /health
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64286 Closing
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64288 Accepted
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64288 [200]: GET /menu
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64288 Closing
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64290 Accepted
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64290 [200]: GET /login
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64290 Closing
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64291 Accepted
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64291 [302]: POST /login
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64291 Closing
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64293 Accepted
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64293 [200]: GET /staff/login
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64293 Closing
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64294 Accepted
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64294 [302]: POST /staff/login
+[Fri Nov  6 20:34:11 2026] 127.0.0.1:64294 Closing
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64296 Accepted
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64296 [200]: GET /staff/login
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64296 Closing
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64297 Accepted
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64297 [302]: POST /staff/login
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64297 Closing
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64299 Accepted
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64299 [200]: GET /orders
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64299 Closing
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64301 Accepted
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64301 [200]: GET /profile
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64301 Closing
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64305 Accepted
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64305 [200]: GET /admin
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64305 Closing
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64307 Accepted
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64307 [403]: GET /admin/staff
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64307 Closing
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64309 Accepted
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64309 [302]: GET /admin
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64309 Closing
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64310 Accepted
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64310 [200]: GET /admin/menu
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64310 Closing
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64312 Accepted
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64312 [200]: GET /admin/tables
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64312 Closing
+[Fri Nov  6 20:34:12 2026] 127.0.0.1:64314 Accepted
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64314 [200]: GET /admin/orders
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64314 Closing
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64316 Accepted
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64316 [200]: GET /admin/reservations
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64316 Closing
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64318 Accepted
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64318 [200]: GET /admin/payments
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64318 Closing
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64320 Accepted
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64320 [200]: GET /admin/customers
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64320 Closing
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64322 Accepted
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64322 [200]: GET /admin/staff
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64322 Closing
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64324 Accepted
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64324 [403]: POST /admin/menu/save
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64324 Closing
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64326 Accepted
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64326 [200]: GET /admin/menu/edit
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64326 Closing
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64328 Accepted
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64328 [302]: POST /admin/menu/save
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64328 Closing
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64331 Accepted
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64331 [200]: GET /admin/menu/edit?id=54
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64331 Closing
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64333 Accepted
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64333 [302]: POST /admin/menu/save
+[Fri Nov  6 20:34:13 2026] 127.0.0.1:64333 Closing
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64336 Accepted
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64336 [200]: GET /admin/menu
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64336 Closing
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64338 Accepted
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64338 [302]: POST /admin/menu/delete
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64338 Closing
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64341 Accepted
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64341 [200]: GET /menu
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64341 Closing
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64343 Accepted
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64343 [302]: POST /cart/add
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64343 Closing
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64345 Accepted
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64345 [200]: GET /cart
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64345 Closing
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64347 Accepted
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64347 [302]: POST /checkout
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64347 Closing
+[Fri Nov  6 20:34:14 2026] 127.0.0.1:64350 Accepted
+[Fri Nov  6 20:34:15 2026] 127.0.0.1:64350 [200]: GET /orders/view?id=63
+[Fri Nov  6 20:34:15 2026] 127.0.0.1:64350 Closing
+[Fri Nov  6 20:34:15 2026] 127.0.0.1:64352 Accepted
+[Fri Nov  6 20:34:15 2026] 127.0.0.1:64352 [200]: GET /admin/orders/view?id=63
+[Fri Nov  6 20:34:15 2026] 127.0.0.1:64352 Closing
+[Fri Nov  6 20:34:15 2026] 127.0.0.1:64354 Accepted
+[Fri Nov  6 20:34:15 2026] 127.0.0.1:64354 [302]: POST /admin/orders/status
+[Fri Nov  6 20:34:15 2026] 127.0.0.1:64354 Closing

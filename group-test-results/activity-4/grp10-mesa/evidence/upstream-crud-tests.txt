@@ -1,0 +1,76 @@
+Pager usage is off.
+BEGIN
+CREATE TABLE
+SELECT 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+UPDATE 1
+UPDATE 1
+INSERT 0 1
+INSERT 0 1
+DO
+ALTER TABLE
+UPDATE 1
+DELETE 1
+UPDATE 1
+DELETE 1
+DELETE 1
+DELETE 1
+INSERT 0 1
+INSERT 0 1
+                                      name                                      |   outcome
+--------------------------------------------------------------------------------+--------------
+ C1 customer inserted                                                           | PASS
+ C2 order total maintained by trigger (3 x price of Chicken Adobo)              | PASS
+ C3 payment and reservation inserted                                            | PASS
+ R1 view v_order_summary shows the new order                                    | PASS
+ R2 menu search (ILIKE) finds adobo                                             | PASS
+ R3 every order total equals the sum of its lines (0 mismatches)                | PASS
+ R4 every payment amount equals the total of its order (0 mismatches)           | PASS
+ U1 price change does NOT alter the stored order line (unit_price history kept) | PASS
+ U2 order status updated                                                        | PASS
+ K1 negative price rejected                                                     | PASS (23514)
+ K2 zero capacity rejected                                                      | PASS (23514)
+ K3 duplicate email rejected                                                    | PASS (23505)
+ K4 order without items rejected at commit                                      | PASS (23514)
+ K5 table double-booking rejected                                               | PASS (23P01)
+ K6 guests above table capacity rejected                                        | PASS (23514)
+ K7 second payment for one order rejected                                       | PASS (23505)
+ K8 unknown status rejected                                                     | PASS (23514)
+ K9 deleting a menu item used by orders rejected                                | PASS (23001)
+ K10 wrong subtotal rejected                                                    | PASS (23514)
+ K11 NULL first name rejected                                                   | PASS (23502)
+ K12 quantity 0 rejected                                                        | PASS (23514)
+ K13 order for a missing customer rejected                                      | PASS (23503)
+ K14 order that has a payment cannot be deleted                                 | PASS (23001)
+ D1 test data removed (children first, order_item cascades)                     | PASS
+ D2 the order lines were removed with their order (ON DELETE CASCADE)           | PASS
+(25 rows)
+
+ passed | failed
+--------+--------
+     25 |      0
+(1 row)
+
+ROLLBACK
+       tbl        | count
+------------------+-------
+ customer         |    51
+ staff            |    10
+ menu_item        |    50
+ restaurant_table |    20
+ orders           |    60
+ order_item       |   167
+ payment          |    56
+ reservation      |    50
+(8 rows)

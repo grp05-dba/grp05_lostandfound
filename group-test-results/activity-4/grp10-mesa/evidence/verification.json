@@ -1,0 +1,758 @@
+[
+  {
+    "name": "runtime-read-approved-tables",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT 'customer',count(*) FROM customer UNION ALL SELECT 'staff',count(*) FROM staff UNION ALL SELECT 'menu_item',count(*) FROM menu_item UNION ALL SELECT 'restaurant_table',count(*) FROM restaurant_table UNION ALL SELECT 'orders',count(*) FROM orders UNION ALL SELECT 'order_item',count(*) FROM order_item UNION ALL SELECT 'reservation',count(*) FROM reservation UNION ALL SELECT 'payment',count(*) FROM payment;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "runtime-positive-workflow",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN;\nINSERT INTO customer(first_name,last_name,email,phone,password) VALUES('G05','Probe','g05-a4@example.invalid','000','non-login-test-marker') RETURNING customer_id AS cid \\gset\nINSERT INTO staff(first_name,last_name,email,role,password) VALUES('G05','Probe','g05-staff@example.invalid','staff','non-login-test-marker') RETURNING staff_id AS sid \\gset\nINSERT INTO menu_item(item_name,category,price) VALUES('G05 A4 probe','Probe',8.75) RETURNING menu_item_id AS mid \\gset\nINSERT INTO restaurant_table(table_number,capacity) VALUES(900001,4) RETURNING table_id AS tid \\gset\nINSERT INTO orders(customer_id) VALUES(:cid) RETURNING order_id AS oid \\gset\nINSERT INTO order_item(order_id,menu_item_id,quantity,unit_price,subtotal) VALUES(:oid,:mid,2,8.75,17.50);\nINSERT INTO payment(order_id,payment_method,amount) VALUES(:oid,'cash',17.50);\nINSERT INTO reservation(customer_id,table_id,reservation_date,reservation_time,number_of_guests) VALUES(:cid,:tid,'2099-01-01','10:00',2) RETURNING reservation_id AS rid \\gset\nUPDATE customer SET first_name='G05 updated' WHERE customer_id=:cid;\nUPDATE staff SET first_name='G05 updated' WHERE staff_id=:sid;\nUPDATE menu_item SET price=10 WHERE menu_item_id=:mid;\nUPDATE restaurant_table SET status='reserved' WHERE table_id=:tid;\nUPDATE orders SET order_status='confirmed' WHERE order_id=:oid;\nUPDATE payment SET payment_status='paid' WHERE order_id=:oid;\nUPDATE reservation SET reservation_status='cancelled' WHERE reservation_id=:rid;\nSELECT total_amount AS captured_total FROM orders WHERE order_id=:oid;\nSET CONSTRAINTS ALL IMMEDIATE;\nDELETE FROM reservation WHERE reservation_id=:rid;\nDELETE FROM restaurant_table WHERE table_id=:tid;\nDELETE FROM staff WHERE staff_id=:sid;\nROLLBACK;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "runtime-read-v_order_summary",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT count(*) FROM v_order_summary;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "runtime-read-v_reservation_schedule",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT count(*) FROM v_reservation_schedule;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "report-read-v_customer_directory",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT count(*) FROM v_customer_directory;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "report-read-v_staff_directory",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT count(*) FROM v_staff_directory;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "report-read-v_order_summary",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT count(*) FROM v_order_summary;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "report-read-v_reservation_schedule",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT count(*) FROM v_reservation_schedule;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-customer",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO customer DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-customer",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; UPDATE customer SET first_name=first_name WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-customer",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM customer WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-staff",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO staff DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-staff",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; UPDATE staff SET first_name=first_name WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-staff",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM staff WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-menu_item",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO menu_item DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-menu_item",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; UPDATE menu_item SET item_name=item_name WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-menu_item",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM menu_item WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-restaurant_table",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO restaurant_table DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-restaurant_table",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; UPDATE restaurant_table SET status=status WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-restaurant_table",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM restaurant_table WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-orders",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO orders DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-orders",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; UPDATE orders SET order_status=order_status WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-orders",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM orders WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-order_item",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO order_item DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-order_item",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; UPDATE order_item SET quantity=quantity WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-order_item",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM order_item WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-reservation",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO reservation DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-reservation",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; UPDATE reservation SET reservation_status=reservation_status WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-reservation",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM reservation WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-payment",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO payment DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-payment",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; UPDATE payment SET amount=amount WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-payment",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM payment WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-delete-customer",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM customer WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-delete-orders",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM orders WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-delete-payment",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM payment WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-delete-order_item",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; DELETE FROM order_item WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-update-order-item",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; UPDATE order_item SET quantity=quantity WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-customer-credentials",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT password FROM customer;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-staff-credentials",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT password FROM staff;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-menu-delete",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO menu_item(item_name,category,price) VALUES('G05 delete probe','Probe',1); DELETE FROM menu_item WHERE item_name='G05 delete probe'; ROLLBACK;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "constraint-negative-price",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO menu_item(item_name,category,price) VALUES('G05 invalid probe','Probe',-1); ROLLBACK;",
+    "expected": "Denied (23514)",
+    "actual": "Denied 23514",
+    "passed": true
+  },
+  {
+    "name": "constraint-empty-order",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO orders(customer_id) SELECT min(customer_id) FROM customer; COMMIT;",
+    "expected": "Denied (23514)",
+    "actual": "Denied 23514",
+    "passed": true
+  },
+  {
+    "name": "constraint-reservation-overlap",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; INSERT INTO reservation(customer_id,table_id,reservation_date,reservation_time,number_of_guests) SELECT (SELECT min(customer_id) FROM customer),min(table_id),'2099-01-02','10:00',1 FROM restaurant_table; INSERT INTO reservation(customer_id,table_id,reservation_date,reservation_time,number_of_guests) SELECT (SELECT min(customer_id) FROM customer),min(table_id),'2099-01-02','11:00',1 FROM restaurant_table; ROLLBACK;",
+    "expected": "Denied (23P01)",
+    "actual": "Denied 23P01",
+    "passed": true
+  },
+  {
+    "name": "runtime-shared-account-boundary",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; UPDATE staff SET role='admin' WHERE email='staff@rors.example'; ROLLBACK;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-createdb",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "CREATE DATABASE g05_forbidden;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-createrole",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "CREATE ROLE g05_forbidden NOLOGIN;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-connect-rors_unrelated_lab",
+    "account": "rors_app",
+    "database": "rors_unrelated_lab",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-connect-postgres",
+    "account": "rors_app",
+    "database": "postgres",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-connect-template1",
+    "account": "rors_app",
+    "database": "template1",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-createdb",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "CREATE DATABASE g05_forbidden;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-createrole",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "CREATE ROLE g05_forbidden NOLOGIN;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-connect-rors_unrelated_lab",
+    "account": "rors_report",
+    "database": "rors_unrelated_lab",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-connect-postgres",
+    "account": "rors_report",
+    "database": "postgres",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-connect-template1",
+    "account": "rors_report",
+    "database": "template1",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "rors_dba-deny-createdb",
+    "account": "rors_dba",
+    "database": "mesa_g05_activity4",
+    "sql": "CREATE DATABASE g05_forbidden;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_dba-deny-createrole",
+    "account": "rors_dba",
+    "database": "mesa_g05_activity4",
+    "sql": "CREATE ROLE g05_forbidden NOLOGIN;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_dba-deny-connect-rors_unrelated_lab",
+    "account": "rors_dba",
+    "database": "rors_unrelated_lab",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "rors_dba-deny-connect-postgres",
+    "account": "rors_dba",
+    "database": "postgres",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "rors_dba-deny-connect-template1",
+    "account": "rors_dba",
+    "database": "template1",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-schema",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; CREATE SCHEMA g05_forbidden; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-table",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-owner",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; SET ROLE rors_owner_grp; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-truncate",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; TRUNCATE payment; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-alter",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; ALTER TABLE customer ADD COLUMN g05_forbidden int; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-sequence-reset",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; SELECT setval('customer_customer_id_seq',1); ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-schema",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; CREATE SCHEMA g05_forbidden; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-table",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-owner",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; SET ROLE rors_owner_grp; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-truncate",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; TRUNCATE payment; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-alter",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; ALTER TABLE customer ADD COLUMN g05_forbidden int; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-sequence-reset",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; SELECT setval('customer_customer_id_seq',1); ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-sequence-state",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT last_value FROM customer_customer_id_seq;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-sequence",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT nextval('customer_customer_id_seq');",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-membership",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "GRANT rors_runtime_grp TO rors_report;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "admin-needs-owner-role",
+    "account": "rors_dba",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "admin-maintenance",
+    "account": "rors_dba",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; SET ROLE rors_owner_grp; CREATE TABLE g05_maintenance(id int); INSERT INTO g05_maintenance VALUES(1); ALTER TABLE g05_maintenance ADD COLUMN note text; DROP TABLE g05_maintenance; ROLLBACK;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "admin-create-future-objects",
+    "account": "rors_dba",
+    "database": "mesa_g05_activity4",
+    "sql": "SET ROLE rors_owner_grp; CREATE TABLE g05_future_probe(id serial PRIMARY KEY); CREATE FUNCTION g05_future_function() RETURNS int LANGUAGE sql AS 'SELECT 1';",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-future-table",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT * FROM g05_future_probe;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_app-deny-future-function",
+    "account": "rors_app",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT g05_future_function();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-future-table",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT * FROM g05_future_probe;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "rors_report-deny-future-function",
+    "account": "rors_report",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT g05_future_function();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "admin-future-use",
+    "account": "rors_dba",
+    "database": "mesa_g05_activity4",
+    "sql": "BEGIN; SET ROLE rors_owner_grp; INSERT INTO g05_future_probe DEFAULT VALUES; SELECT g05_future_function(); ROLLBACK;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "admin-remove-future-objects",
+    "account": "rors_dba",
+    "database": "mesa_g05_activity4",
+    "sql": "SET ROLE rors_owner_grp; DROP TABLE g05_future_probe; DROP FUNCTION g05_future_function();",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "catalog-and-cleanup",
+    "account": "lab_admin",
+    "database": "mesa_g05_activity4",
+    "sql": "SELECT version(),current_database();\nSELECT rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolinherit FROM pg_roles WHERE rolname LIKE 'rors_%' ORDER BY 1;\nSELECT a.rolname AS member,b.rolname AS parent,m.admin_option,m.inherit_option,m.set_option FROM pg_auth_members m JOIN pg_roles a ON a.oid=m.member JOIN pg_roles b ON b.oid=m.roleid WHERE a.rolname LIKE 'rors_%';\nSELECT datname,pg_get_userbyid(datdba),datacl FROM pg_database ORDER BY datname;\nSELECT nspname,nspacl FROM pg_namespace WHERE nspname='public';\nSELECT c.relname,c.relkind,pg_get_userbyid(c.relowner) AS owner,c.relacl FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind IN('r','S','v') ORDER BY c.relname;\nSELECT proname,pg_get_userbyid(proowner),prosecdef,proacl FROM pg_proc p WHERE pronamespace='public'::regnamespace AND NOT EXISTS(SELECT 1 FROM pg_depend d WHERE d.classid='pg_proc'::regclass AND d.objid=p.oid AND d.deptype='e') ORDER BY proname;\nSELECT t.tgrelid::regclass,t.tgname,t.tgenabled FROM pg_trigger t WHERE NOT t.tgisinternal ORDER BY 1,2;\nSELECT extname,extversion FROM pg_extension ORDER BY 1;\nSELECT defaclrole::regrole,defaclobjtype,defaclacl FROM pg_default_acl;\nSELECT conrelid::regclass,conname,pg_get_constraintdef(oid) FROM pg_constraint WHERE connamespace='public'::regnamespace ORDER BY 1,2;\nSELECT 'customer',count(*) FROM customer UNION ALL SELECT 'staff',count(*) FROM staff UNION ALL SELECT 'menu_item',count(*) FROM menu_item UNION ALL SELECT 'restaurant_table',count(*) FROM restaurant_table UNION ALL SELECT 'orders',count(*) FROM orders UNION ALL SELECT 'order_item',count(*) FROM order_item UNION ALL SELECT 'reservation',count(*) FROM reservation UNION ALL SELECT 'payment',count(*) FROM payment;\nSELECT to_regclass('g05_future_probe') IS NULL AS probe_table_removed,to_regprocedure('g05_future_function()') IS NULL AS probe_function_removed;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  }
+]

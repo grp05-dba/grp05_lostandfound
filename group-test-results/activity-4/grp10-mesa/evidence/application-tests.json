@@ -1,0 +1,308 @@
+[
+  {
+    "name": "health",
+    "method": "GET",
+    "path": "/health",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "public-menu",
+    "method": "GET",
+    "path": "/menu",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "login-customer-form",
+    "method": "GET",
+    "path": "/login",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "login-customer",
+    "method": "POST",
+    "path": "/login",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/menu"
+  },
+  {
+    "name": "login-staff-form",
+    "method": "GET",
+    "path": "/staff/login",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "login-staff",
+    "method": "POST",
+    "path": "/staff/login",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/admin"
+  },
+  {
+    "name": "login-admin-form",
+    "method": "GET",
+    "path": "/staff/login",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "login-admin",
+    "method": "POST",
+    "path": "/staff/login",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/admin"
+  },
+  {
+    "name": "customer-orders",
+    "method": "GET",
+    "path": "/orders",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "customer-profile",
+    "method": "GET",
+    "path": "/profile",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "staff-dashboard",
+    "method": "GET",
+    "path": "/admin",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "staff-denied-staff-management",
+    "method": "GET",
+    "path": "/admin/staff",
+    "expected": 403,
+    "actual": 403,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "customer-denied-staff-route",
+    "method": "GET",
+    "path": "/admin",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/staff/login"
+  },
+  {
+    "name": "admin-menu",
+    "method": "GET",
+    "path": "/admin/menu",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-tables",
+    "method": "GET",
+    "path": "/admin/tables",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-orders",
+    "method": "GET",
+    "path": "/admin/orders",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-reservations",
+    "method": "GET",
+    "path": "/admin/reservations",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-payments",
+    "method": "GET",
+    "path": "/admin/payments",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-customers",
+    "method": "GET",
+    "path": "/admin/customers",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "admin-staff",
+    "method": "GET",
+    "path": "/admin/staff",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "csrf-missing-denied",
+    "method": "POST",
+    "path": "/admin/menu/save",
+    "expected": 403,
+    "actual": 403,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "menu-create-form",
+    "method": "GET",
+    "path": "/admin/menu/edit",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "menu-create",
+    "method": "POST",
+    "path": "/admin/menu/save",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/admin/menu"
+  },
+  {
+    "name": "menu-update-form",
+    "method": "GET",
+    "path": "/admin/menu/edit?id=54",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "menu-update",
+    "method": "POST",
+    "path": "/admin/menu/save",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/admin/menu"
+  },
+  {
+    "name": "menu-delete-form",
+    "method": "GET",
+    "path": "/admin/menu",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "menu-delete",
+    "method": "POST",
+    "path": "/admin/menu/delete",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/admin/menu"
+  },
+  {
+    "name": "cart-add-form",
+    "method": "GET",
+    "path": "/menu",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "cart-add",
+    "method": "POST",
+    "path": "/cart/add",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/cart"
+  },
+  {
+    "name": "checkout-form",
+    "method": "GET",
+    "path": "/cart",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "checkout",
+    "method": "POST",
+    "path": "/checkout",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/orders/view?id=63"
+  },
+  {
+    "name": "customer-view-new-order",
+    "method": "GET",
+    "path": "/orders/view?id=63",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "staff-confirm-order-form",
+    "method": "GET",
+    "path": "/admin/orders/view?id=63",
+    "expected": 200,
+    "actual": 200,
+    "passed": true,
+    "redirect": ""
+  },
+  {
+    "name": "staff-confirm-order",
+    "method": "POST",
+    "path": "/admin/orders/status",
+    "expected": 302,
+    "actual": 302,
+    "passed": true,
+    "redirect": "/admin/orders/view?id=63"
+  }
+]

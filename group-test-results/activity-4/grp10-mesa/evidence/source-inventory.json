@@ -1,0 +1,23 @@
+{
+  "group": "10",
+  "source_commit": "9e1141a51515fcede0fe176ee5f47cfb6c8abf9b",
+  "seed_counts": {
+    "customer": 51,
+    "staff": 10,
+    "menu_item": 50,
+    "restaurant_table": 20,
+    "orders": 60,
+    "order_item": 167,
+    "reservation": 50,
+    "payment": 56
+  },
+  "pdf_review": [
+    {
+      "path": "docs/progress/BinarySisters_Progress_Documentation.pdf",
+      "pages": 7,
+      "to_complete_markers": 28,
+      "has_repo_placeholder": true,
+      "has_tracker_placeholder": true
+    }
+  ]
+}

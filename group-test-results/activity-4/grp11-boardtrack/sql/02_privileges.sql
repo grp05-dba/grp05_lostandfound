@@ -1,0 +1,21 @@
+\set ON_ERROR_STOP on
+BEGIN;
+DO $$ BEGIN IF current_database()<>'boardtrack_g05_activity4' THEN RAISE EXCEPTION 'Wrong evaluation database'; END IF; END $$;
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC,boardtrack_app,boardtrack_report,boardtrack_runtime_grp,boardtrack_readonly_grp;
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC,boardtrack_app,boardtrack_report,boardtrack_runtime_grp,boardtrack_readonly_grp;
+REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA public FROM PUBLIC;
+GRANT USAGE ON SCHEMA public TO boardtrack_runtime_grp,boardtrack_readonly_grp;
+GRANT USAGE,CREATE ON SCHEMA public TO boardtrack_owner_grp;
+GRANT SELECT,INSERT,UPDATE,DELETE ON property,room,tenant,lease,payment,utility_bill TO boardtrack_runtime_grp;
+GRANT SELECT ON app_user,v_lease_summary TO boardtrack_runtime_grp;
+GRANT SELECT ON v_lease_summary TO boardtrack_readonly_grp;
+GRANT EXECUTE ON FUNCTION crypt(text,text),sync_room_status(),guard_room_status() TO boardtrack_runtime_grp;
+GRANT USAGE ON SEQUENCE property_property_id_seq,room_room_id_seq,tenant_tenant_id_seq,lease_lease_id_seq,payment_payment_id_seq,utility_bill_utility_bill_id_seq TO boardtrack_runtime_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE boardtrack_owner_grp REVOKE ALL ON TABLES FROM PUBLIC,boardtrack_runtime_grp,boardtrack_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE boardtrack_owner_grp REVOKE ALL ON SEQUENCES FROM PUBLIC,boardtrack_runtime_grp,boardtrack_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE boardtrack_owner_grp REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES FOR ROLE boardtrack_dba REVOKE ALL ON TABLES FROM PUBLIC,boardtrack_runtime_grp,boardtrack_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE boardtrack_dba REVOKE ALL ON SEQUENCES FROM PUBLIC,boardtrack_runtime_grp,boardtrack_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE boardtrack_dba REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+COMMIT;

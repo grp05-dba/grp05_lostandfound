@@ -1,0 +1,30 @@
+SELECT 'student',count(*) FROM student UNION ALL SELECT 'vendor',count(*) FROM vendor UNION ALL SELECT 'menu_item',count(*) FROM menu_item UNION ALL SELECT 'customer_order',count(*) FROM customer_order UNION ALL SELECT 'order_item',count(*) FROM order_item UNION ALL SELECT 'queue_entry',count(*) FROM queue_entry UNION ALL SELECT 'notification',count(*) FROM notification;
+SELECT count(*) AS http_probe_rows FROM menu_item WHERE item_name='G05 A4 HTTP probe';
+SELECT count(*) AS student_probe_rows FROM student WHERE email LIKE 'g05-%@example.invalid';
+SELECT to_regclass('g05_future_probe') IS NULL AS future_probe_removed;
+
+    ?column?    | count
+----------------+-------
+ student        |     3
+ vendor         |     4
+ menu_item      |    10
+ customer_order |     2
+ order_item     |     2
+ queue_entry    |     2
+ notification   |     3
+(7 rows)
+
+ http_probe_rows
+-----------------
+               0
+(1 row)
+
+ student_probe_rows
+--------------------
+                  0
+(1 row)
+
+ future_probe_removed
+----------------------
+ t
+(1 row)
