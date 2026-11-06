@@ -32,7 +32,7 @@ require_once __DIR__ . '/../src/entities/claim.php';
 require_once __DIR__ . '/../src/utils/requestUtils.php';
 
 try {
-    $connection = Connection::getAdminConnection();
+    $connection = Connection::getPublicConnection();
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Database connection failed']);
