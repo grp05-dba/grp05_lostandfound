@@ -1,0 +1,89 @@
+Captured: 2026-11-06T21:08:33.712371+08:00
+Login: canteen_app
+SQL:
+SET statement_timeout='30s'; SET lock_timeout='3s'; SET timezone='Asia/Manila';
+BEGIN READ ONLY; EXPLAIN (ANALYZE,BUFFERS,FORMAT JSON) SELECT count(*) FILTER (WHERE o.status = 'completed'), count(*) FILTER (WHERE o.status = 'cancelled'), count(*) FROM customer_order o WHERE o.order_date >= TIMESTAMP '2026-10-08 00:00:00' AND o.order_date < TIMESTAMP '2026-11-07 00:00:00'; ROLLBACK;
+Exit: 0
+
+SET
+SET
+SET
+BEGIN
+[
+  {
+    "Plan": {
+      "Node Type": "Aggregate",
+      "Strategy": "Plain",
+      "Partial Mode": "Simple",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 20.70,
+      "Total Cost": 20.71,
+      "Plan Rows": 1,
+      "Plan Width": 24,
+      "Actual Startup Time": 0.110,
+      "Actual Total Time": 0.110,
+      "Actual Rows": 1.00,
+      "Actual Loops": 1,
+      "Disabled": false,
+      "Shared Hit Blocks": 1,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0,
+      "Plans": [
+        {
+          "Node Type": "Seq Scan",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Relation Name": "customer_order",
+          "Alias": "o",
+          "Startup Cost": 0.00,
+          "Total Cost": 20.65,
+          "Plan Rows": 4,
+          "Plan Width": 58,
+          "Actual Startup Time": 0.089,
+          "Actual Total Time": 0.090,
+          "Actual Rows": 2.00,
+          "Actual Loops": 1,
+          "Disabled": false,
+          "Filter": "((order_date >= '2026-10-08 00:00:00'::timestamp without time zone) AND (order_date < '2026-11-07 00:00:00'::timestamp without time zone))",
+          "Rows Removed by Filter": 0,
+          "Shared Hit Blocks": 1,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        }
+      ]
+    },
+    "Planning": {
+      "Shared Hit Blocks": 63,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0
+    },
+    "Planning Time": 3.688,
+    "Triggers": [
+    ],
+    "Execution Time": 0.424
+  }
+]
+ROLLBACK

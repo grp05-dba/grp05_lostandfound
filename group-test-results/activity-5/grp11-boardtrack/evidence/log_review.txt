@@ -1,0 +1,477 @@
+Scoped OS log review; no logging settings changed. Only first ERROR/WARNING/FATAL/PANIC lines retained; statement/detail/context excluded.
+{
+  "source": "Dedicated G11 PostgreSQL stderr log redirected by pg_ctl",
+  "reviewed_at": "2026-11-06T21:08:43.550685+08:00",
+  "first_diagnostic": "2026-11-06 20:32:36.208 +08",
+  "last_diagnostic": "2026-11-06 21:08:43.529 +08",
+  "total_file_lines": 165,
+  "retained_event_count": 75,
+  "counts": {
+    "ERROR": 66,
+    "WARNING": 0,
+    "FATAL": 9,
+    "PANIC": 0
+  },
+  "sql_log_access_probes": {
+    "current-logfile": {
+      "exit_code": 3,
+      "denied_42501": true
+    },
+    "list-logdir": {
+      "exit_code": 3,
+      "denied_42501": true
+    }
+  },
+  "events": [
+    {
+      "timestamp": "2026-11-06 20:32:36.208 +08",
+      "pid": 22728,
+      "level": "ERROR",
+      "message": "permission denied for table property"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:36.333 +08",
+      "pid": 23808,
+      "level": "ERROR",
+      "message": "permission denied for table property"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:36.463 +08",
+      "pid": 13804,
+      "level": "ERROR",
+      "message": "permission denied for table property"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:36.590 +08",
+      "pid": 5668,
+      "level": "ERROR",
+      "message": "permission denied for table room"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:36.716 +08",
+      "pid": 23884,
+      "level": "ERROR",
+      "message": "permission denied for table room"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:36.856 +08",
+      "pid": 19424,
+      "level": "ERROR",
+      "message": "permission denied for table room"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:36.997 +08",
+      "pid": 5500,
+      "level": "ERROR",
+      "message": "permission denied for table tenant"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:37.114 +08",
+      "pid": 22860,
+      "level": "ERROR",
+      "message": "permission denied for table tenant"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:37.224 +08",
+      "pid": 22876,
+      "level": "ERROR",
+      "message": "permission denied for table tenant"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:37.432 +08",
+      "pid": 21796,
+      "level": "ERROR",
+      "message": "permission denied for table lease"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:37.547 +08",
+      "pid": 23872,
+      "level": "ERROR",
+      "message": "permission denied for table lease"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:37.651 +08",
+      "pid": 24400,
+      "level": "ERROR",
+      "message": "permission denied for table lease"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:37.749 +08",
+      "pid": 5568,
+      "level": "ERROR",
+      "message": "permission denied for table payment"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:37.870 +08",
+      "pid": 25064,
+      "level": "ERROR",
+      "message": "permission denied for table payment"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:38.095 +08",
+      "pid": 24900,
+      "level": "ERROR",
+      "message": "permission denied for table payment"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:38.199 +08",
+      "pid": 16544,
+      "level": "ERROR",
+      "message": "permission denied for table utility_bill"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:38.302 +08",
+      "pid": 21472,
+      "level": "ERROR",
+      "message": "permission denied for table utility_bill"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:38.397 +08",
+      "pid": 23076,
+      "level": "ERROR",
+      "message": "permission denied for table utility_bill"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:38.490 +08",
+      "pid": 23448,
+      "level": "ERROR",
+      "message": "permission denied for table app_user"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:38.698 +08",
+      "pid": 22852,
+      "level": "ERROR",
+      "message": "permission denied for table app_user"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:38.799 +08",
+      "pid": 20056,
+      "level": "ERROR",
+      "message": "permission denied for table app_user"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:38.909 +08",
+      "pid": 20040,
+      "level": "ERROR",
+      "message": "permission denied for table schema_migrations"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:39.011 +08",
+      "pid": 4172,
+      "level": "ERROR",
+      "message": "permission denied for table schema_migrations"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:39.110 +08",
+      "pid": 22552,
+      "level": "ERROR",
+      "message": "permission denied for table schema_migrations"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:39.211 +08",
+      "pid": 20756,
+      "level": "ERROR",
+      "message": "permission denied for table app_user"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:39.335 +08",
+      "pid": 19352,
+      "level": "ERROR",
+      "message": "permission denied for table app_user"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:39.450 +08",
+      "pid": 7716,
+      "level": "ERROR",
+      "message": "permission denied for table app_user"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:39.556 +08",
+      "pid": 20620,
+      "level": "ERROR",
+      "message": "permission denied for table schema_migrations"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:39.664 +08",
+      "pid": 22580,
+      "level": "ERROR",
+      "message": "permission denied for table schema_migrations"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:39.772 +08",
+      "pid": 17012,
+      "level": "ERROR",
+      "message": "permission denied for table schema_migrations"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:39.884 +08",
+      "pid": 8708,
+      "level": "ERROR",
+      "message": "permission denied for table schema_migrations"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:40.079 +08",
+      "pid": 9196,
+      "level": "ERROR",
+      "message": "permission denied for sequence app_user_user_id_seq"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:40.174 +08",
+      "pid": 22832,
+      "level": "ERROR",
+      "message": "permission denied for table app_user"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:40.272 +08",
+      "pid": 21592,
+      "level": "ERROR",
+      "message": "permission denied for table tenant"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:40.463 +08",
+      "pid": 16852,
+      "level": "ERROR",
+      "message": "permission denied for function crypt"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:40.564 +08",
+      "pid": 17384,
+      "level": "ERROR",
+      "message": "conflicting key value violates exclusion constraint \"ex_lease_no_overlap\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:40.675 +08",
+      "pid": 4888,
+      "level": "ERROR",
+      "message": "This room has an ACTIVE lease, so it cannot be AVAILABLE. Terminate the lease first."
+    },
+    {
+      "timestamp": "2026-11-06 20:32:40.881 +08",
+      "pid": 18284,
+      "level": "ERROR",
+      "message": "permission denied to create database"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:40.981 +08",
+      "pid": 21076,
+      "level": "ERROR",
+      "message": "permission denied to create role"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:41.091 +08",
+      "pid": 18624,
+      "level": "FATAL",
+      "message": "permission denied for database \"boardtrack_unrelated_lab\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:41.184 +08",
+      "pid": 25380,
+      "level": "FATAL",
+      "message": "permission denied for database \"postgres\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:41.283 +08",
+      "pid": 22672,
+      "level": "FATAL",
+      "message": "permission denied for database \"template1\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:41.375 +08",
+      "pid": 20668,
+      "level": "ERROR",
+      "message": "permission denied to create database"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:41.466 +08",
+      "pid": 22968,
+      "level": "ERROR",
+      "message": "permission denied to create role"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:41.555 +08",
+      "pid": 25024,
+      "level": "FATAL",
+      "message": "permission denied for database \"boardtrack_unrelated_lab\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:41.754 +08",
+      "pid": 24696,
+      "level": "FATAL",
+      "message": "permission denied for database \"postgres\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:41.956 +08",
+      "pid": 21428,
+      "level": "FATAL",
+      "message": "permission denied for database \"template1\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:42.048 +08",
+      "pid": 18200,
+      "level": "ERROR",
+      "message": "permission denied to create database"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:42.148 +08",
+      "pid": 23084,
+      "level": "ERROR",
+      "message": "permission denied to create role"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:42.249 +08",
+      "pid": 21208,
+      "level": "FATAL",
+      "message": "permission denied for database \"boardtrack_unrelated_lab\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:42.344 +08",
+      "pid": 18924,
+      "level": "FATAL",
+      "message": "permission denied for database \"postgres\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:42.437 +08",
+      "pid": 24912,
+      "level": "FATAL",
+      "message": "permission denied for database \"template1\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:42.537 +08",
+      "pid": 20592,
+      "level": "ERROR",
+      "message": "permission denied for database boardtrack_g05_activity4"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:42.631 +08",
+      "pid": 18804,
+      "level": "ERROR",
+      "message": "permission denied for schema public at character 14"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:42.732 +08",
+      "pid": 21268,
+      "level": "ERROR",
+      "message": "permission denied to set role \"boardtrack_owner_grp\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:42.858 +08",
+      "pid": 19336,
+      "level": "ERROR",
+      "message": "permission denied for table utility_bill"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:42.996 +08",
+      "pid": 21092,
+      "level": "ERROR",
+      "message": "must be owner of table property"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:43.108 +08",
+      "pid": 23008,
+      "level": "ERROR",
+      "message": "permission denied for sequence property_property_id_seq"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:43.212 +08",
+      "pid": 19888,
+      "level": "ERROR",
+      "message": "permission denied for database boardtrack_g05_activity4"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:43.316 +08",
+      "pid": 24396,
+      "level": "ERROR",
+      "message": "permission denied for schema public at character 14"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:43.420 +08",
+      "pid": 8580,
+      "level": "ERROR",
+      "message": "permission denied to set role \"boardtrack_owner_grp\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:43.521 +08",
+      "pid": 2504,
+      "level": "ERROR",
+      "message": "permission denied for table utility_bill"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:43.616 +08",
+      "pid": 12160,
+      "level": "ERROR",
+      "message": "must be owner of table property"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:43.827 +08",
+      "pid": 21612,
+      "level": "ERROR",
+      "message": "permission denied for sequence property_property_id_seq"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:43.947 +08",
+      "pid": 7960,
+      "level": "ERROR",
+      "message": "permission denied for sequence property_property_id_seq"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:44.047 +08",
+      "pid": 23336,
+      "level": "ERROR",
+      "message": "permission denied for sequence property_property_id_seq"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:44.136 +08",
+      "pid": 19936,
+      "level": "ERROR",
+      "message": "permission denied to grant role \"boardtrack_runtime_grp\""
+    },
+    {
+      "timestamp": "2026-11-06 20:32:44.228 +08",
+      "pid": 10124,
+      "level": "ERROR",
+      "message": "permission denied for schema public at character 14"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:44.649 +08",
+      "pid": 5480,
+      "level": "ERROR",
+      "message": "permission denied for table g05_future_probe"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:44.742 +08",
+      "pid": 19768,
+      "level": "ERROR",
+      "message": "permission denied for function g05_future_function"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:44.844 +08",
+      "pid": 23924,
+      "level": "ERROR",
+      "message": "permission denied for table g05_future_probe"
+    },
+    {
+      "timestamp": "2026-11-06 20:32:44.942 +08",
+      "pid": 3736,
+      "level": "ERROR",
+      "message": "permission denied for function g05_future_function"
+    },
+    {
+      "timestamp": "2026-11-06 20:39:24.385 +08",
+      "pid": 23504,
+      "level": "ERROR",
+      "message": "Wrong evaluation database"
+    },
+    {
+      "timestamp": "2026-11-06 21:08:43.436 +08",
+      "pid": 20160,
+      "level": "ERROR",
+      "message": "permission denied for function pg_current_logfile"
+    },
+    {
+      "timestamp": "2026-11-06 21:08:43.529 +08",
+      "pid": 3736,
+      "level": "ERROR",
+      "message": "permission denied for function pg_ls_logdir"
+    }
+  ]
+}

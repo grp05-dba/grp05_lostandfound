@@ -1,0 +1,1687 @@
+{
+  "group": "10",
+  "started": "2026-11-06T21:08:36.453026+08:00",
+  "finished": "2026-11-06T21:08:40.246151+08:00",
+  "database": "mesa_g05_activity4",
+  "port": "55410",
+  "admin": "rors_dba",
+  "owner": "rors_owner_grp",
+  "runtime": "rors_app",
+  "report": "rors_report",
+  "target": "menu_item",
+  "analyze": [
+    "menu_item"
+  ],
+  "before": {
+    "captured_at": "2026-11-06T21:08:36.718274+08:00",
+    "session_user": "rors_dba",
+    "current_user": "rors_owner_grp",
+    "database": "mesa_g05_activity4",
+    "version": "18.3",
+    "size_bytes": 9803455,
+    "pretty_size": "9574 kB",
+    "counts": {
+      "customer": 51,
+      "staff": 10,
+      "menu_item": 50,
+      "restaurant_table": 20,
+      "orders": 60,
+      "order_item": 167,
+      "reservation": 50,
+      "payment": 56
+    },
+    "objects": {
+      "r": 8,
+      "v": 4,
+      "i": 19,
+      "S": 7
+    },
+    "sessions": [
+      {
+        "pid": 19920,
+        "user": "rors_dba",
+        "state": null,
+        "wait_type": null,
+        "wait_event": null,
+        "duration_seconds": null,
+        "query_visible": true,
+        "statement": "this inspection statement",
+        "blocking_pids": [],
+        "visibility_note": "State/duration unavailable in owner-switched health session; query_visible field was only a non-null check, not proof of actual text visibility. See separate activity_visibility evidence."
+      }
+    ],
+    "database_stats": {
+      "numbackends": 1,
+      "xact_commit": 540,
+      "xact_rollback": 66,
+      "deadlocks": 0,
+      "conflicts": 0,
+      "sessions": 144,
+      "sessions_abandoned": 0,
+      "sessions_fatal": 0,
+      "sessions_killed": 0,
+      "stats_reset": null
+    },
+    "tables": [
+      {
+        "relname": "customer",
+        "reltuples": 51,
+        "n_live_tup": 51,
+        "n_dead_tup": 49,
+        "n_mod_since_analyze": 0,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": "2026-11-06T20:32:18.05137+08:00",
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 1,
+        "total_bytes": 73728,
+        "xid_age": 74,
+        "reloptions": null
+      },
+      {
+        "relname": "menu_item",
+        "reltuples": 50,
+        "n_live_tup": 50,
+        "n_dead_tup": 6,
+        "n_mod_since_analyze": 0,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": "2026-11-06T20:35:08.07922+08:00",
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 1,
+        "total_bytes": 49152,
+        "xid_age": 74,
+        "reloptions": null
+      },
+      {
+        "relname": "order_item",
+        "reltuples": 167,
+        "n_live_tup": 167,
+        "n_dead_tup": 3,
+        "n_mod_since_analyze": 2,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": "2026-11-06T20:32:18.084032+08:00",
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 1,
+        "total_bytes": 73728,
+        "xid_age": 74,
+        "reloptions": null
+      },
+      {
+        "relname": "orders",
+        "reltuples": 60,
+        "n_live_tup": 60,
+        "n_dead_tup": 13,
+        "n_mod_since_analyze": 5,
+        "last_vacuum": null,
+        "last_autovacuum": "2026-11-06T20:32:18.059106+08:00",
+        "last_analyze": null,
+        "last_autoanalyze": "2026-11-06T20:32:18.080018+08:00",
+        "vacuum_count": 0,
+        "autovacuum_count": 1,
+        "analyze_count": 0,
+        "autoanalyze_count": 1,
+        "total_bytes": 98304,
+        "xid_age": 70,
+        "reloptions": null
+      },
+      {
+        "relname": "payment",
+        "reltuples": 56,
+        "n_live_tup": 56,
+        "n_dead_tup": 6,
+        "n_mod_since_analyze": 2,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": "2026-11-06T20:32:18.087828+08:00",
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 1,
+        "total_bytes": 40960,
+        "xid_age": 74,
+        "reloptions": null
+      },
+      {
+        "relname": "reservation",
+        "reltuples": -1,
+        "n_live_tup": 50,
+        "n_dead_tup": 6,
+        "n_mod_since_analyze": 50,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 65536,
+        "xid_age": 74,
+        "reloptions": null
+      },
+      {
+        "relname": "restaurant_table",
+        "reltuples": -1,
+        "n_live_tup": 20,
+        "n_dead_tup": 2,
+        "n_mod_since_analyze": 20,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 40960,
+        "xid_age": 74,
+        "reloptions": null
+      },
+      {
+        "relname": "staff",
+        "reltuples": -1,
+        "n_live_tup": 10,
+        "n_dead_tup": 11,
+        "n_mod_since_analyze": 18,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 40960,
+        "xid_age": 74,
+        "reloptions": null
+      }
+    ],
+    "indexes": [
+      {
+        "relname": "customer",
+        "indexrelname": "customer_pkey",
+        "idx_scan": 315,
+        "idx_tup_read": 317,
+        "idx_tup_fetch": 315,
+        "bytes": 16384
+      },
+      {
+        "relname": "customer",
+        "indexrelname": "uq_customer_email",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "menu_item",
+        "indexrelname": "idx_menu_item_category",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "menu_item",
+        "indexrelname": "menu_item_pkey",
+        "idx_scan": 182,
+        "idx_tup_read": 182,
+        "idx_tup_fetch": 182,
+        "bytes": 16384
+      },
+      {
+        "relname": "order_item",
+        "indexrelname": "idx_order_item_menu_item",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "order_item",
+        "indexrelname": "pk_order_item",
+        "idx_scan": 170,
+        "idx_tup_read": 506,
+        "idx_tup_fetch": 3,
+        "bytes": 16384
+      },
+      {
+        "relname": "orders",
+        "indexrelname": "idx_orders_customer_date",
+        "idx_scan": 35,
+        "idx_tup_read": 40,
+        "idx_tup_fetch": 32,
+        "bytes": 16384
+      },
+      {
+        "relname": "orders",
+        "indexrelname": "idx_orders_status",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "orders",
+        "indexrelname": "orders_pkey",
+        "idx_scan": 471,
+        "idx_tup_read": 657,
+        "idx_tup_fetch": 471,
+        "bytes": 16384
+      },
+      {
+        "relname": "payment",
+        "indexrelname": "payment_pkey",
+        "idx_scan": 1,
+        "idx_tup_read": 1,
+        "idx_tup_fetch": 1,
+        "bytes": 16384
+      },
+      {
+        "relname": "payment",
+        "indexrelname": "uq_payment_order",
+        "idx_scan": 82,
+        "idx_tup_read": 79,
+        "idx_tup_fetch": 78,
+        "bytes": 16384
+      },
+      {
+        "relname": "reservation",
+        "indexrelname": "ex_reservation_no_overlap",
+        "idx_scan": 53,
+        "idx_tup_read": 102,
+        "idx_tup_fetch": 52,
+        "bytes": 8192
+      },
+      {
+        "relname": "reservation",
+        "indexrelname": "idx_reservation_customer",
+        "idx_scan": 3,
+        "idx_tup_read": 3,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "reservation",
+        "indexrelname": "idx_reservation_date",
+        "idx_scan": 1,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "reservation",
+        "indexrelname": "reservation_pkey",
+        "idx_scan": 3,
+        "idx_tup_read": 4,
+        "idx_tup_fetch": 3,
+        "bytes": 16384
+      },
+      {
+        "relname": "restaurant_table",
+        "indexrelname": "restaurant_table_pkey",
+        "idx_scan": 115,
+        "idx_tup_read": 115,
+        "idx_tup_fetch": 115,
+        "bytes": 16384
+      },
+      {
+        "relname": "restaurant_table",
+        "indexrelname": "uq_restaurant_table_number",
+        "idx_scan": 1,
+        "idx_tup_read": 21,
+        "idx_tup_fetch": 20,
+        "bytes": 16384
+      },
+      {
+        "relname": "staff",
+        "indexrelname": "staff_pkey",
+        "idx_scan": 21,
+        "idx_tup_read": 21,
+        "idx_tup_fetch": 21,
+        "bytes": 16384
+      },
+      {
+        "relname": "staff",
+        "indexrelname": "uq_staff_email",
+        "idx_scan": 3,
+        "idx_tup_read": 3,
+        "idx_tup_fetch": 3,
+        "bytes": 16384
+      }
+    ],
+    "sequences": [
+      {
+        "sequencename": "customer_customer_id_seq",
+        "last_value": 55,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "menu_item_menu_item_id_seq",
+        "last_value": 55,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "orders_order_id_seq",
+        "last_value": 66,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "payment_payment_id_seq",
+        "last_value": 60,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "reservation_reservation_id_seq",
+        "last_value": 56,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "restaurant_table_table_id_seq",
+        "last_value": 22,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "staff_staff_id_seq",
+        "last_value": 11,
+        "increment_by": 1
+      }
+    ],
+    "settings": {
+      "autovacuum": "on",
+      "log_connections": "",
+      "log_destination": "stderr",
+      "log_disconnections": "off",
+      "log_min_duration_statement": "-1",
+      "log_min_messages": "warning",
+      "log_statement": "none",
+      "logging_collector": "off",
+      "track_activities": "on",
+      "track_counts": "on"
+    }
+  },
+  "after": {
+    "captured_at": "2026-11-06T21:08:38.368494+08:00",
+    "session_user": "rors_dba",
+    "current_user": "rors_owner_grp",
+    "database": "mesa_g05_activity4",
+    "version": "18.3",
+    "size_bytes": 9836223,
+    "pretty_size": "9606 kB",
+    "counts": {
+      "customer": 51,
+      "staff": 10,
+      "menu_item": 50,
+      "restaurant_table": 20,
+      "orders": 60,
+      "order_item": 167,
+      "reservation": 50,
+      "payment": 56
+    },
+    "objects": {
+      "r": 8,
+      "v": 4,
+      "i": 19,
+      "S": 7
+    },
+    "sessions": [
+      {
+        "pid": 16792,
+        "user": "rors_dba",
+        "state": null,
+        "wait_type": null,
+        "wait_event": null,
+        "duration_seconds": null,
+        "query_visible": true,
+        "statement": "this inspection statement",
+        "blocking_pids": [],
+        "visibility_note": "State/duration unavailable in owner-switched health session; query_visible field was only a non-null check, not proof of actual text visibility. See separate activity_visibility evidence."
+      }
+    ],
+    "database_stats": {
+      "numbackends": 1,
+      "xact_commit": 581,
+      "xact_rollback": 68,
+      "deadlocks": 0,
+      "conflicts": 0,
+      "sessions": 150,
+      "sessions_abandoned": 0,
+      "sessions_fatal": 0,
+      "sessions_killed": 0,
+      "stats_reset": null
+    },
+    "tables": [
+      {
+        "relname": "customer",
+        "reltuples": 51,
+        "n_live_tup": 51,
+        "n_dead_tup": 49,
+        "n_mod_since_analyze": 0,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": "2026-11-06T20:32:18.05137+08:00",
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 1,
+        "total_bytes": 73728,
+        "xid_age": 76,
+        "reloptions": null
+      },
+      {
+        "relname": "menu_item",
+        "reltuples": 50,
+        "n_live_tup": 50,
+        "n_dead_tup": 0,
+        "n_mod_since_analyze": 0,
+        "last_vacuum": "2026-11-06T21:08:38.190815+08:00",
+        "last_autovacuum": null,
+        "last_analyze": "2026-11-06T21:08:38.197603+08:00",
+        "last_autoanalyze": "2026-11-06T20:35:08.07922+08:00",
+        "vacuum_count": 1,
+        "autovacuum_count": 0,
+        "analyze_count": 2,
+        "autoanalyze_count": 1,
+        "total_bytes": 81920,
+        "xid_age": 1,
+        "reloptions": null
+      },
+      {
+        "relname": "order_item",
+        "reltuples": 167,
+        "n_live_tup": 167,
+        "n_dead_tup": 3,
+        "n_mod_since_analyze": 2,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": "2026-11-06T20:32:18.084032+08:00",
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 1,
+        "total_bytes": 73728,
+        "xid_age": 76,
+        "reloptions": null
+      },
+      {
+        "relname": "orders",
+        "reltuples": 60,
+        "n_live_tup": 60,
+        "n_dead_tup": 13,
+        "n_mod_since_analyze": 5,
+        "last_vacuum": null,
+        "last_autovacuum": "2026-11-06T20:32:18.059106+08:00",
+        "last_analyze": null,
+        "last_autoanalyze": "2026-11-06T20:32:18.080018+08:00",
+        "vacuum_count": 0,
+        "autovacuum_count": 1,
+        "analyze_count": 0,
+        "autoanalyze_count": 1,
+        "total_bytes": 98304,
+        "xid_age": 72,
+        "reloptions": null
+      },
+      {
+        "relname": "payment",
+        "reltuples": 56,
+        "n_live_tup": 56,
+        "n_dead_tup": 6,
+        "n_mod_since_analyze": 2,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": "2026-11-06T20:32:18.087828+08:00",
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 1,
+        "total_bytes": 40960,
+        "xid_age": 76,
+        "reloptions": null
+      },
+      {
+        "relname": "reservation",
+        "reltuples": -1,
+        "n_live_tup": 50,
+        "n_dead_tup": 6,
+        "n_mod_since_analyze": 50,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 65536,
+        "xid_age": 76,
+        "reloptions": null
+      },
+      {
+        "relname": "restaurant_table",
+        "reltuples": -1,
+        "n_live_tup": 20,
+        "n_dead_tup": 2,
+        "n_mod_since_analyze": 20,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 40960,
+        "xid_age": 76,
+        "reloptions": null
+      },
+      {
+        "relname": "staff",
+        "reltuples": -1,
+        "n_live_tup": 10,
+        "n_dead_tup": 11,
+        "n_mod_since_analyze": 18,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 40960,
+        "xid_age": 76,
+        "reloptions": null
+      }
+    ],
+    "indexes": [
+      {
+        "relname": "customer",
+        "indexrelname": "customer_pkey",
+        "idx_scan": 317,
+        "idx_tup_read": 320,
+        "idx_tup_fetch": 317,
+        "bytes": 16384
+      },
+      {
+        "relname": "customer",
+        "indexrelname": "uq_customer_email",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "menu_item",
+        "indexrelname": "idx_menu_item_category",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "menu_item",
+        "indexrelname": "menu_item_pkey",
+        "idx_scan": 182,
+        "idx_tup_read": 182,
+        "idx_tup_fetch": 182,
+        "bytes": 16384
+      },
+      {
+        "relname": "order_item",
+        "indexrelname": "idx_order_item_menu_item",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "order_item",
+        "indexrelname": "pk_order_item",
+        "idx_scan": 170,
+        "idx_tup_read": 506,
+        "idx_tup_fetch": 3,
+        "bytes": 16384
+      },
+      {
+        "relname": "orders",
+        "indexrelname": "idx_orders_customer_date",
+        "idx_scan": 37,
+        "idx_tup_read": 46,
+        "idx_tup_fetch": 34,
+        "bytes": 16384
+      },
+      {
+        "relname": "orders",
+        "indexrelname": "idx_orders_status",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "orders",
+        "indexrelname": "orders_pkey",
+        "idx_scan": 471,
+        "idx_tup_read": 657,
+        "idx_tup_fetch": 471,
+        "bytes": 16384
+      },
+      {
+        "relname": "payment",
+        "indexrelname": "payment_pkey",
+        "idx_scan": 1,
+        "idx_tup_read": 1,
+        "idx_tup_fetch": 1,
+        "bytes": 16384
+      },
+      {
+        "relname": "payment",
+        "indexrelname": "uq_payment_order",
+        "idx_scan": 82,
+        "idx_tup_read": 79,
+        "idx_tup_fetch": 78,
+        "bytes": 16384
+      },
+      {
+        "relname": "reservation",
+        "indexrelname": "ex_reservation_no_overlap",
+        "idx_scan": 53,
+        "idx_tup_read": 102,
+        "idx_tup_fetch": 52,
+        "bytes": 8192
+      },
+      {
+        "relname": "reservation",
+        "indexrelname": "idx_reservation_customer",
+        "idx_scan": 3,
+        "idx_tup_read": 3,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "reservation",
+        "indexrelname": "idx_reservation_date",
+        "idx_scan": 1,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "reservation",
+        "indexrelname": "reservation_pkey",
+        "idx_scan": 3,
+        "idx_tup_read": 4,
+        "idx_tup_fetch": 3,
+        "bytes": 16384
+      },
+      {
+        "relname": "restaurant_table",
+        "indexrelname": "restaurant_table_pkey",
+        "idx_scan": 115,
+        "idx_tup_read": 115,
+        "idx_tup_fetch": 115,
+        "bytes": 16384
+      },
+      {
+        "relname": "restaurant_table",
+        "indexrelname": "uq_restaurant_table_number",
+        "idx_scan": 1,
+        "idx_tup_read": 21,
+        "idx_tup_fetch": 20,
+        "bytes": 16384
+      },
+      {
+        "relname": "staff",
+        "indexrelname": "staff_pkey",
+        "idx_scan": 21,
+        "idx_tup_read": 21,
+        "idx_tup_fetch": 21,
+        "bytes": 16384
+      },
+      {
+        "relname": "staff",
+        "indexrelname": "uq_staff_email",
+        "idx_scan": 3,
+        "idx_tup_read": 3,
+        "idx_tup_fetch": 3,
+        "bytes": 16384
+      }
+    ],
+    "sequences": [
+      {
+        "sequencename": "customer_customer_id_seq",
+        "last_value": 55,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "menu_item_menu_item_id_seq",
+        "last_value": 55,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "orders_order_id_seq",
+        "last_value": 66,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "payment_payment_id_seq",
+        "last_value": 60,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "reservation_reservation_id_seq",
+        "last_value": 56,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "restaurant_table_table_id_seq",
+        "last_value": 22,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "staff_staff_id_seq",
+        "last_value": 11,
+        "increment_by": 1
+      }
+    ],
+    "settings": {
+      "autovacuum": "on",
+      "log_connections": "",
+      "log_destination": "stderr",
+      "log_disconnections": "off",
+      "log_min_duration_statement": "-1",
+      "log_min_messages": "warning",
+      "log_statement": "none",
+      "logging_collector": "off",
+      "track_activities": "on",
+      "track_counts": "on"
+    }
+  },
+  "roles": {
+    "roles": [
+      {
+        "rolname": "rors_app",
+        "rolcanlogin": true,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": true
+      },
+      {
+        "rolname": "rors_dba",
+        "rolcanlogin": true,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": false
+      },
+      {
+        "rolname": "rors_owner_grp",
+        "rolcanlogin": false,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": true
+      },
+      {
+        "rolname": "rors_readonly_grp",
+        "rolcanlogin": false,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": true
+      },
+      {
+        "rolname": "rors_report",
+        "rolcanlogin": true,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": true
+      },
+      {
+        "rolname": "rors_runtime_grp",
+        "rolcanlogin": false,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": true
+      }
+    ],
+    "memberships": [
+      {
+        "member": "rors_app",
+        "parent": "rors_runtime_grp",
+        "admin_option": false,
+        "inherit_option": true,
+        "set_option": true
+      },
+      {
+        "member": "rors_dba",
+        "parent": "rors_owner_grp",
+        "admin_option": false,
+        "inherit_option": false,
+        "set_option": true
+      },
+      {
+        "member": "rors_report",
+        "parent": "rors_readonly_grp",
+        "admin_option": false,
+        "inherit_option": true,
+        "set_option": true
+      }
+    ],
+    "objects": [
+      {
+        "relname": "customer",
+        "relkind": "r",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arw/rors_owner_grp}"
+      },
+      {
+        "relname": "customer_customer_id_seq",
+        "relkind": "S",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}"
+      },
+      {
+        "relname": "menu_item",
+        "relkind": "r",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}"
+      },
+      {
+        "relname": "menu_item_menu_item_id_seq",
+        "relkind": "S",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}"
+      },
+      {
+        "relname": "order_item",
+        "relkind": "r",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=ar/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}"
+      },
+      {
+        "relname": "orders",
+        "relkind": "r",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arw/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}"
+      },
+      {
+        "relname": "orders_order_id_seq",
+        "relkind": "S",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}"
+      },
+      {
+        "relname": "payment",
+        "relkind": "r",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arw/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}"
+      },
+      {
+        "relname": "payment_payment_id_seq",
+        "relkind": "S",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}"
+      },
+      {
+        "relname": "reservation",
+        "relkind": "r",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}"
+      },
+      {
+        "relname": "reservation_reservation_id_seq",
+        "relkind": "S",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}"
+      },
+      {
+        "relname": "restaurant_table",
+        "relkind": "r",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}"
+      },
+      {
+        "relname": "restaurant_table_table_id_seq",
+        "relkind": "S",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}"
+      },
+      {
+        "relname": "staff",
+        "relkind": "r",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp}"
+      },
+      {
+        "relname": "staff_staff_id_seq",
+        "relkind": "S",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}"
+      },
+      {
+        "relname": "v_customer_directory",
+        "relkind": "v",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}"
+      },
+      {
+        "relname": "v_order_summary",
+        "relkind": "v",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}"
+      },
+      {
+        "relname": "v_reservation_schedule",
+        "relkind": "v",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}"
+      },
+      {
+        "relname": "v_staff_directory",
+        "relkind": "v",
+        "owner": "rors_owner_grp",
+        "relacl": "{rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}"
+      }
+    ],
+    "defaults": [
+      {
+        "defaclrole": "rors_dba",
+        "defaclnamespace": "0",
+        "defaclobjtype": "f",
+        "defaclacl": "{rors_dba=X/rors_dba}"
+      },
+      {
+        "defaclrole": "rors_owner_grp",
+        "defaclnamespace": "0",
+        "defaclobjtype": "f",
+        "defaclacl": "{rors_owner_grp=X/rors_owner_grp}"
+      }
+    ],
+    "schema": "{pg_database_owner=UC/pg_database_owner,rors_runtime_grp=U/pg_database_owner,rors_readonly_grp=U/pg_database_owner,rors_owner_grp=UC/pg_database_owner}",
+    "database_acl": "{rors_owner_grp=CTc/rors_owner_grp,rors_dba=c/rors_owner_grp,rors_runtime_grp=c/rors_owner_grp,rors_readonly_grp=c/rors_owner_grp}",
+    "owner_can_maintain": true,
+    "runtime_can_maintain": false
+  },
+  "query_provenance": {
+    "commit": "9e1141a51515fcede0fe176ee5f47cfb6c8abf9b",
+    "source_path": "app/src/controllers/menu.php",
+    "source_blob": "7a425d0ae15776b4e70b228b60fcd44c7398decb",
+    "query": "SELECT menu_item_id, item_name, description, category, price FROM menu_item WHERE availability = true ORDER BY category, item_name;",
+    "adaptation": "G10 menu query with empty search/category, verbatim assembled SQL"
+  },
+  "plan_before": {
+    "Plan": {
+      "Node Type": "Sort",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 2.84,
+      "Total Cost": 2.96,
+      "Plan Rows": 48,
+      "Plan Width": 73,
+      "Actual Startup Time": 0.179,
+      "Actual Total Time": 0.182,
+      "Actual Rows": 48.0,
+      "Actual Loops": 1,
+      "Disabled": false,
+      "Sort Key": [
+        "category",
+        "item_name"
+      ],
+      "Sort Method": "quicksort",
+      "Sort Space Used": 29,
+      "Sort Space Type": "Memory",
+      "Shared Hit Blocks": 4,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0,
+      "Plans": [
+        {
+          "Node Type": "Seq Scan",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Relation Name": "menu_item",
+          "Alias": "menu_item",
+          "Startup Cost": 0.0,
+          "Total Cost": 1.5,
+          "Plan Rows": 48,
+          "Plan Width": 73,
+          "Actual Startup Time": 0.056,
+          "Actual Total Time": 0.066,
+          "Actual Rows": 48.0,
+          "Actual Loops": 1,
+          "Disabled": false,
+          "Filter": "availability",
+          "Rows Removed by Filter": 2,
+          "Shared Hit Blocks": 1,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        }
+      ]
+    },
+    "Planning": {
+      "Shared Hit Blocks": 114,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0
+    },
+    "Planning Time": 4.716,
+    "Triggers": [],
+    "Execution Time": 0.321
+  },
+  "plan_after": {
+    "Plan": {
+      "Node Type": "Sort",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 2.84,
+      "Total Cost": 2.96,
+      "Plan Rows": 48,
+      "Plan Width": 73,
+      "Actual Startup Time": 0.289,
+      "Actual Total Time": 0.292,
+      "Actual Rows": 48.0,
+      "Actual Loops": 1,
+      "Disabled": false,
+      "Sort Key": [
+        "category",
+        "item_name"
+      ],
+      "Sort Method": "quicksort",
+      "Sort Space Used": 29,
+      "Sort Space Type": "Memory",
+      "Shared Hit Blocks": 4,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0,
+      "Plans": [
+        {
+          "Node Type": "Seq Scan",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Relation Name": "menu_item",
+          "Alias": "menu_item",
+          "Startup Cost": 0.0,
+          "Total Cost": 1.5,
+          "Plan Rows": 48,
+          "Plan Width": 73,
+          "Actual Startup Time": 0.084,
+          "Actual Total Time": 0.099,
+          "Actual Rows": 48.0,
+          "Actual Loops": 1,
+          "Disabled": false,
+          "Filter": "availability",
+          "Rows Removed by Filter": 2,
+          "Shared Hit Blocks": 1,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        }
+      ]
+    },
+    "Planning": {
+      "Shared Hit Blocks": 114,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0
+    },
+    "Planning Time": 5.371,
+    "Triggers": [],
+    "Execution Time": 0.472
+  },
+  "log_review": {
+    "source": "Dedicated G10 PostgreSQL stderr log redirected by pg_ctl",
+    "reviewed_at": "2026-11-06T21:08:39.974506+08:00",
+    "first_diagnostic": "2026-11-06 20:32:25.969 +08",
+    "last_diagnostic": "2026-11-06 21:08:39.951 +08",
+    "total_file_lines": 165,
+    "retained_event_count": 73,
+    "counts": {
+      "ERROR": 64,
+      "WARNING": 0,
+      "FATAL": 9,
+      "PANIC": 0
+    },
+    "sql_log_access_probes": {
+      "current-logfile": {
+        "exit_code": 3,
+        "denied_42501": true
+      },
+      "list-logdir": {
+        "exit_code": 3,
+        "denied_42501": true
+      }
+    },
+    "events": [
+      {
+        "timestamp": "2026-11-06 20:32:25.969 +08",
+        "pid": 19908,
+        "level": "ERROR",
+        "message": "permission denied for table customer"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:26.066 +08",
+        "pid": 23636,
+        "level": "ERROR",
+        "message": "permission denied for table customer"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:26.173 +08",
+        "pid": 24968,
+        "level": "ERROR",
+        "message": "permission denied for table customer"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:26.370 +08",
+        "pid": 24732,
+        "level": "ERROR",
+        "message": "permission denied for table staff"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:26.467 +08",
+        "pid": 23008,
+        "level": "ERROR",
+        "message": "permission denied for table staff"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:26.559 +08",
+        "pid": 22552,
+        "level": "ERROR",
+        "message": "permission denied for table staff"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:26.762 +08",
+        "pid": 24176,
+        "level": "ERROR",
+        "message": "permission denied for table menu_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:26.880 +08",
+        "pid": 24208,
+        "level": "ERROR",
+        "message": "permission denied for table menu_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:26.983 +08",
+        "pid": 20620,
+        "level": "ERROR",
+        "message": "permission denied for table menu_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:27.081 +08",
+        "pid": 3892,
+        "level": "ERROR",
+        "message": "permission denied for table restaurant_table"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:27.182 +08",
+        "pid": 23912,
+        "level": "ERROR",
+        "message": "permission denied for table restaurant_table"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:27.282 +08",
+        "pid": 23040,
+        "level": "ERROR",
+        "message": "permission denied for table restaurant_table"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:27.379 +08",
+        "pid": 9576,
+        "level": "ERROR",
+        "message": "permission denied for table orders"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:27.480 +08",
+        "pid": 25124,
+        "level": "ERROR",
+        "message": "permission denied for table orders"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:27.579 +08",
+        "pid": 21592,
+        "level": "ERROR",
+        "message": "permission denied for table orders"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:27.671 +08",
+        "pid": 5668,
+        "level": "ERROR",
+        "message": "permission denied for table order_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:27.767 +08",
+        "pid": 15268,
+        "level": "ERROR",
+        "message": "permission denied for table order_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:27.875 +08",
+        "pid": 21508,
+        "level": "ERROR",
+        "message": "permission denied for table order_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:28.074 +08",
+        "pid": 19716,
+        "level": "ERROR",
+        "message": "permission denied for table reservation"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:28.173 +08",
+        "pid": 21884,
+        "level": "ERROR",
+        "message": "permission denied for table reservation"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:28.271 +08",
+        "pid": 8688,
+        "level": "ERROR",
+        "message": "permission denied for table reservation"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:28.363 +08",
+        "pid": 21076,
+        "level": "ERROR",
+        "message": "permission denied for table payment"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:28.460 +08",
+        "pid": 23460,
+        "level": "ERROR",
+        "message": "permission denied for table payment"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:28.555 +08",
+        "pid": 25380,
+        "level": "ERROR",
+        "message": "permission denied for table payment"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:28.650 +08",
+        "pid": 20196,
+        "level": "ERROR",
+        "message": "permission denied for table customer"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:28.745 +08",
+        "pid": 24092,
+        "level": "ERROR",
+        "message": "permission denied for table orders"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:28.856 +08",
+        "pid": 23788,
+        "level": "ERROR",
+        "message": "permission denied for table payment"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:28.954 +08",
+        "pid": 20552,
+        "level": "ERROR",
+        "message": "permission denied for table order_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:29.050 +08",
+        "pid": 21796,
+        "level": "ERROR",
+        "message": "permission denied for table order_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:29.145 +08",
+        "pid": 3848,
+        "level": "ERROR",
+        "message": "permission denied for table customer"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:29.345 +08",
+        "pid": 22084,
+        "level": "ERROR",
+        "message": "permission denied for table staff"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:29.582 +08",
+        "pid": 14576,
+        "level": "ERROR",
+        "message": "new row for relation \"menu_item\" violates check constraint \"chk_menu_item_price\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:29.806 +08",
+        "pid": 23512,
+        "level": "ERROR",
+        "message": "Order 62 must contain at least one order item"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:30.020 +08",
+        "pid": 900,
+        "level": "ERROR",
+        "message": "conflicting key value violates exclusion constraint \"ex_reservation_no_overlap\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:30.206 +08",
+        "pid": 20136,
+        "level": "ERROR",
+        "message": "permission denied to create database"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:30.405 +08",
+        "pid": 13200,
+        "level": "ERROR",
+        "message": "permission denied to create role"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:30.507 +08",
+        "pid": 19908,
+        "level": "FATAL",
+        "message": "permission denied for database \"rors_unrelated_lab\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:30.703 +08",
+        "pid": 22852,
+        "level": "FATAL",
+        "message": "permission denied for database \"postgres\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:30.801 +08",
+        "pid": 24968,
+        "level": "FATAL",
+        "message": "permission denied for database \"template1\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:30.911 +08",
+        "pid": 24732,
+        "level": "ERROR",
+        "message": "permission denied to create database"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:31.113 +08",
+        "pid": 20688,
+        "level": "ERROR",
+        "message": "permission denied to create role"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:31.206 +08",
+        "pid": 604,
+        "level": "FATAL",
+        "message": "permission denied for database \"rors_unrelated_lab\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:31.303 +08",
+        "pid": 20756,
+        "level": "FATAL",
+        "message": "permission denied for database \"postgres\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:31.399 +08",
+        "pid": 21880,
+        "level": "FATAL",
+        "message": "permission denied for database \"template1\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:31.504 +08",
+        "pid": 18696,
+        "level": "ERROR",
+        "message": "permission denied to create database"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:31.609 +08",
+        "pid": 14360,
+        "level": "ERROR",
+        "message": "permission denied to create role"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:31.699 +08",
+        "pid": 19468,
+        "level": "FATAL",
+        "message": "permission denied for database \"rors_unrelated_lab\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:31.878 +08",
+        "pid": 24864,
+        "level": "FATAL",
+        "message": "permission denied for database \"postgres\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:31.981 +08",
+        "pid": 22888,
+        "level": "FATAL",
+        "message": "permission denied for database \"template1\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:32.075 +08",
+        "pid": 21652,
+        "level": "ERROR",
+        "message": "permission denied for database mesa_g05_activity4"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:32.165 +08",
+        "pid": 18548,
+        "level": "ERROR",
+        "message": "permission denied for schema public at character 14"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:32.373 +08",
+        "pid": 23272,
+        "level": "ERROR",
+        "message": "permission denied to set role \"rors_owner_grp\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:32.476 +08",
+        "pid": 19688,
+        "level": "ERROR",
+        "message": "permission denied for table payment"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:32.578 +08",
+        "pid": 13060,
+        "level": "ERROR",
+        "message": "must be owner of table customer"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:32.672 +08",
+        "pid": 12952,
+        "level": "ERROR",
+        "message": "permission denied for sequence customer_customer_id_seq"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:32.777 +08",
+        "pid": 20212,
+        "level": "ERROR",
+        "message": "permission denied for database mesa_g05_activity4"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:32.890 +08",
+        "pid": 10260,
+        "level": "ERROR",
+        "message": "permission denied for schema public at character 14"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:32.997 +08",
+        "pid": 19684,
+        "level": "ERROR",
+        "message": "permission denied to set role \"rors_owner_grp\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:33.108 +08",
+        "pid": 5528,
+        "level": "ERROR",
+        "message": "permission denied for table payment"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:33.214 +08",
+        "pid": 24264,
+        "level": "ERROR",
+        "message": "must be owner of table customer"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:33.424 +08",
+        "pid": 22860,
+        "level": "ERROR",
+        "message": "permission denied for sequence customer_customer_id_seq"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:33.519 +08",
+        "pid": 25476,
+        "level": "ERROR",
+        "message": "permission denied for sequence customer_customer_id_seq"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:33.611 +08",
+        "pid": 12836,
+        "level": "ERROR",
+        "message": "permission denied for sequence customer_customer_id_seq"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:33.702 +08",
+        "pid": 3748,
+        "level": "ERROR",
+        "message": "permission denied to grant role \"rors_runtime_grp\""
+      },
+      {
+        "timestamp": "2026-11-06 20:32:33.798 +08",
+        "pid": 22548,
+        "level": "ERROR",
+        "message": "permission denied for schema public at character 14"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:34.272 +08",
+        "pid": 19756,
+        "level": "ERROR",
+        "message": "permission denied for table g05_future_probe"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:34.470 +08",
+        "pid": 17472,
+        "level": "ERROR",
+        "message": "permission denied for function g05_future_function"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:34.567 +08",
+        "pid": 900,
+        "level": "ERROR",
+        "message": "permission denied for table g05_future_probe"
+      },
+      {
+        "timestamp": "2026-11-06 20:32:34.657 +08",
+        "pid": 25220,
+        "level": "ERROR",
+        "message": "permission denied for function g05_future_function"
+      },
+      {
+        "timestamp": "2026-11-06 20:38:52.165 +08",
+        "pid": 21152,
+        "level": "ERROR",
+        "message": "Wrong evaluation database"
+      },
+      {
+        "timestamp": "2026-11-06 20:39:19.628 +08",
+        "pid": 24264,
+        "level": "ERROR",
+        "message": "Wrong evaluation database"
+      },
+      {
+        "timestamp": "2026-11-06 21:08:39.830 +08",
+        "pid": 21968,
+        "level": "ERROR",
+        "message": "permission denied for function pg_current_logfile"
+      },
+      {
+        "timestamp": "2026-11-06 21:08:39.951 +08",
+        "pid": 19588,
+        "level": "ERROR",
+        "message": "permission denied for function pg_ls_logdir"
+      }
+    ]
+  },
+  "maintenance_verified": true,
+  "unchanged_counts": true,
+  "unchanged_sequences": true,
+  "unchanged_acls": true,
+  "activity_visibility": {
+    "captured_at": "2026-11-06T21:10:09.445156+08:00",
+    "session_user": "rors_dba",
+    "current_user": "rors_dba",
+    "sessions": [
+      {
+        "pid": 8332,
+        "user": "rors_dba",
+        "state": "active",
+        "wait_type": null,
+        "wait_event": null,
+        "seconds_since_query_start": 0.020714,
+        "query_visible": true,
+        "query_label": "this inspection SQL (recorded in this evidence file)",
+        "blocking_pids": []
+      }
+    ]
+  }
+}

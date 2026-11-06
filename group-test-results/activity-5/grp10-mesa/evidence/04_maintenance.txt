@@ -1,0 +1,74 @@
+Captured: 2026-11-06T21:08:38.207364+08:00
+Login: rors_dba
+SQL:
+SET statement_timeout='30s'; SET lock_timeout='3s'; SET timezone='Asia/Manila';
+SET ROLE rors_owner_grp;
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),current_setting('server_version'),inet_server_addr(),inet_server_port();
+-- Refresh planner estimates; approved Activity4 owner membership only.
+ANALYZE VERBOSE public.menu_item;
+-- Standalone ordinary VACUUM; disable tail truncation to avoid its stronger lock.
+VACUUM (VERBOSE, ANALYZE, TRUNCATE FALSE) public.menu_item;
+
+Exit: 0
+
+SET
+SET
+SET
+SET
+2026-11-06 21:08:38.174712+08|rors_dba|rors_owner_grp|mesa_g05_activity4|18.3|127.0.0.1|55410
+ANALYZE
+VACUUM
+psql:<stdin>:5: INFO:  00000: analyzing "public.menu_item"
+LOCATION:  do_analyze_rel, analyze.c:324
+psql:<stdin>:5: INFO:  00000: "menu_item": scanned 1 of 1 pages, containing 50 live rows and 6 dead rows; 50 rows in sample, 50 estimated total rows
+LOCATION:  acquire_sample_rows, analyze.c:1352
+psql:<stdin>:5: INFO:  00000: finished analyzing table "mesa_g05_activity4.public.menu_item"
+avg read rate: 0.000 MB/s, avg write rate: 7.812 MB/s
+buffer usage: 447 hits, 0 reads, 7 dirtied
+WAL usage: 19 records, 6 full page images, 37392 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+LOCATION:  do_analyze_rel, analyze.c:843
+psql:<stdin>:7: INFO:  00000: vacuuming "mesa_g05_activity4.public.menu_item"
+LOCATION:  heap_vacuum_rel, vacuumlazy.c:822
+psql:<stdin>:7: INFO:  00000: finished vacuuming "mesa_g05_activity4.public.menu_item": index scans: 1
+pages: 0 removed, 1 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 6 removed, 50 remain, 0 are dead but not yet removable
+removable cutoff: 844, which was 0 XIDs old when operation ended
+new relfrozenxid: 844, which is 75 XIDs ahead of previous value
+new relminmxid: 2, which is 1 MXIDs ahead of previous value
+frozen: 1 pages from table (100.00% of total) had 50 tuples frozen
+visibility map: 1 pages set all-visible, 1 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 3 dead item identifiers removed
+index "menu_item_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "idx_menu_item_category": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 11.746 MB/s
+buffer usage: 33 hits, 0 reads, 8 dirtied
+WAL usage: 9 records, 8 full page images, 47213 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+LOCATION:  heap_vacuum_rel, vacuumlazy.c:1147
+psql:<stdin>:7: INFO:  00000: vacuuming "mesa_g05_activity4.pg_toast.pg_toast_17178"
+LOCATION:  heap_vacuum_rel, vacuumlazy.c:822
+psql:<stdin>:7: INFO:  00000: finished vacuuming "mesa_g05_activity4.pg_toast.pg_toast_17178": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 844, which was 0 XIDs old when operation ended
+new relfrozenxid: 844, which is 75 XIDs ahead of previous value
+new relminmxid: 2, which is 1 MXIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 2.582 MB/s, avg write rate: 2.582 MB/s
+buffer usage: 27 hits, 1 reads, 1 dirtied
+WAL usage: 1 records, 1 full page images, 2891 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+LOCATION:  heap_vacuum_rel, vacuumlazy.c:1147
+psql:<stdin>:7: INFO:  00000: analyzing "public.menu_item"
+LOCATION:  do_analyze_rel, analyze.c:324
+psql:<stdin>:7: INFO:  00000: "menu_item": scanned 1 of 1 pages, containing 50 live rows and 0 dead rows; 50 rows in sample, 50 estimated total rows
+LOCATION:  acquire_sample_rows, analyze.c:1352
+psql:<stdin>:7: INFO:  00000: finished analyzing table "mesa_g05_activity4.public.menu_item"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 52 hits, 0 reads, 0 dirtied
+WAL usage: 12 records, 0 full page images, 2264 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+LOCATION:  do_analyze_rel, analyze.c:843

@@ -1,0 +1,17 @@
+\set ON_ERROR_STOP on
+DO $$ BEGIN IF current_database()<>'canteen_g05_activity4' OR current_setting('port')<>'55408' THEN RAISE EXCEPTION 'Wrong Activity 5 test database'; END IF; END $$;
+SET ROLE canteen_owner_grp;
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),current_setting('server_version'),inet_server_addr(),inet_server_port();
+SELECT json_build_object(
+ 'captured_at',clock_timestamp(),'session_user',session_user,'current_user',current_user,
+ 'database',current_database(),'version',current_setting('server_version'),
+ 'size_bytes',pg_database_size(current_database()),'pretty_size',pg_size_pretty(pg_database_size(current_database())),
+ 'counts',(SELECT json_object_agg(name,rows) FROM (SELECT 'student' AS name,count(*) AS rows FROM public.student UNION ALL SELECT 'vendor' AS name,count(*) AS rows FROM public.vendor UNION ALL SELECT 'menu_item' AS name,count(*) AS rows FROM public.menu_item UNION ALL SELECT 'customer_order' AS name,count(*) AS rows FROM public.customer_order UNION ALL SELECT 'order_item' AS name,count(*) AS rows FROM public.order_item UNION ALL SELECT 'queue_entry' AS name,count(*) AS rows FROM public.queue_entry UNION ALL SELECT 'notification' AS name,count(*) AS rows FROM public.notification) q),
+ 'objects',(SELECT json_object_agg(kind,n) FROM (SELECT relkind::text AS kind,count(*) AS n FROM pg_class WHERE relnamespace='public'::regnamespace AND relkind IN('r','S','v','i') GROUP BY relkind) q),
+ 'sessions',(SELECT coalesce(json_agg(json_build_object('pid',pid,'user',usename,'state',state,'wait_type',wait_event_type,'wait_event',wait_event,'duration_seconds',extract(epoch FROM(clock_timestamp()-query_start)),'query_visible',query IS NOT NULL,'statement',CASE WHEN pid=pg_backend_pid() THEN 'this inspection statement' ELSE '[not copied / may be restricted]' END,'blocking_pids',pg_blocking_pids(pid))),'[]'::json) FROM pg_stat_activity WHERE datname=current_database()),
+ 'database_stats',(SELECT row_to_json(d) FROM (SELECT numbackends,xact_commit,xact_rollback,deadlocks,conflicts,sessions,sessions_abandoned,sessions_fatal,sessions_killed,stats_reset FROM pg_stat_database WHERE datname=current_database()) d),
+ 'tables',(SELECT json_agg(row_to_json(t)) FROM (SELECT s.relname,c.reltuples,s.n_live_tup,s.n_dead_tup,s.n_mod_since_analyze,s.last_vacuum,s.last_autovacuum,s.last_analyze,s.last_autoanalyze,s.vacuum_count,s.autovacuum_count,s.analyze_count,s.autoanalyze_count,pg_total_relation_size(s.relid) AS total_bytes,age(c.relfrozenxid) AS xid_age,c.reloptions FROM pg_stat_user_tables s JOIN pg_class c ON c.oid=s.relid WHERE s.schemaname='public' ORDER BY s.relname) t),
+ 'indexes',(SELECT json_agg(row_to_json(i)) FROM (SELECT relname,indexrelname,idx_scan,idx_tup_read,idx_tup_fetch,pg_relation_size(indexrelid) AS bytes FROM pg_stat_user_indexes WHERE schemaname='public' ORDER BY relname,indexrelname) i),
+ 'sequences',(SELECT json_agg(row_to_json(s)) FROM (SELECT sequencename,last_value,increment_by FROM pg_sequences WHERE schemaname='public' ORDER BY sequencename) s),
+ 'settings',(SELECT json_object_agg(name,setting) FROM pg_settings WHERE name IN('autovacuum','track_counts','track_activities','log_destination','logging_collector','log_statement','log_min_duration_statement','log_min_messages','log_connections','log_disconnections'))
+);

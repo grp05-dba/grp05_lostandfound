@@ -1,0 +1,101 @@
+Captured: 2026-11-06T21:08:41.681416+08:00
+Login: boardtrack_app
+SQL:
+SET statement_timeout='30s'; SET lock_timeout='3s'; SET timezone='Asia/Manila';
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),current_setting('server_version'),inet_server_addr(),inet_server_port();
+BEGIN READ ONLY;
+EXPLAIN SELECT lease_id, tenant_id, tenant, property_name, room_number, start_date, end_date, monthly_rent, status, total_paid, utilities_billed FROM v_lease_summary ORDER BY 1;
+EXPLAIN (ANALYZE,BUFFERS) SELECT lease_id, tenant_id, tenant, property_name, room_number, start_date, end_date, monthly_rent, status, total_paid, utilities_billed FROM v_lease_summary ORDER BY 1;
+ROLLBACK;
+Exit: 0
+
+SET
+SET
+SET
+2026-11-06 21:08:41.646651+08|boardtrack_app|boardtrack_app|boardtrack_g05_activity4|18.3|127.0.0.1|55411
+BEGIN
+Sort  (cost=12286.98..12288.58 rows=640 width=648)
+  Sort Key: l.lease_id
+  ->  Hash Join  (cost=45.75..12257.15 rows=640 width=648)
+        Hash Cond: (r.property_id = p.property_id)
+        ->  Hash Join  (cost=33.50..53.30 rows=640 width=370)
+              Hash Cond: (l.room_id = r.room_id)
+              ->  Hash Join  (cost=12.70..30.81 rows=640 width=312)
+                    Hash Cond: (l.tenant_id = t.tenant_id)
+                    ->  Seq Scan on lease l  (cost=0.00..16.40 rows=640 width=94)
+                    ->  Hash  (cost=11.20..11.20 rows=120 width=222)
+                          ->  Seq Scan on tenant t  (cost=0.00..11.20 rows=120 width=222)
+              ->  Hash  (cost=14.80..14.80 rows=480 width=66)
+                    ->  Seq Scan on room r  (cost=0.00..14.80 rows=480 width=66)
+        ->  Hash  (cost=11.00..11.00 rows=100 width=222)
+              ->  Seq Scan on property p  (cost=0.00..11.00 rows=100 width=222)
+        SubPlan 1
+          ->  Aggregate  (cost=9.51..9.52 rows=1 width=32)
+                ->  Bitmap Heap Scan on payment x  (cost=4.16..9.51 rows=1 width=16)
+                      Recheck Cond: (lease_id = l.lease_id)
+                      Filter: ((status)::text = 'COMPLETED'::text)
+                      ->  Bitmap Index Scan on idx_payment_lease  (cost=0.00..4.16 rows=2 width=0)
+                            Index Cond: (lease_id = l.lease_id)
+        SubPlan 2
+          ->  Aggregate  (cost=9.51..9.52 rows=1 width=32)
+                ->  Bitmap Heap Scan on utility_bill u  (cost=4.16..9.50 rows=2 width=16)
+                      Recheck Cond: (lease_id = l.lease_id)
+                      ->  Bitmap Index Scan on idx_utility_lease  (cost=0.00..4.16 rows=2 width=0)
+                            Index Cond: (lease_id = l.lease_id)
+Sort  (cost=12286.98..12288.58 rows=640 width=648) (actual time=0.652..0.655 rows=4.00 loops=1)
+  Sort Key: l.lease_id
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=22
+  ->  Hash Join  (cost=45.75..12257.15 rows=640 width=648) (actual time=0.462..0.549 rows=4.00 loops=1)
+        Hash Cond: (r.property_id = p.property_id)
+        Buffers: shared hit=19
+        ->  Hash Join  (cost=33.50..53.30 rows=640 width=370) (actual time=0.200..0.207 rows=4.00 loops=1)
+              Hash Cond: (l.room_id = r.room_id)
+              Buffers: shared hit=3
+              ->  Hash Join  (cost=12.70..30.81 rows=640 width=312) (actual time=0.089..0.094 rows=4.00 loops=1)
+                    Hash Cond: (l.tenant_id = t.tenant_id)
+                    Buffers: shared hit=2
+                    ->  Seq Scan on lease l  (cost=0.00..16.40 rows=640 width=94) (actual time=0.028..0.029 rows=4.00 loops=1)
+                          Buffers: shared hit=1
+                    ->  Hash  (cost=11.20..11.20 rows=120 width=222) (actual time=0.035..0.036 rows=4.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                          Buffers: shared hit=1
+                          ->  Seq Scan on tenant t  (cost=0.00..11.20 rows=120 width=222) (actual time=0.024..0.025 rows=4.00 loops=1)
+                                Buffers: shared hit=1
+              ->  Hash  (cost=14.80..14.80 rows=480 width=66) (actual time=0.038..0.038 rows=6.00 loops=1)
+                    Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                    Buffers: shared hit=1
+                    ->  Seq Scan on room r  (cost=0.00..14.80 rows=480 width=66) (actual time=0.026..0.027 rows=6.00 loops=1)
+                          Buffers: shared hit=1
+        ->  Hash  (cost=11.00..11.00 rows=100 width=222) (actual time=0.067..0.067 rows=2.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=1
+              ->  Seq Scan on property p  (cost=0.00..11.00 rows=100 width=222) (actual time=0.051..0.052 rows=2.00 loops=1)
+                    Buffers: shared hit=1
+        SubPlan 1
+          ->  Aggregate  (cost=9.51..9.52 rows=1 width=32) (actual time=0.038..0.038 rows=1.00 loops=4)
+                Buffers: shared hit=8
+                ->  Bitmap Heap Scan on payment x  (cost=4.16..9.51 rows=1 width=16) (actual time=0.018..0.018 rows=1.25 loops=4)
+                      Recheck Cond: (lease_id = l.lease_id)
+                      Filter: ((status)::text = 'COMPLETED'::text)
+                      Rows Removed by Filter: 0
+                      Heap Blocks: exact=4
+                      Buffers: shared hit=8
+                      ->  Bitmap Index Scan on idx_payment_lease  (cost=0.00..4.16 rows=2 width=0) (actual time=0.008..0.008 rows=1.50 loops=4)
+                            Index Cond: (lease_id = l.lease_id)
+                            Index Searches: 4
+                            Buffers: shared hit=4
+        SubPlan 2
+          ->  Aggregate  (cost=9.51..9.52 rows=1 width=32) (actual time=0.020..0.020 rows=1.00 loops=4)
+                Buffers: shared hit=7
+                ->  Bitmap Heap Scan on utility_bill u  (cost=4.16..9.50 rows=2 width=16) (actual time=0.012..0.012 rows=1.00 loops=4)
+                      Recheck Cond: (lease_id = l.lease_id)
+                      Heap Blocks: exact=3
+                      Buffers: shared hit=7
+                      ->  Bitmap Index Scan on idx_utility_lease  (cost=0.00..4.16 rows=2 width=0) (actual time=0.004..0.004 rows=1.00 loops=4)
+                            Index Cond: (lease_id = l.lease_id)
+                            Index Searches: 4
+                            Buffers: shared hit=4
+Planning Time: 0.716 ms
+Execution Time: 0.851 ms
+ROLLBACK

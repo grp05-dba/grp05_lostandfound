@@ -1,0 +1,7 @@
+{
+  "commit": "5056cb1c1cddca71c0641dd01fc7b82082f1c3ed",
+  "source_path": "src/main/java/com/bwisit/canteen/service/ReportService.java",
+  "source_blob": "7ec9e9ddac564f247d048ec90a0d22df4df6deb4",
+  "query": "SELECT count(*) FILTER (WHERE o.status = 'completed'), count(*) FILTER (WHERE o.status = 'cancelled'), count(*) FROM customer_order o WHERE o.order_date >= TIMESTAMP '2026-10-08 00:00:00' AND o.order_date < TIMESTAMP '2026-11-07 00:00:00';",
+  "adaptation": "G08 native administrator count query with concrete last-30-day timestamps"
+}
