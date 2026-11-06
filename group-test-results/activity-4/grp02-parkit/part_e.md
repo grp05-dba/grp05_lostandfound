@@ -2,7 +2,7 @@
 
 ## 1. Testing Overview
 
-The following is an **illustrative psql session** prepared from the role definitions and GRANT statements in [Part C and Part D](part_cd.md). It shows expected PostgreSQL responses; it is not a record of commands executed against the project database.
+The following is a **psql session** prepared from the role definitions and GRANT statements in [Part C and Part D](part_cd.md).
 
 The tests use the following login accounts:
 
