@@ -1,0 +1,12 @@
+{
+  "database": "ojt_managementdb",
+  "filename": "original.dump",
+  "path": "D:\\Data Administration\\course-review\\activity6-private\\g03\\original.dump",
+  "started": "2026-11-06T23:02:28.234257+08:00",
+  "completed": "2026-11-06T23:02:31.104808+08:00",
+  "bytes": 59505,
+  "sha256": "b73949bf0ba8af876d8a31b7598170a7ba4c98b8f5fa15b658d55a5984b79bb4",
+  "exit_code": 0,
+  "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55403 -U grp03_ojt_dba --role=grp03_ojt_admin_grp -Fc -d ojt_managementdb -f \"D:\\Data Administration\\course-review\\activity6-private\\g03\\original.dump\"",
+  "stderr": ""
+}

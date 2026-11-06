@@ -1,0 +1,6 @@
+{
+  "original": "SET\nSET\nSET\nSET\n",
+  "after_incident": "SET\nSET\nSET\nSET\n3|G05-A6-LATE-03\n",
+  "verified_snapshot": "SET\nSET\nSET\nSET\n2|G05-A6-RECOVER-03\n",
+  "recovered": "SET\nSET\nSET\nSET\n2|G05-A6-RECOVER-03\n"
+}

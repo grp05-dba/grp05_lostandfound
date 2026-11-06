@@ -1,0 +1,11 @@
+[
+  {
+    "phase": "objects",
+    "account": "grp03_ojt_dba",
+    "role": "grp03_ojt_admin_grp",
+    "entries": 158,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55403 -U grp03_ojt_dba --role=grp03_ojt_admin_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g03\\snapshot_objects.list\" -d g05_a6_g03_snapshot \"D:\\Data Administration\\course-review\\activity6-private\\g03\\fixture.dump\"",
+    "exit_code": 0,
+    "stderr": ""
+  }
+]

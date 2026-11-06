@@ -1,0 +1,12 @@
+{
+  "database": "grp07_campussafedb",
+  "filename": "original.dump",
+  "path": "D:\\Data Administration\\course-review\\activity6-private\\g07\\original.dump",
+  "started": "2026-11-06T23:05:13.824150+08:00",
+  "completed": "2026-11-06T23:05:15.389408+08:00",
+  "bytes": 49610,
+  "sha256": "938f85a9b89ff37ceadc01490a3a2163b4b23f4bfcc62955d17869595c492624",
+  "exit_code": 0,
+  "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55407 -U campussafe_backup -Fc -d grp07_campussafedb -f \"D:\\Data Administration\\course-review\\activity6-private\\g07\\original.dump\"",
+  "stderr": ""
+}

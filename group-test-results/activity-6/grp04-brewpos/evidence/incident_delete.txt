@@ -1,0 +1,10 @@
+Database: g05_a6_g04_restore
+SET
+SET
+SET
+SET
+BEGIN
+DO
+4|G05-A6-RECOVER-04
+DELETE 1
+COMMIT

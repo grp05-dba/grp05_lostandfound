@@ -1,0 +1,10 @@
+Database: g05_a6_g03_restore
+Account: grp03_ojt_dba (owner role)
+SQL:
+INSERT INTO companies(company_name,industry,address,contact_number,email) VALUES('G05-A6-RECOVER-03','Test','Disposable local record','000','act6-03-recover@example.invalid') RETURNING company_id,company_name;
+SET
+SET
+SET
+SET
+2|G05-A6-RECOVER-03
+INSERT 0 1

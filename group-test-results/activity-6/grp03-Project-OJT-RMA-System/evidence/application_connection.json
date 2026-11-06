@@ -1,0 +1,14 @@
+[
+  {
+    "target": "restore",
+    "method": "Unchanged Java JDBC app, five demo logins and initial role-tab reads; headless",
+    "exit_code": 0,
+    "output": "JDBC session: {current_user=grp03_ojt_app, current_database=g05_a6_g03_restore}\nPASS ADMIN: login and 2 tabs constructed\nPASS STUDENT: login and 6 tabs constructed\nPASS ACADEMIC_SUPERVISOR: login and 4 tabs constructed\nPASS COMPANY_SUPERVISOR: login and 3 tabs constructed\nPASS OJT_COORDINATOR: login and 3 tabs constructed\nPASS application startup, authentication and initial tab queries; interactive actions not exercised\n"
+  },
+  {
+    "target": "recovered",
+    "method": "Unchanged Java JDBC app, five demo logins and initial role-tab reads; headless",
+    "exit_code": 0,
+    "output": "JDBC session: {current_user=grp03_ojt_app, current_database=g05_a6_g03_recovered}\nPASS ADMIN: login and 2 tabs constructed\nPASS STUDENT: login and 6 tabs constructed\nPASS ACADEMIC_SUPERVISOR: login and 4 tabs constructed\nPASS COMPANY_SUPERVISOR: login and 3 tabs constructed\nPASS OJT_COORDINATOR: login and 3 tabs constructed\nPASS application startup, authentication and initial tab queries; interactive actions not exercised\n"
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "table": "app_user",
+    "column": "account_status",
+    "sql": "BEGIN; UPDATE public.app_user SET account_status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"app_user\" violates check constraint \"app_user_account_status_check\"\nSCHEMA NAME:  public\nTABLE NAME:  app_user\nCONSTRAINT NAME:  app_user_account_status_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "assignment",
+    "column": "assignment_status",
+    "sql": "BEGIN; UPDATE public.assignment SET assignment_status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"assignment\" violates check constraint \"assignment_assignment_status_check\"\nSCHEMA NAME:  public\nTABLE NAME:  assignment\nCONSTRAINT NAME:  assignment_assignment_status_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "hazard_report",
+    "column": "priority",
+    "sql": "BEGIN; UPDATE public.hazard_report SET priority='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"hazard_report\" violates check constraint \"hazard_report_priority_check\"\nSCHEMA NAME:  public\nTABLE NAME:  hazard_report\nCONSTRAINT NAME:  hazard_report_priority_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "hazard_report",
+    "column": "status",
+    "sql": "BEGIN; UPDATE public.hazard_report SET status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"hazard_report\" violates check constraint \"hazard_report_status_check\"\nSCHEMA NAME:  public\nTABLE NAME:  hazard_report\nCONSTRAINT NAME:  hazard_report_status_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  }
+]

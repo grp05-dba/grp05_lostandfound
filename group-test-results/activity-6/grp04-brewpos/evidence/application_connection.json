@@ -1,0 +1,20 @@
+[
+  {
+    "target": "restore",
+    "method": "Unchanged Spring Boot app, HTTP /api/staff",
+    "http_status": 200,
+    "returned_records": 2,
+    "observed_runtime_connections": 10,
+    "account": "brewpos_app",
+    "database": "g05_a6_g04_restore"
+  },
+  {
+    "target": "recovered",
+    "method": "Unchanged Spring Boot app, HTTP /api/staff",
+    "http_status": 200,
+    "returned_records": 2,
+    "observed_runtime_connections": 10,
+    "account": "brewpos_app",
+    "database": "g05_a6_g04_recovered"
+  }
+]

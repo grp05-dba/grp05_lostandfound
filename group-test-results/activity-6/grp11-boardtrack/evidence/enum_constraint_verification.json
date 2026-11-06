@@ -1,0 +1,58 @@
+[
+  {
+    "table": "app_user",
+    "column": "role",
+    "sql": "BEGIN; UPDATE public.app_user SET role='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"app_user\" violates check constraint \"app_user_role_check\"\nSCHEMA NAME:  public\nTABLE NAME:  app_user\nCONSTRAINT NAME:  app_user_role_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "lease",
+    "column": "status",
+    "sql": "BEGIN; UPDATE public.lease SET status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"lease\" violates check constraint \"lease_status_check\"\nSCHEMA NAME:  public\nTABLE NAME:  lease\nCONSTRAINT NAME:  lease_status_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "payment",
+    "column": "payment_method",
+    "sql": "BEGIN; UPDATE public.payment SET payment_method='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"payment\" violates check constraint \"payment_payment_method_check\"\nSCHEMA NAME:  public\nTABLE NAME:  payment\nCONSTRAINT NAME:  payment_payment_method_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "payment",
+    "column": "status",
+    "sql": "BEGIN; UPDATE public.payment SET status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"payment\" violates check constraint \"payment_status_check\"\nSCHEMA NAME:  public\nTABLE NAME:  payment\nCONSTRAINT NAME:  payment_status_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "room",
+    "column": "status",
+    "sql": "BEGIN; UPDATE public.room SET status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"room\" violates check constraint \"room_status_check\"\nSCHEMA NAME:  public\nTABLE NAME:  room\nCONSTRAINT NAME:  room_status_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "utility_bill",
+    "column": "status",
+    "sql": "BEGIN; UPDATE public.utility_bill SET status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"utility_bill\" violates check constraint \"utility_bill_status_check\"\nSCHEMA NAME:  public\nTABLE NAME:  utility_bill\nCONSTRAINT NAME:  utility_bill_status_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "utility_bill",
+    "column": "utility_type",
+    "sql": "BEGIN; UPDATE public.utility_bill SET utility_type='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"utility_bill\" violates check constraint \"utility_bill_utility_type_check\"\nSCHEMA NAME:  public\nTABLE NAME:  utility_bill\nCONSTRAINT NAME:  utility_bill_utility_type_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  }
+]

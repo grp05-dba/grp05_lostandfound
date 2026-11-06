@@ -1,0 +1,12 @@
+{
+  "database": "mesa_g05_activity4",
+  "filename": "original.dump",
+  "path": "D:\\Data Administration\\course-review\\activity6-private\\g10\\original.dump",
+  "started": "2026-11-06T22:51:23.100983+08:00",
+  "completed": "2026-11-06T22:51:24.109978+08:00",
+  "bytes": 115386,
+  "sha256": "ab2274d3b5cc1218c221d2aa69604e97fe9220b834799da0efb1937833a4632a",
+  "exit_code": 0,
+  "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55410 -U rors_dba --role=rors_owner_grp -Fc -d mesa_g05_activity4 -f \"D:\\Data Administration\\course-review\\activity6-private\\g10\\original.dump\"",
+  "stderr": ""
+}

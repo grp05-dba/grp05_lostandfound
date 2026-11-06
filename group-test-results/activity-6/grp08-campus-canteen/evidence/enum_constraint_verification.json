@@ -1,0 +1,26 @@
+[
+  {
+    "table": "customer_order",
+    "column": "status",
+    "sql": "BEGIN; UPDATE public.customer_order SET status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"customer_order\" violates check constraint \"customer_order_status_check\"\nSCHEMA NAME:  public\nTABLE NAME:  customer_order\nCONSTRAINT NAME:  customer_order_status_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "queue_entry",
+    "column": "status",
+    "sql": "BEGIN; UPDATE public.queue_entry SET status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"queue_entry\" violates check constraint \"queue_entry_status_check\"\nSCHEMA NAME:  public\nTABLE NAME:  queue_entry\nCONSTRAINT NAME:  queue_entry_status_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "student",
+    "column": "role",
+    "sql": "BEGIN; UPDATE public.student SET role='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"student\" violates check constraint \"student_role_check\"\nSCHEMA NAME:  public\nTABLE NAME:  student\nCONSTRAINT NAME:  student_role_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  }
+]

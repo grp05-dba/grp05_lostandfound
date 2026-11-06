@@ -1,0 +1,12 @@
+{
+  "database": "grp_brewposdb",
+  "filename": "original.dump",
+  "path": "D:\\Data Administration\\course-review\\activity6-private\\g04\\original.dump",
+  "started": "2026-11-06T23:03:22.277982+08:00",
+  "completed": "2026-11-06T23:03:23.372231+08:00",
+  "bytes": 18352,
+  "sha256": "5ba78bf4fe0eb9f195e7383cea59e16b7e0360637160c4c3eec36f6175953603",
+  "exit_code": 0,
+  "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55404 -U brewpos_dba --role=brewpos_owner_grp -Fc -d grp_brewposdb -f \"D:\\Data Administration\\course-review\\activity6-private\\g04\\original.dump\"",
+  "stderr": ""
+}

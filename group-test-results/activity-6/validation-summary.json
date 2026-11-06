@@ -1,0 +1,177 @@
+[
+  {
+    "group": "03",
+    "restore_and_recovery_verified": true,
+    "application_connections_verified": true,
+    "marker_states_verified": true,
+    "source_counts_preserved": true,
+    "recovered_full_row_fingerprints_match_verified_snapshot": true,
+    "effective_schema_database_privileges_and_role_settings_preserved": true,
+    "all_toc_entries_routed_once": true,
+    "archives": [
+      {
+        "filename": "original.dump",
+        "checksum_verified": true,
+        "bytes": 59505
+      },
+      {
+        "filename": "fixture.dump",
+        "checksum_verified": true,
+        "bytes": 59600
+      }
+    ],
+    "files_scanned": 35,
+    "secrets_or_backup_payloads_in_submission": false,
+    "relative_links": "all resolve"
+  },
+  {
+    "group": "04",
+    "restore_and_recovery_verified": true,
+    "application_connections_verified": true,
+    "marker_states_verified": true,
+    "source_counts_preserved": true,
+    "recovered_full_row_fingerprints_match_verified_snapshot": true,
+    "effective_schema_database_privileges_and_role_settings_preserved": true,
+    "all_toc_entries_routed_once": true,
+    "archives": [
+      {
+        "filename": "original.dump",
+        "checksum_verified": true,
+        "bytes": 18352
+      },
+      {
+        "filename": "fixture.dump",
+        "checksum_verified": true,
+        "bytes": 18417
+      }
+    ],
+    "files_scanned": 36,
+    "secrets_or_backup_payloads_in_submission": false,
+    "relative_links": "all resolve"
+  },
+  {
+    "group": "06",
+    "restore_and_recovery_verified": true,
+    "application_connections_verified": true,
+    "marker_states_verified": true,
+    "source_counts_preserved": true,
+    "recovered_full_row_fingerprints_match_verified_snapshot": true,
+    "effective_schema_database_privileges_and_role_settings_preserved": true,
+    "all_toc_entries_routed_once": true,
+    "archives": [
+      {
+        "filename": "original.dump",
+        "checksum_verified": true,
+        "bytes": 31120
+      },
+      {
+        "filename": "fixture.dump",
+        "checksum_verified": true,
+        "bytes": 31184
+      }
+    ],
+    "files_scanned": 34,
+    "secrets_or_backup_payloads_in_submission": false,
+    "relative_links": "all resolve"
+  },
+  {
+    "group": "07",
+    "restore_and_recovery_verified": true,
+    "application_connections_verified": true,
+    "marker_states_verified": true,
+    "source_counts_preserved": true,
+    "recovered_full_row_fingerprints_match_verified_snapshot": true,
+    "effective_schema_database_privileges_and_role_settings_preserved": true,
+    "all_toc_entries_routed_once": true,
+    "archives": [
+      {
+        "filename": "original.dump",
+        "checksum_verified": true,
+        "bytes": 49610
+      },
+      {
+        "filename": "fixture.dump",
+        "checksum_verified": true,
+        "bytes": 49704
+      }
+    ],
+    "files_scanned": 33,
+    "secrets_or_backup_payloads_in_submission": false,
+    "relative_links": "all resolve"
+  },
+  {
+    "group": "08",
+    "restore_and_recovery_verified": true,
+    "application_connections_verified": true,
+    "marker_states_verified": true,
+    "source_counts_preserved": true,
+    "recovered_full_row_fingerprints_match_verified_snapshot": true,
+    "effective_schema_database_privileges_and_role_settings_preserved": true,
+    "all_toc_entries_routed_once": true,
+    "archives": [
+      {
+        "filename": "original.dump",
+        "checksum_verified": true,
+        "bytes": 31226
+      },
+      {
+        "filename": "fixture.dump",
+        "checksum_verified": true,
+        "bytes": 31215
+      }
+    ],
+    "files_scanned": 37,
+    "secrets_or_backup_payloads_in_submission": false,
+    "relative_links": "all resolve"
+  },
+  {
+    "group": "10",
+    "restore_and_recovery_verified": true,
+    "application_connections_verified": true,
+    "marker_states_verified": true,
+    "source_counts_preserved": true,
+    "recovered_full_row_fingerprints_match_verified_snapshot": true,
+    "effective_schema_database_privileges_and_role_settings_preserved": true,
+    "all_toc_entries_routed_once": true,
+    "archives": [
+      {
+        "filename": "original.dump",
+        "checksum_verified": true,
+        "bytes": 115386
+      },
+      {
+        "filename": "fixture.dump",
+        "checksum_verified": true,
+        "bytes": 115540
+      }
+    ],
+    "files_scanned": 38,
+    "secrets_or_backup_payloads_in_submission": false,
+    "relative_links": "all resolve"
+  },
+  {
+    "group": "11",
+    "restore_and_recovery_verified": true,
+    "application_connections_verified": true,
+    "marker_states_verified": true,
+    "source_counts_preserved": true,
+    "recovered_full_row_fingerprints_match_verified_snapshot": true,
+    "effective_schema_database_privileges_and_role_settings_preserved": true,
+    "all_toc_entries_routed_once": true,
+    "archives": [
+      {
+        "filename": "original.dump",
+        "checksum_verified": true,
+        "bytes": 100082
+      },
+      {
+        "filename": "fixture.dump",
+        "checksum_verified": true,
+        "bytes": 100103
+      }
+    ],
+    "files_scanned": 38,
+    "secrets_or_backup_payloads_in_submission": false,
+    "relative_links": "all resolve"
+  }
+]

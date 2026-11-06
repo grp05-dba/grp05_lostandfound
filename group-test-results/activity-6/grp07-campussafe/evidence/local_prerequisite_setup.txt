@@ -1,0 +1,119 @@
+Existing Group5 Activity4 role/database script
+SET
+SET
+SET
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+GRANT ROLE
+GRANT ROLE
+GRANT ROLE
+GRANT ROLE
+CREATE DATABASE
+CREATE DATABASE
+REVOKE
+REVOKE
+GRANT
+
+SCHEMA/SEED 01_schema.sql (SQL not echoed)
+SET
+SET
+SET
+SET
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+psql:<stdin>:16: NOTICE:  00000: table "attachment" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1497
+psql:<stdin>:17: NOTICE:  00000: table "maintenance_action" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1497
+psql:<stdin>:18: NOTICE:  00000: table "report_status_history" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1497
+psql:<stdin>:19: NOTICE:  00000: table "assignment" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1497
+psql:<stdin>:20: NOTICE:  00000: table "hazard_report" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1497
+psql:<stdin>:21: NOTICE:  00000: table "campus_location" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1497
+psql:<stdin>:22: NOTICE:  00000: table "hazard_category" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1497
+psql:<stdin>:23: NOTICE:  00000: table "app_user" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1497
+psql:<stdin>:24: NOTICE:  00000: table "role" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1497
+
+SCHEMA/SEED 02_seed.sql (SQL not echoed)
+SET
+SET
+SET
+SET
+TRUNCATE TABLE
+INSERT 0 5
+5
+INSERT 0 6
+6
+INSERT 0 6
+6
+INSERT 0 10
+10
+INSERT 0 16
+16
+INSERT 0 12
+12
+INSERT 0 60
+INSERT 0 9
+INSERT 0 5
+5
+
+Existing Group5 Activity4 privilege script
+SET
+SET
+SET
+ALTER SCHEMA
+REVOKE
+REVOKE
+REVOKE
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER ROLE
+ALTER ROLE
+ALTER ROLE

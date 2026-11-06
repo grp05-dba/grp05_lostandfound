@@ -1,0 +1,12 @@
+{
+  "database": "g05_a6_g10_restore",
+  "filename": "fixture.dump",
+  "path": "D:\\Data Administration\\course-review\\activity6-private\\g10\\fixture.dump",
+  "started": "2026-11-06T22:56:01.243810+08:00",
+  "completed": "2026-11-06T22:56:01.877832+08:00",
+  "bytes": 115540,
+  "sha256": "fcf81ca02c62d68e241f2dfa8bfef81a7fd4e15cafbacd1c5ef387a9e9018ef9",
+  "exit_code": 0,
+  "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55410 -U rors_dba --role=rors_owner_grp -Fc -d g05_a6_g10_restore -f \"D:\\Data Administration\\course-review\\activity6-private\\g10\\fixture.dump\"",
+  "stderr": ""
+}

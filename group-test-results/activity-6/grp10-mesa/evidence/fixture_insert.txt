@@ -1,0 +1,10 @@
+Database: g05_a6_g10_restore
+Account: rors_dba (owner role)
+SQL:
+INSERT INTO menu_item(item_name,category,price) VALUES('G05-A6-RECOVER-10','Activity6 disposable',1) RETURNING menu_item_id,item_name;
+SET
+SET
+SET
+SET
+56|G05-A6-RECOVER-10
+INSERT 0 1

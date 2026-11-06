@@ -1,0 +1,10 @@
+Database: g05_a6_g04_restore
+Account: brewpos_dba (owner role)
+SQL:
+INSERT INTO menu_category(category_name) VALUES('G05-A6-LATE-04') RETURNING category_id,category_name;
+SET
+SET
+SET
+SET
+5|G05-A6-LATE-04
+INSERT 0 1

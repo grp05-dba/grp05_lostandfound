@@ -1,0 +1,190 @@
+{
+  "group": "04",
+  "source_database": "grp_brewposdb",
+  "source_port": "55404",
+  "backup_account": "brewpos_dba",
+  "owner_role": "brewpos_owner_grp",
+  "targets": {
+    "restore": "g05_a6_g04_restore",
+    "snapshot": "g05_a6_g04_snapshot",
+    "recovered": "g05_a6_g04_recovered"
+  },
+  "original_backup": {
+    "database": "grp_brewposdb",
+    "filename": "original.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g04\\original.dump",
+    "started": "2026-11-06T23:03:22.277982+08:00",
+    "completed": "2026-11-06T23:03:23.372231+08:00",
+    "bytes": 18352,
+    "sha256": "5ba78bf4fe0eb9f195e7383cea59e16b7e0360637160c4c3eec36f6175953603",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55404 -U brewpos_dba --role=brewpos_owner_grp -Fc -d grp_brewposdb -f \"D:\\Data Administration\\course-review\\activity6-private\\g04\\original.dump\"",
+    "stderr": ""
+  },
+  "fixture_backup": {
+    "database": "g05_a6_g04_restore",
+    "filename": "fixture.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g04\\fixture.dump",
+    "started": "2026-11-06T23:03:33.885307+08:00",
+    "completed": "2026-11-06T23:03:34.437591+08:00",
+    "bytes": 18417,
+    "sha256": "6696338d77d2923a9cb70d9cc85b6dc94211aca6bf7e6ec5f2c8c388b95637e0",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55404 -U brewpos_dba --role=brewpos_owner_grp -Fc -d g05_a6_g04_restore -f \"D:\\Data Administration\\course-review\\activity6-private\\g04\\fixture.dump\"",
+    "stderr": ""
+  },
+  "fixture": {
+    "marker": "G05-A6-RECOVER-04",
+    "table": "menu_category",
+    "column": "category_name",
+    "key": "category_id",
+    "sql": "INSERT INTO menu_category(category_name) VALUES('G05-A6-RECOVER-04') RETURNING category_id,category_name;"
+  },
+  "late": {
+    "marker": "G05-A6-LATE-04",
+    "table": "menu_category",
+    "column": "category_name",
+    "key": "category_id",
+    "sql": "INSERT INTO menu_category(category_name) VALUES('G05-A6-LATE-04') RETURNING category_id,category_name;"
+  },
+  "source_counts": {
+    "menu_category": 3,
+    "menu_item": 11,
+    "order_line_item": 9,
+    "order_ticket": 5,
+    "staff": 2
+  },
+  "schema_object_counts": {
+    "columns": 18,
+    "relations": 9,
+    "constraints": 34,
+    "indexes": 9,
+    "views": 0,
+    "routines": 0,
+    "triggers": 0,
+    "extensions": 1,
+    "sequences": 4,
+    "roles": 6,
+    "memberships": 3,
+    "table_privileges": 160,
+    "column_privileges": 72,
+    "sequence_privileges": 48,
+    "function_privileges": 0,
+    "default_acl": 1
+  },
+  "restore_verified": true,
+  "recovery_verified": true,
+  "original_preserved": true,
+  "checksums_rechecked": true,
+  "timeline": [
+    {
+      "event": "source inspection started",
+      "time": "2026-11-06T23:03:21.339951+08:00"
+    },
+    {
+      "event": "original backup and listing completed",
+      "time": "2026-11-06T23:03:23.373239+08:00"
+    },
+    {
+      "event": "restore database provisioned",
+      "time": "2026-11-06T23:03:30.248956+08:00"
+    },
+    {
+      "event": "restore restore completed",
+      "time": "2026-11-06T23:03:30.839769+08:00"
+    },
+    {
+      "event": "recovery fixture inserted",
+      "time": "2026-11-06T23:03:32.814357+08:00"
+    },
+    {
+      "event": "fixture backup and listing completed",
+      "time": "2026-11-06T23:03:34.440100+08:00"
+    },
+    {
+      "event": "snapshot database provisioned",
+      "time": "2026-11-06T23:03:36.848768+08:00"
+    },
+    {
+      "event": "snapshot restore completed",
+      "time": "2026-11-06T23:03:37.401985+08:00"
+    },
+    {
+      "event": "fixture archive independently restored and verified before deletion",
+      "time": "2026-11-06T23:03:39.716299+08:00"
+    },
+    {
+      "event": "late fixture inserted",
+      "time": "2026-11-06T23:03:40.076567+08:00"
+    },
+    {
+      "event": "fixture deleted only in disposable restore database",
+      "time": "2026-11-06T23:03:40.881938+08:00"
+    },
+    {
+      "event": "recovered database provisioned",
+      "time": "2026-11-06T23:03:47.678329+08:00"
+    },
+    {
+      "event": "recovered restore completed",
+      "time": "2026-11-06T23:03:48.252665+08:00"
+    },
+    {
+      "event": "recovery, access, original preservation and archive checksums verified",
+      "time": "2026-11-06T23:03:51.377688+08:00"
+    }
+  ],
+  "restore_operations": [
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g04_restore",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55404 -U lab_admin -T template0 -O brewpos_owner_grp --encoding=UTF8 --locale=C g05_a6_g04_restore",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g04_restore FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g04_restore TO brewpos_dba,brewpos_runtime_grp,brewpos_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "brewpos_dba",
+      "role": "brewpos_owner_grp",
+      "entries": 50,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55404 -U brewpos_dba --role=brewpos_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g04\\restore_objects.list\" -d g05_a6_g04_restore \"D:\\Data Administration\\course-review\\activity6-private\\g04\\original.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g04_snapshot",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55404 -U lab_admin -T template0 -O brewpos_owner_grp --encoding=UTF8 --locale=C g05_a6_g04_snapshot",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g04_snapshot FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g04_snapshot TO brewpos_dba,brewpos_runtime_grp,brewpos_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "brewpos_dba",
+      "role": "brewpos_owner_grp",
+      "entries": 50,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55404 -U brewpos_dba --role=brewpos_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g04\\snapshot_objects.list\" -d g05_a6_g04_snapshot \"D:\\Data Administration\\course-review\\activity6-private\\g04\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g04_recovered",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55404 -U lab_admin -T template0 -O brewpos_owner_grp --encoding=UTF8 --locale=C g05_a6_g04_recovered",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g04_recovered FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g04_recovered TO brewpos_dba,brewpos_runtime_grp,brewpos_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "brewpos_dba",
+      "role": "brewpos_owner_grp",
+      "entries": 50,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55404 -U brewpos_dba --role=brewpos_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g04\\recovered_objects.list\" -d g05_a6_g04_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g04\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ]
+}

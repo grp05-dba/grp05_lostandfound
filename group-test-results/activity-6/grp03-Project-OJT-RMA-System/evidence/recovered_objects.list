@@ -1,0 +1,158 @@
+5197; 0 0 ACL - SCHEMA public pg_database_owner
+219; 1259 16710 TABLE public academic_supervisors grp03_ojt_admin_grp
+5198; 0 0 ACL public TABLE academic_supervisors grp03_ojt_admin_grp
+220; 1259 16719 SEQUENCE public academic_supervisors_academic_sup_id_seq grp03_ojt_admin_grp
+5199; 0 0 SEQUENCE OWNED BY public academic_supervisors_academic_sup_id_seq grp03_ojt_admin_grp
+5200; 0 0 ACL public SEQUENCE academic_supervisors_academic_sup_id_seq grp03_ojt_admin_grp
+221; 1259 16720 TABLE public attendance grp03_ojt_admin_grp
+5201; 0 0 ACL public TABLE attendance grp03_ojt_admin_grp
+5202; 0 0 ACL public COLUMN attendance.is_verified grp03_ojt_admin_grp
+222; 1259 16734 SEQUENCE public attendance_attendance_id_seq grp03_ojt_admin_grp
+5203; 0 0 SEQUENCE OWNED BY public attendance_attendance_id_seq grp03_ojt_admin_grp
+5204; 0 0 ACL public SEQUENCE attendance_attendance_id_seq grp03_ojt_admin_grp
+223; 1259 16735 TABLE public audit_log grp03_ojt_admin_grp
+5205; 0 0 ACL public TABLE audit_log grp03_ojt_admin_grp
+5206; 0 0 ACL public COLUMN audit_log.audit_id grp03_ojt_admin_grp
+5207; 0 0 ACL public COLUMN audit_log.table_name grp03_ojt_admin_grp
+5208; 0 0 ACL public COLUMN audit_log.action grp03_ojt_admin_grp
+5209; 0 0 ACL public COLUMN audit_log.row_id grp03_ojt_admin_grp
+5210; 0 0 ACL public COLUMN audit_log.action_time grp03_ojt_admin_grp
+224; 1259 16746 SEQUENCE public audit_log_audit_id_seq grp03_ojt_admin_grp
+5211; 0 0 SEQUENCE OWNED BY public audit_log_audit_id_seq grp03_ojt_admin_grp
+225; 1259 16747 TABLE public companies grp03_ojt_admin_grp
+5212; 0 0 ACL public TABLE companies grp03_ojt_admin_grp
+226; 1259 16762 SEQUENCE public companies_company_id_seq grp03_ojt_admin_grp
+5213; 0 0 SEQUENCE OWNED BY public companies_company_id_seq grp03_ojt_admin_grp
+5214; 0 0 ACL public SEQUENCE companies_company_id_seq grp03_ojt_admin_grp
+227; 1259 16763 TABLE public company_supervisors grp03_ojt_admin_grp
+5215; 0 0 ACL public TABLE company_supervisors grp03_ojt_admin_grp
+228; 1259 16775 SEQUENCE public company_supervisors_company_sup_id_seq grp03_ojt_admin_grp
+5216; 0 0 SEQUENCE OWNED BY public company_supervisors_company_sup_id_seq grp03_ojt_admin_grp
+5217; 0 0 ACL public SEQUENCE company_supervisors_company_sup_id_seq grp03_ojt_admin_grp
+229; 1259 16776 TABLE public evaluations grp03_ojt_admin_grp
+5218; 0 0 ACL public TABLE evaluations grp03_ojt_admin_grp
+230; 1259 16790 SEQUENCE public evaluations_evaluation_id_seq grp03_ojt_admin_grp
+5219; 0 0 SEQUENCE OWNED BY public evaluations_evaluation_id_seq grp03_ojt_admin_grp
+5220; 0 0 ACL public SEQUENCE evaluations_evaluation_id_seq grp03_ojt_admin_grp
+231; 1259 16791 TABLE public ojt_applications grp03_ojt_admin_grp
+5221; 0 0 ACL public TABLE ojt_applications grp03_ojt_admin_grp
+5222; 0 0 ACL public COLUMN ojt_applications.status grp03_ojt_admin_grp
+5223; 0 0 ACL public COLUMN ojt_applications.remarks grp03_ojt_admin_grp
+232; 1259 16806 SEQUENCE public ojt_applications_application_id_seq grp03_ojt_admin_grp
+5224; 0 0 SEQUENCE OWNED BY public ojt_applications_application_id_seq grp03_ojt_admin_grp
+5225; 0 0 ACL public SEQUENCE ojt_applications_application_id_seq grp03_ojt_admin_grp
+233; 1259 16807 TABLE public ojt_placements grp03_ojt_admin_grp
+5226; 0 0 ACL public TABLE ojt_placements grp03_ojt_admin_grp
+5227; 0 0 ACL public COLUMN ojt_placements.status grp03_ojt_admin_grp
+234; 1259 16826 SEQUENCE public ojt_placements_placement_id_seq grp03_ojt_admin_grp
+5228; 0 0 SEQUENCE OWNED BY public ojt_placements_placement_id_seq grp03_ojt_admin_grp
+5229; 0 0 ACL public SEQUENCE ojt_placements_placement_id_seq grp03_ojt_admin_grp
+235; 1259 16827 TABLE public requirements grp03_ojt_admin_grp
+5230; 0 0 ACL public TABLE requirements grp03_ojt_admin_grp
+236; 1259 16838 SEQUENCE public requirements_req_id_seq grp03_ojt_admin_grp
+5231; 0 0 SEQUENCE OWNED BY public requirements_req_id_seq grp03_ojt_admin_grp
+5232; 0 0 ACL public SEQUENCE requirements_req_id_seq grp03_ojt_admin_grp
+237; 1259 16839 TABLE public student_requirements grp03_ojt_admin_grp
+5233; 0 0 ACL public TABLE student_requirements grp03_ojt_admin_grp
+5234; 0 0 ACL public COLUMN student_requirements.verified_by_sup_id grp03_ojt_admin_grp
+5235; 0 0 ACL public COLUMN student_requirements.file_path grp03_ojt_admin_grp
+5236; 0 0 ACL public COLUMN student_requirements.status grp03_ojt_admin_grp
+5237; 0 0 ACL public COLUMN student_requirements.submission_date grp03_ojt_admin_grp
+5238; 0 0 ACL public COLUMN student_requirements.verified_at grp03_ojt_admin_grp
+5239; 0 0 ACL public COLUMN student_requirements.remarks grp03_ojt_admin_grp
+238; 1259 16850 SEQUENCE public student_requirements_student_req_id_seq grp03_ojt_admin_grp
+5240; 0 0 SEQUENCE OWNED BY public student_requirements_student_req_id_seq grp03_ojt_admin_grp
+5241; 0 0 ACL public SEQUENCE student_requirements_student_req_id_seq grp03_ojt_admin_grp
+239; 1259 16851 TABLE public students grp03_ojt_admin_grp
+5242; 0 0 ACL public TABLE students grp03_ojt_admin_grp
+240; 1259 16865 SEQUENCE public students_student_id_seq grp03_ojt_admin_grp
+5243; 0 0 SEQUENCE OWNED BY public students_student_id_seq grp03_ojt_admin_grp
+5244; 0 0 ACL public SEQUENCE students_student_id_seq grp03_ojt_admin_grp
+241; 1259 16866 TABLE public users grp03_ojt_admin_grp
+5245; 0 0 ACL public TABLE users grp03_ojt_admin_grp
+5246; 0 0 ACL public COLUMN users.user_id grp03_ojt_admin_grp
+5247; 0 0 ACL public COLUMN users.username grp03_ojt_admin_grp
+5248; 0 0 ACL public COLUMN users.role grp03_ojt_admin_grp
+5249; 0 0 ACL public COLUMN users.is_active grp03_ojt_admin_grp
+5250; 0 0 ACL public COLUMN users.created_at grp03_ojt_admin_grp
+5251; 0 0 ACL public COLUMN users.updated_at grp03_ojt_admin_grp
+5252; 0 0 ACL public COLUMN users.deleted_at grp03_ojt_admin_grp
+242; 1259 16883 SEQUENCE public users_user_id_seq grp03_ojt_admin_grp
+5253; 0 0 SEQUENCE OWNED BY public users_user_id_seq grp03_ojt_admin_grp
+5254; 0 0 ACL public SEQUENCE users_user_id_seq grp03_ojt_admin_grp
+4912; 2604 16884 DEFAULT public academic_supervisors academic_sup_id grp03_ojt_admin_grp
+4914; 2604 16885 DEFAULT public attendance attendance_id grp03_ojt_admin_grp
+4918; 2604 16886 DEFAULT public audit_log audit_id grp03_ojt_admin_grp
+4920; 2604 16887 DEFAULT public companies company_id grp03_ojt_admin_grp
+4923; 2604 16888 DEFAULT public company_supervisors company_sup_id grp03_ojt_admin_grp
+4925; 2604 16889 DEFAULT public evaluations evaluation_id grp03_ojt_admin_grp
+4928; 2604 16890 DEFAULT public ojt_applications application_id grp03_ojt_admin_grp
+4932; 2604 16891 DEFAULT public ojt_placements placement_id grp03_ojt_admin_grp
+4935; 2604 16892 DEFAULT public requirements req_id grp03_ojt_admin_grp
+4938; 2604 16893 DEFAULT public student_requirements student_req_id grp03_ojt_admin_grp
+4940; 2604 16894 DEFAULT public students student_id grp03_ojt_admin_grp
+4942; 2604 16895 DEFAULT public users user_id grp03_ojt_admin_grp
+5166; 0 16710 TABLE DATA public academic_supervisors grp03_ojt_admin_grp
+5168; 0 16720 TABLE DATA public attendance grp03_ojt_admin_grp
+5170; 0 16735 TABLE DATA public audit_log grp03_ojt_admin_grp
+5172; 0 16747 TABLE DATA public companies grp03_ojt_admin_grp
+5174; 0 16763 TABLE DATA public company_supervisors grp03_ojt_admin_grp
+5176; 0 16776 TABLE DATA public evaluations grp03_ojt_admin_grp
+5178; 0 16791 TABLE DATA public ojt_applications grp03_ojt_admin_grp
+5180; 0 16807 TABLE DATA public ojt_placements grp03_ojt_admin_grp
+5182; 0 16827 TABLE DATA public requirements grp03_ojt_admin_grp
+5184; 0 16839 TABLE DATA public student_requirements grp03_ojt_admin_grp
+5186; 0 16851 TABLE DATA public students grp03_ojt_admin_grp
+5188; 0 16866 TABLE DATA public users grp03_ojt_admin_grp
+5255; 0 0 SEQUENCE SET public academic_supervisors_academic_sup_id_seq grp03_ojt_admin_grp
+5256; 0 0 SEQUENCE SET public attendance_attendance_id_seq grp03_ojt_admin_grp
+5257; 0 0 SEQUENCE SET public audit_log_audit_id_seq grp03_ojt_admin_grp
+5258; 0 0 SEQUENCE SET public companies_company_id_seq grp03_ojt_admin_grp
+5259; 0 0 SEQUENCE SET public company_supervisors_company_sup_id_seq grp03_ojt_admin_grp
+5260; 0 0 SEQUENCE SET public evaluations_evaluation_id_seq grp03_ojt_admin_grp
+5261; 0 0 SEQUENCE SET public ojt_applications_application_id_seq grp03_ojt_admin_grp
+5262; 0 0 SEQUENCE SET public ojt_placements_placement_id_seq grp03_ojt_admin_grp
+5263; 0 0 SEQUENCE SET public requirements_req_id_seq grp03_ojt_admin_grp
+5264; 0 0 SEQUENCE SET public student_requirements_student_req_id_seq grp03_ojt_admin_grp
+5265; 0 0 SEQUENCE SET public students_student_id_seq grp03_ojt_admin_grp
+5266; 0 0 SEQUENCE SET public users_user_id_seq grp03_ojt_admin_grp
+4957; 2606 16897 CONSTRAINT public academic_supervisors academic_supervisors_pkey grp03_ojt_admin_grp
+4959; 2606 16899 CONSTRAINT public academic_supervisors academic_supervisors_user_id_key grp03_ojt_admin_grp
+4961; 2606 16901 CONSTRAINT public attendance attendance_pkey grp03_ojt_admin_grp
+4963; 2606 16903 CONSTRAINT public attendance attendance_placement_id_attendance_date_key grp03_ojt_admin_grp
+4965; 2606 16905 CONSTRAINT public audit_log audit_log_pkey grp03_ojt_admin_grp
+4967; 2606 16907 CONSTRAINT public companies companies_company_name_key grp03_ojt_admin_grp
+4969; 2606 16909 CONSTRAINT public companies companies_pkey grp03_ojt_admin_grp
+4971; 2606 16911 CONSTRAINT public company_supervisors company_supervisors_pkey grp03_ojt_admin_grp
+4973; 2606 16913 CONSTRAINT public company_supervisors company_supervisors_user_id_key grp03_ojt_admin_grp
+4975; 2606 16915 CONSTRAINT public evaluations evaluations_pkey grp03_ojt_admin_grp
+4977; 2606 16917 CONSTRAINT public ojt_applications ojt_applications_application_id_student_id_company_id_key grp03_ojt_admin_grp
+4979; 2606 16919 CONSTRAINT public ojt_applications ojt_applications_pkey grp03_ojt_admin_grp
+4981; 2606 16921 CONSTRAINT public ojt_placements ojt_placements_application_id_key grp03_ojt_admin_grp
+4983; 2606 16923 CONSTRAINT public ojt_placements ojt_placements_pkey grp03_ojt_admin_grp
+4985; 2606 16925 CONSTRAINT public requirements requirements_pkey grp03_ojt_admin_grp
+4987; 2606 16927 CONSTRAINT public requirements requirements_title_key grp03_ojt_admin_grp
+4989; 2606 16929 CONSTRAINT public student_requirements student_requirements_pkey grp03_ojt_admin_grp
+4991; 2606 16931 CONSTRAINT public student_requirements student_requirements_student_id_req_id_key grp03_ojt_admin_grp
+4993; 2606 16933 CONSTRAINT public students students_pkey grp03_ojt_admin_grp
+4995; 2606 16935 CONSTRAINT public students students_student_number_key grp03_ojt_admin_grp
+4997; 2606 16937 CONSTRAINT public students students_user_id_key grp03_ojt_admin_grp
+4999; 2606 16939 CONSTRAINT public users users_email_key grp03_ojt_admin_grp
+5001; 2606 16941 CONSTRAINT public users users_pkey grp03_ojt_admin_grp
+5003; 2606 16943 CONSTRAINT public users users_username_key grp03_ojt_admin_grp
+5004; 2606 16944 FK CONSTRAINT public academic_supervisors academic_supervisors_user_id_fkey grp03_ojt_admin_grp
+5005; 2606 16949 FK CONSTRAINT public attendance attendance_placement_id_fkey grp03_ojt_admin_grp
+5006; 2606 16954 FK CONSTRAINT public company_supervisors company_supervisors_company_id_fkey grp03_ojt_admin_grp
+5007; 2606 16959 FK CONSTRAINT public company_supervisors company_supervisors_user_id_fkey grp03_ojt_admin_grp
+5008; 2606 16964 FK CONSTRAINT public evaluations evaluations_company_sup_id_fkey grp03_ojt_admin_grp
+5009; 2606 16969 FK CONSTRAINT public evaluations evaluations_placement_id_fkey grp03_ojt_admin_grp
+5012; 2606 16974 FK CONSTRAINT public ojt_placements fk_placement_application_consistency grp03_ojt_admin_grp
+5010; 2606 16979 FK CONSTRAINT public ojt_applications ojt_applications_company_id_fkey grp03_ojt_admin_grp
+5011; 2606 16984 FK CONSTRAINT public ojt_applications ojt_applications_student_id_fkey grp03_ojt_admin_grp
+5013; 2606 16989 FK CONSTRAINT public ojt_placements ojt_placements_academic_sup_id_fkey grp03_ojt_admin_grp
+5014; 2606 16994 FK CONSTRAINT public ojt_placements ojt_placements_company_sup_id_fkey grp03_ojt_admin_grp
+5015; 2606 16999 FK CONSTRAINT public student_requirements student_requirements_req_id_fkey grp03_ojt_admin_grp
+5016; 2606 17004 FK CONSTRAINT public student_requirements student_requirements_student_id_fkey grp03_ojt_admin_grp
+5017; 2606 17009 FK CONSTRAINT public student_requirements student_requirements_verified_by_sup_id_fkey grp03_ojt_admin_grp
+5018; 2606 17014 FK CONSTRAINT public students students_user_id_fkey grp03_ojt_admin_grp
+2107; 826 17019 DEFAULT ACL - DEFAULT PRIVILEGES FOR FUNCTIONS grp03_ojt_admin_grp

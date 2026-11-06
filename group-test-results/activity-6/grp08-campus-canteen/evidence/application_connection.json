@@ -1,0 +1,20 @@
+[
+  {
+    "target": "restore",
+    "method": "Unchanged Spring Boot app, HTTP /api/vendors",
+    "http_status": 200,
+    "returned_records": 3,
+    "observed_runtime_connections": 10,
+    "account": "canteen_app",
+    "database": "g05_a6_g08_restore"
+  },
+  {
+    "target": "recovered",
+    "method": "Unchanged Spring Boot app, HTTP /api/vendors",
+    "http_status": 200,
+    "returned_records": 3,
+    "observed_runtime_connections": 10,
+    "account": "canteen_app",
+    "database": "g05_a6_g08_recovered"
+  }
+]

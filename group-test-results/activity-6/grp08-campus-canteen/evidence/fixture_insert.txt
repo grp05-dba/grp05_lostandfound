@@ -1,0 +1,10 @@
+Database: g05_a6_g08_restore
+Account: canteen_admin (owner role)
+SQL:
+INSERT INTO menu_item(vendor_id,item_name,price,is_available) SELECT min(vendor_id),'G05-A6-RECOVER-08',1,true FROM vendor RETURNING item_id,item_name;
+SET
+SET
+SET
+SET
+14|G05-A6-RECOVER-08
+INSERT 0 1

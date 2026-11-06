@@ -1,0 +1,12 @@
+{
+  "database": "g05_a6_g03_restore",
+  "filename": "fixture.dump",
+  "path": "D:\\Data Administration\\course-review\\activity6-private\\g03\\fixture.dump",
+  "started": "2026-11-06T23:02:58.974333+08:00",
+  "completed": "2026-11-06T23:03:00.067868+08:00",
+  "bytes": 59600,
+  "sha256": "e377cb37edfd47c6601fd48c15d18fa6947d3eb8891ae9c9fd10983b9de8d7d5",
+  "exit_code": 0,
+  "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55403 -U grp03_ojt_dba --role=grp03_ojt_admin_grp -Fc -d g05_a6_g03_restore -f \"D:\\Data Administration\\course-review\\activity6-private\\g03\\fixture.dump\"",
+  "stderr": ""
+}

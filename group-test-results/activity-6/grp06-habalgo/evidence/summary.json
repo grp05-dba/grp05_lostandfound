@@ -1,0 +1,173 @@
+{
+  "group": "06",
+  "source_database": "grp00_habalgodb",
+  "source_port": "55406",
+  "backup_account": "habalgo_dba",
+  "owner_role": "habalgo_owner_grp",
+  "targets": {
+    "restore": "g05_a6_g06_restore",
+    "snapshot": "g05_a6_g06_snapshot",
+    "recovered": "g05_a6_g06_recovered"
+  },
+  "original_backup": {
+    "database": "grp00_habalgodb",
+    "filename": "original.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g06\\original.dump",
+    "started": "2026-11-06T23:03:12.232118+08:00",
+    "completed": "2026-11-06T23:03:13.465408+08:00",
+    "bytes": 31120,
+    "sha256": "1d81457062867a9af5f1d32a17846b3e3335d4c05492035c4de887800b80a1fe",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55406 -U habalgo_dba --role=habalgo_owner_grp -Fc -d grp00_habalgodb -f \"D:\\Data Administration\\course-review\\activity6-private\\g06\\original.dump\"",
+    "stderr": ""
+  },
+  "fixture_backup": {
+    "database": "g05_a6_g06_restore",
+    "filename": "fixture.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g06\\fixture.dump",
+    "started": "2026-11-06T23:04:54.926014+08:00",
+    "completed": "2026-11-06T23:04:56.485549+08:00",
+    "bytes": 31184,
+    "sha256": "fe7df50cbccb60c809fb388ebc2ee85bebd0e1124d1c6341c82144efe81455eb",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55406 -U habalgo_dba --role=habalgo_owner_grp -Fc -d g05_a6_g06_restore -f \"D:\\Data Administration\\course-review\\activity6-private\\g06\\fixture.dump\"",
+    "stderr": ""
+  },
+  "fixture": {
+    "marker": "G05-A6-RECOVER-06",
+    "table": "vehicle",
+    "column": "plate_no",
+    "key": "vehicle_id",
+    "sql": "INSERT INTO habalgo.vehicle(plate_no,vehicle_type,model) VALUES('G05-A6-RECOVER-06','Motorcycle','Activity6 disposable') RETURNING vehicle_id,plate_no;"
+  },
+  "late": {
+    "marker": "G05-A6-LATE-06",
+    "table": "vehicle",
+    "column": "plate_no",
+    "key": "vehicle_id",
+    "sql": "INSERT INTO habalgo.vehicle(plate_no,vehicle_type,model) VALUES('G05-A6-LATE-06','Motorcycle','Activity6 disposable') RETURNING vehicle_id,plate_no;"
+  },
+  "source_counts": {
+    "booking": 0,
+    "customer": 0,
+    "driver": 10,
+    "driver_vehicle": 0,
+    "location": 0,
+    "payment": 0,
+    "rating_feedback": 0,
+    "vehicle": 0
+  },
+  "schema_object_counts": {
+    "columns": 36,
+    "relations": 15,
+    "constraints": 58,
+    "indexes": 17,
+    "views": 0,
+    "routines": 0,
+    "triggers": 0,
+    "extensions": 1,
+    "sequences": 7,
+    "roles": 6,
+    "memberships": 3,
+    "table_privileges": 256,
+    "column_privileges": 144,
+    "sequence_privileges": 84,
+    "function_privileges": 0,
+    "default_acl": 1
+  },
+  "restore_verified": true,
+  "recovery_verified": true,
+  "original_preserved": true,
+  "checksums_rechecked": true,
+  "timeline": [
+    {
+      "event": "source inspection started",
+      "time": "2026-11-06T23:04:49.160305+08:00"
+    },
+    {
+      "event": "recovery fixture inserted",
+      "time": "2026-11-06T23:04:53.384188+08:00"
+    },
+    {
+      "event": "fixture backup and listing completed",
+      "time": "2026-11-06T23:04:56.486549+08:00"
+    },
+    {
+      "event": "snapshot database provisioned",
+      "time": "2026-11-06T23:05:01.108787+08:00"
+    },
+    {
+      "event": "snapshot restore completed",
+      "time": "2026-11-06T23:05:01.965536+08:00"
+    },
+    {
+      "event": "fixture archive independently restored and verified before deletion",
+      "time": "2026-11-06T23:05:04.892209+08:00"
+    },
+    {
+      "event": "late fixture inserted",
+      "time": "2026-11-06T23:05:05.784310+08:00"
+    },
+    {
+      "event": "fixture deleted only in disposable restore database",
+      "time": "2026-11-06T23:05:06.434100+08:00"
+    },
+    {
+      "event": "recovered database provisioned",
+      "time": "2026-11-06T23:05:07.955771+08:00"
+    },
+    {
+      "event": "recovered restore completed",
+      "time": "2026-11-06T23:05:08.249907+08:00"
+    },
+    {
+      "event": "recovery, access, original preservation and archive checksums verified",
+      "time": "2026-11-06T23:05:12.307001+08:00"
+    }
+  ],
+  "restore_operations": [
+    {
+      "phase": "objects",
+      "account": "habalgo_dba",
+      "role": "habalgo_owner_grp",
+      "entries": 88,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55406 -U habalgo_dba --role=habalgo_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g06\\restore_objects.list\" -d g05_a6_g06_restore \"D:\\Data Administration\\course-review\\activity6-private\\g06\\original.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g06_snapshot",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55406 -U lab_admin -T template0 -O habalgo_owner_grp --encoding=UTF8 --locale=C g05_a6_g06_snapshot",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g06_snapshot FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g06_snapshot TO habalgo_dba,habalgo_runtime_grp,habalgo_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "habalgo_dba",
+      "role": "habalgo_owner_grp",
+      "entries": 88,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55406 -U habalgo_dba --role=habalgo_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g06\\snapshot_objects.list\" -d g05_a6_g06_snapshot \"D:\\Data Administration\\course-review\\activity6-private\\g06\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g06_recovered",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55406 -U lab_admin -T template0 -O habalgo_owner_grp --encoding=UTF8 --locale=C g05_a6_g06_recovered",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g06_recovered FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g06_recovered TO habalgo_dba,habalgo_runtime_grp,habalgo_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "habalgo_dba",
+      "role": "habalgo_owner_grp",
+      "entries": 88,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55406 -U habalgo_dba --role=habalgo_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g06\\recovered_objects.list\" -d g05_a6_g06_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g06\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ]
+}

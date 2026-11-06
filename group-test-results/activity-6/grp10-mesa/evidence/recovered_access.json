@@ -1,0 +1,26 @@
+[
+  {
+    "account": "rors_app",
+    "sql": "SELECT count(*) FROM v_order_summary;",
+    "expected": "Allowed",
+    "exit_code": 0,
+    "passed": true,
+    "output": "SET\nSET\nSET\n60\n"
+  },
+  {
+    "account": "rors_report",
+    "sql": "SELECT count(*) FROM v_order_summary;",
+    "expected": "Allowed",
+    "exit_code": 0,
+    "passed": true,
+    "output": "SET\nSET\nSET\n60\n"
+  },
+  {
+    "account": "rors_report",
+    "sql": "BEGIN; UPDATE menu_item SET price=price WHERE false; ROLLBACK;",
+    "expected": "Denied 42501",
+    "exit_code": 3,
+    "passed": true,
+    "output": "SET\nSET\nSET\nBEGIN\npsql:<stdin>:2: ERROR:  42501: permission denied for table menu_item\nLOCATION:  aclcheck_error, aclchk.c:2795\n"
+  }
+]

@@ -1,0 +1,197 @@
+{
+  "group": "03",
+  "source_database": "ojt_managementdb",
+  "source_port": "55403",
+  "backup_account": "grp03_ojt_dba",
+  "owner_role": "grp03_ojt_admin_grp",
+  "targets": {
+    "restore": "g05_a6_g03_restore",
+    "snapshot": "g05_a6_g03_snapshot",
+    "recovered": "g05_a6_g03_recovered"
+  },
+  "original_backup": {
+    "database": "ojt_managementdb",
+    "filename": "original.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g03\\original.dump",
+    "started": "2026-11-06T23:02:28.234257+08:00",
+    "completed": "2026-11-06T23:02:31.104808+08:00",
+    "bytes": 59505,
+    "sha256": "b73949bf0ba8af876d8a31b7598170a7ba4c98b8f5fa15b658d55a5984b79bb4",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55403 -U grp03_ojt_dba --role=grp03_ojt_admin_grp -Fc -d ojt_managementdb -f \"D:\\Data Administration\\course-review\\activity6-private\\g03\\original.dump\"",
+    "stderr": ""
+  },
+  "fixture_backup": {
+    "database": "g05_a6_g03_restore",
+    "filename": "fixture.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g03\\fixture.dump",
+    "started": "2026-11-06T23:02:58.974333+08:00",
+    "completed": "2026-11-06T23:03:00.067868+08:00",
+    "bytes": 59600,
+    "sha256": "e377cb37edfd47c6601fd48c15d18fa6947d3eb8891ae9c9fd10983b9de8d7d5",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55403 -U grp03_ojt_dba --role=grp03_ojt_admin_grp -Fc -d g05_a6_g03_restore -f \"D:\\Data Administration\\course-review\\activity6-private\\g03\\fixture.dump\"",
+    "stderr": ""
+  },
+  "fixture": {
+    "marker": "G05-A6-RECOVER-03",
+    "table": "companies",
+    "column": "company_name",
+    "key": "company_id",
+    "sql": "INSERT INTO companies(company_name,industry,address,contact_number,email) VALUES('G05-A6-RECOVER-03','Test','Disposable local record','000','act6-03-recover@example.invalid') RETURNING company_id,company_name;"
+  },
+  "late": {
+    "marker": "G05-A6-LATE-03",
+    "table": "companies",
+    "column": "company_name",
+    "key": "company_id",
+    "sql": "INSERT INTO companies(company_name,industry,address,contact_number,email) VALUES('G05-A6-LATE-03','Test','Disposable local record','000','act6-03-late@example.invalid') RETURNING company_id,company_name;"
+  },
+  "source_counts": {
+    "academic_supervisors": 1,
+    "attendance": 0,
+    "audit_log": 0,
+    "companies": 1,
+    "company_supervisors": 1,
+    "evaluations": 0,
+    "ojt_applications": 0,
+    "ojt_placements": 0,
+    "requirements": 3,
+    "student_requirements": 0,
+    "students": 1,
+    "users": 5
+  },
+  "schema_object_counts": {
+    "columns": 103,
+    "relations": 24,
+    "constraints": 129,
+    "indexes": 24,
+    "views": 0,
+    "routines": 0,
+    "triggers": 0,
+    "extensions": 1,
+    "sequences": 12,
+    "roles": 6,
+    "memberships": 3,
+    "table_privileges": 384,
+    "column_privileges": 412,
+    "sequence_privileges": 144,
+    "function_privileges": 0,
+    "default_acl": 1
+  },
+  "restore_verified": true,
+  "recovery_verified": true,
+  "original_preserved": true,
+  "checksums_rechecked": true,
+  "timeline": [
+    {
+      "event": "source inspection started",
+      "time": "2026-11-06T23:02:25.294405+08:00"
+    },
+    {
+      "event": "original backup and listing completed",
+      "time": "2026-11-06T23:02:31.106318+08:00"
+    },
+    {
+      "event": "restore database provisioned",
+      "time": "2026-11-06T23:02:53.719969+08:00"
+    },
+    {
+      "event": "restore restore completed",
+      "time": "2026-11-06T23:02:54.441579+08:00"
+    },
+    {
+      "event": "recovery fixture inserted",
+      "time": "2026-11-06T23:02:57.497815+08:00"
+    },
+    {
+      "event": "fixture backup and listing completed",
+      "time": "2026-11-06T23:03:00.069381+08:00"
+    },
+    {
+      "event": "snapshot database provisioned",
+      "time": "2026-11-06T23:03:03.641189+08:00"
+    },
+    {
+      "event": "snapshot restore completed",
+      "time": "2026-11-06T23:03:05.175895+08:00"
+    },
+    {
+      "event": "fixture archive independently restored and verified before deletion",
+      "time": "2026-11-06T23:03:08.519514+08:00"
+    },
+    {
+      "event": "late fixture inserted",
+      "time": "2026-11-06T23:03:08.759467+08:00"
+    },
+    {
+      "event": "fixture deleted only in disposable restore database",
+      "time": "2026-11-06T23:03:09.264406+08:00"
+    },
+    {
+      "event": "recovered database provisioned",
+      "time": "2026-11-06T23:03:14.883499+08:00"
+    },
+    {
+      "event": "recovered restore completed",
+      "time": "2026-11-06T23:03:16.392467+08:00"
+    },
+    {
+      "event": "recovery, access, original preservation and archive checksums verified",
+      "time": "2026-11-06T23:03:21.090782+08:00"
+    }
+  ],
+  "restore_operations": [
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g03_restore",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55403 -U lab_admin -T template0 -O grp03_ojt_admin_grp --encoding=UTF8 --locale=C g05_a6_g03_restore",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g03_restore FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g03_restore TO grp03_ojt_dba,grp03_ojt_runtime_grp,grp03_ojt_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "grp03_ojt_dba",
+      "role": "grp03_ojt_admin_grp",
+      "entries": 158,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55403 -U grp03_ojt_dba --role=grp03_ojt_admin_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g03\\restore_objects.list\" -d g05_a6_g03_restore \"D:\\Data Administration\\course-review\\activity6-private\\g03\\original.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g03_snapshot",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55403 -U lab_admin -T template0 -O grp03_ojt_admin_grp --encoding=UTF8 --locale=C g05_a6_g03_snapshot",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g03_snapshot FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g03_snapshot TO grp03_ojt_dba,grp03_ojt_runtime_grp,grp03_ojt_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "grp03_ojt_dba",
+      "role": "grp03_ojt_admin_grp",
+      "entries": 158,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55403 -U grp03_ojt_dba --role=grp03_ojt_admin_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g03\\snapshot_objects.list\" -d g05_a6_g03_snapshot \"D:\\Data Administration\\course-review\\activity6-private\\g03\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g03_recovered",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55403 -U lab_admin -T template0 -O grp03_ojt_admin_grp --encoding=UTF8 --locale=C g05_a6_g03_recovered",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g03_recovered FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g03_recovered TO grp03_ojt_dba,grp03_ojt_runtime_grp,grp03_ojt_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "grp03_ojt_dba",
+      "role": "grp03_ojt_admin_grp",
+      "entries": 158,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55403 -U grp03_ojt_dba --role=grp03_ojt_admin_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g03\\recovered_objects.list\" -d g05_a6_g03_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g03\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ]
+}

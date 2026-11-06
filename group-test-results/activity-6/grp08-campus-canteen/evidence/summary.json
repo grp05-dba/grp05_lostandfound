@@ -1,0 +1,199 @@
+{
+  "group": "08",
+  "source_database": "canteen_g05_activity4",
+  "source_port": "55408",
+  "backup_account": "canteen_admin",
+  "owner_role": "canteen_owner_grp",
+  "targets": {
+    "restore": "g05_a6_g08_restore",
+    "snapshot": "g05_a6_g08_snapshot",
+    "recovered": "g05_a6_g08_recovered"
+  },
+  "original_backup": {
+    "database": "canteen_g05_activity4",
+    "filename": "original.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g08\\original.dump",
+    "started": "2026-11-06T22:51:21.618288+08:00",
+    "completed": "2026-11-06T22:51:23.093968+08:00",
+    "bytes": 31226,
+    "sha256": "daefc61ad1f266fa3961eeef67390cc54a7a432cee4547257764a78cc56f4deb",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55408 -U canteen_admin --role=canteen_owner_grp -Fc -d canteen_g05_activity4 -f \"D:\\Data Administration\\course-review\\activity6-private\\g08\\original.dump\"",
+    "stderr": ""
+  },
+  "fixture_backup": {
+    "database": "g05_a6_g08_restore",
+    "filename": "fixture.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g08\\fixture.dump",
+    "started": "2026-11-06T22:54:45.990383+08:00",
+    "completed": "2026-11-06T22:54:46.498868+08:00",
+    "bytes": 31215,
+    "sha256": "6ef0d3203d6ab06bf4d253f3051f55320fefc0c37f36e5c8154d367a7a175e54",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55408 -U canteen_admin --role=canteen_owner_grp -Fc -d g05_a6_g08_restore -f \"D:\\Data Administration\\course-review\\activity6-private\\g08\\fixture.dump\"",
+    "stderr": ""
+  },
+  "fixture": {
+    "marker": "G05-A6-RECOVER-08",
+    "table": "menu_item",
+    "column": "item_name",
+    "key": "item_id",
+    "sql": "INSERT INTO menu_item(vendor_id,item_name,price,is_available) SELECT min(vendor_id),'G05-A6-RECOVER-08',1,true FROM vendor RETURNING item_id,item_name;"
+  },
+  "late": {
+    "marker": "G05-A6-LATE-08",
+    "table": "menu_item",
+    "column": "item_name",
+    "key": "item_id",
+    "sql": "INSERT INTO menu_item(vendor_id,item_name,price,is_available) SELECT min(vendor_id),'G05-A6-LATE-08',1,true FROM vendor RETURNING item_id,item_name;"
+  },
+  "source_counts": {
+    "student": 3,
+    "vendor": 4,
+    "menu_item": 10,
+    "customer_order": 2,
+    "order_item": 2,
+    "queue_entry": 2,
+    "notification": 3
+  },
+  "schema_object_counts": {
+    "columns": 38,
+    "relations": 14,
+    "constraints": 58,
+    "indexes": 11,
+    "views": 0,
+    "routines": 0,
+    "triggers": 0,
+    "extensions": 1,
+    "sequences": 7,
+    "roles": 6,
+    "memberships": 3,
+    "table_privileges": 224,
+    "column_privileges": 152,
+    "sequence_privileges": 84,
+    "function_privileges": 0,
+    "default_acl": 2
+  },
+  "restore_verified": true,
+  "recovery_verified": true,
+  "original_preserved": true,
+  "checksums_rechecked": true,
+  "timeline": [
+    {
+      "event": "source inspection started",
+      "time": "2026-11-06T22:54:41.708756+08:00"
+    },
+    {
+      "event": "recovery fixture inserted",
+      "time": "2026-11-06T22:54:44.723409+08:00"
+    },
+    {
+      "event": "fixture backup and listing completed",
+      "time": "2026-11-06T22:54:46.499868+08:00"
+    },
+    {
+      "event": "snapshot database provisioned",
+      "time": "2026-11-06T22:54:47.188292+08:00"
+    },
+    {
+      "event": "snapshot restore completed",
+      "time": "2026-11-06T22:54:47.676476+08:00"
+    },
+    {
+      "event": "fixture archive independently restored and verified before deletion",
+      "time": "2026-11-06T22:54:49.093314+08:00"
+    },
+    {
+      "event": "late fixture inserted",
+      "time": "2026-11-06T22:54:49.203657+08:00"
+    },
+    {
+      "event": "fixture deleted only in disposable restore database",
+      "time": "2026-11-06T22:54:49.457552+08:00"
+    },
+    {
+      "event": "recovered database provisioned",
+      "time": "2026-11-06T22:54:50.076735+08:00"
+    },
+    {
+      "event": "recovered restore completed",
+      "time": "2026-11-06T22:54:50.435746+08:00"
+    },
+    {
+      "event": "recovery, access, original preservation and archive checksums verified",
+      "time": "2026-11-06T22:54:53.511236+08:00"
+    }
+  ],
+  "restore_operations": [
+    {
+      "phase": "objects",
+      "account": "canteen_admin",
+      "role": "canteen_owner_grp",
+      "entries": 91,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55408 -U canteen_admin --role=canteen_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g08\\restore_objects.list\" -d g05_a6_g08_restore \"D:\\Data Administration\\course-review\\activity6-private\\g08\\original.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "phase": "login_defaults",
+      "account": "canteen_admin",
+      "role": null,
+      "entries": 1,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55408 -U canteen_admin \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g08\\restore_login_defaults.list\" -d g05_a6_g08_restore \"D:\\Data Administration\\course-review\\activity6-private\\g08\\original.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g08_snapshot",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55408 -U lab_admin -T template0 -O canteen_owner_grp --encoding=UTF8 --locale=C g05_a6_g08_snapshot",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g08_snapshot FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g08_snapshot TO canteen_admin,canteen_app_grp,canteen_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "canteen_admin",
+      "role": "canteen_owner_grp",
+      "entries": 91,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55408 -U canteen_admin --role=canteen_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g08\\snapshot_objects.list\" -d g05_a6_g08_snapshot \"D:\\Data Administration\\course-review\\activity6-private\\g08\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "phase": "login_defaults",
+      "account": "canteen_admin",
+      "role": null,
+      "entries": 1,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55408 -U canteen_admin \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g08\\snapshot_login_defaults.list\" -d g05_a6_g08_snapshot \"D:\\Data Administration\\course-review\\activity6-private\\g08\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g08_recovered",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55408 -U lab_admin -T template0 -O canteen_owner_grp --encoding=UTF8 --locale=C g05_a6_g08_recovered",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g08_recovered FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g08_recovered TO canteen_admin,canteen_app_grp,canteen_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "canteen_admin",
+      "role": "canteen_owner_grp",
+      "entries": 91,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55408 -U canteen_admin --role=canteen_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g08\\recovered_objects.list\" -d g05_a6_g08_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g08\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "phase": "login_defaults",
+      "account": "canteen_admin",
+      "role": null,
+      "entries": 1,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55408 -U canteen_admin \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g08\\recovered_login_defaults.list\" -d g05_a6_g08_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g08\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ]
+}

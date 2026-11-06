@@ -1,0 +1,22 @@
+[
+  {
+    "target": "restore",
+    "method": "Unchanged application database/configuration component via PHP PDO CLI",
+    "result": {
+      "database": "g05_a6_g06_restore",
+      "account": "habalgo_app",
+      "records": 10
+    },
+    "exit_code": 0
+  },
+  {
+    "target": "recovered",
+    "method": "Unchanged application database/configuration component via PHP PDO CLI",
+    "result": {
+      "database": "g05_a6_g06_recovered",
+      "account": "habalgo_app",
+      "records": 10
+    },
+    "exit_code": 0
+  }
+]

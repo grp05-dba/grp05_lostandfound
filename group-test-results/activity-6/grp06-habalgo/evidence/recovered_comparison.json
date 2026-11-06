@@ -1,0 +1,33 @@
+{
+  "label": "recovered",
+  "counts_match": true,
+  "row_fingerprints_match": true,
+  "schema_and_access_checks": {
+    "columns": true,
+    "relations": true,
+    "constraints": true,
+    "indexes": true,
+    "views": true,
+    "routines": true,
+    "triggers": true,
+    "extensions": true,
+    "sequences": true,
+    "roles": true,
+    "memberships": true,
+    "table_privileges": true,
+    "column_privileges": true,
+    "sequence_privileges": true,
+    "function_privileges": true,
+    "default_acl": true
+  },
+  "counts": {
+    "booking": 0,
+    "customer": 0,
+    "driver": 10,
+    "driver_vehicle": 0,
+    "location": 0,
+    "payment": 0,
+    "rating_feedback": 0,
+    "vehicle": 1
+  }
+}

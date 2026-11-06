@@ -1,0 +1,18 @@
+[
+  {
+    "table": "order_ticket",
+    "column": "payment_method",
+    "sql": "BEGIN; UPDATE public.order_ticket SET payment_method='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"order_ticket\" violates check constraint \"chk_order_ticket_payment\"\nSCHEMA NAME:  public\nTABLE NAME:  order_ticket\nCONSTRAINT NAME:  chk_order_ticket_payment\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "staff",
+    "column": "role",
+    "sql": "BEGIN; UPDATE public.staff SET role='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"staff\" violates check constraint \"chk_staff_role\"\nSCHEMA NAME:  public\nTABLE NAME:  staff\nCONSTRAINT NAME:  chk_staff_role\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  }
+]

@@ -1,0 +1,33 @@
+{
+  "label": "recovered",
+  "counts_match": true,
+  "row_fingerprints_match": true,
+  "schema_and_access_checks": {
+    "columns": true,
+    "relations": true,
+    "constraints": true,
+    "indexes": true,
+    "views": true,
+    "routines": true,
+    "triggers": true,
+    "extensions": true,
+    "sequences": true,
+    "roles": true,
+    "memberships": true,
+    "table_privileges": true,
+    "column_privileges": true,
+    "sequence_privileges": true,
+    "function_privileges": true,
+    "default_acl": true
+  },
+  "counts": {
+    "property": 3,
+    "room": 6,
+    "tenant": 4,
+    "lease": 4,
+    "payment": 6,
+    "utility_bill": 4,
+    "app_user": 3,
+    "schema_migrations": 1
+  }
+}
