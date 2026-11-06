@@ -1,0 +1,9 @@
+Captured: 2026-11-06T09:40:12.382147+00:00
+OS reader: current workspace user (me); no sudo, database superuser, or filesystem privilege change.
+Command: journalctl -u postgresql --since 2026-11-06 00:00:00 --until 2026-11-06 17:41:00 --no-pager -o json
+Exit status: 0
+Readable service journal entries in window: 1430
+Entries mentioning project database or login: 96
+Raw service messages were not copied to avoid unrelated-project data or credentials.
+/var/log/postgresql: FileNotFoundError; errno=2
+/var/lib/postgres/data/log: PermissionError; errno=13

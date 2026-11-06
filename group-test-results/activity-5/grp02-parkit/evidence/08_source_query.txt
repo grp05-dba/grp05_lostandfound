@@ -1,0 +1,17 @@
+Repository: https://github.com/HelloP0/PARK-IT-DATABASE-MANAGEMENT-SYSTEM
+Commit: d369a457ce2dc88a024428513360f0ad76473f43
+Path: park-it/modules/monitoring/api_status.php
+Git blob SHA: 27d62b240308b9df5ddebf6906ea8830e183d977
+Retrieved: 2026-11-06 using connected GitHub read tools.
+Excerpt: active parked vehicles query, unchanged PHP source:
+
+    $stmtActive = $pdo->query("
+        SELECT t.transaction_id, t.entry_time, t.status,
+               v.license_plate, v.vehicle_type,
+               z.zone_name
+        FROM public.\"transaction\" t
+        JOIN public.vehicle v ON t.vehicle_id = v.vehicle_id
+        JOIN public.parking_zone z ON t.zone_id = z.zone_id
+        WHERE t.status = 'Active'
+        ORDER BY t.entry_time DESC
+    ");

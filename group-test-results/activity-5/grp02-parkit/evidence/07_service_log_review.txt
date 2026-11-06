@@ -1,0 +1,47 @@
+Captured: 2026-11-06T17:41:21+08:00
+Reader: existing workspace OS user me; no sudo or database impersonation.
+Command: journalctl -u postgresql --since 2026-11-06 00:00:00 --until 2026-11-06T17:41:21+08:00 --no-pager -o json
+Exit status: 0
+Readable service entries: 1432
+
+Connection authorizations (exact database/account match; not application_name):
+grp03_ojt_app | grp_parkitdb | 1
+grp03_ojt_auditor | grp_parkitdb | 1
+grp03_ojt_dba | grp_parkitdb | 1
+me | grp_parkitdb | 1
+park_it_app | grp_parkitdb | 6
+park_it_app | postgres | 1
+park_it_auditor | grp_parkitdb | 5
+park_it_auditor | postgres | 1
+park_it_dba | grp_parkitdb | 6
+park_it_dba | postgres | 1
+postgres | grp_parkitdb | 4
+
+Project session diagnostics (UTC timestamps; PID correlated with preceding authorization):
+2026-11-05T16:53:20.706409+00:00 | 101674 | postgres | grp_parkitdb | ERROR | relation "vehicle" does not exist
+2026-11-05T16:53:38.167452+00:00 | 101674 | postgres | grp_parkitdb | ERROR | relation "vehicle" does not exist
+2026-11-05T18:06:19.790739+00:00 | 101674 | postgres | grp_parkitdb | FATAL | terminating connection due to administrator command
+2026-11-05T18:06:19.801262+00:00 | 101553 | postgres | grp_parkitdb | FATAL | terminating connection due to administrator command
+2026-11-05T18:06:19.815305+00:00 | 102055 | postgres | grp_parkitdb | FATAL | terminating connection due to administrator command
+2026-11-06T08:21:11.432386+00:00 | 19694 | me | grp_parkitdb | FATAL | role "me" does not exist
+2026-11-06T08:23:15.467882+00:00 | 20188 | park_it_app | grp_parkitdb | ERROR | permission denied for table payment
+2026-11-06T08:23:15.468945+00:00 | 20188 | park_it_app | grp_parkitdb | ERROR | permission denied for table staff_user
+2026-11-06T08:23:15.470655+00:00 | 20188 | park_it_app | grp_parkitdb | ERROR | permission denied to create database
+2026-11-06T08:23:15.471587+00:00 | 20188 | park_it_app | grp_parkitdb | ERROR | permission denied to create role
+2026-11-06T08:23:15.473944+00:00 | 20188 | park_it_app | grp_parkitdb | ERROR | permission denied for schema public at character 14
+2026-11-06T08:23:16.500119+00:00 | 20190 | park_it_auditor | grp_parkitdb | ERROR | permission denied for table staff_user
+2026-11-06T08:23:16.500119+00:00 | 20190 | park_it_auditor | grp_parkitdb | ERROR | permission denied for table vehicle
+2026-11-06T08:23:16.500119+00:00 | 20190 | park_it_auditor | grp_parkitdb | ERROR | permission denied for table vehicle
+2026-11-06T08:23:16.501494+00:00 | 20190 | park_it_auditor | grp_parkitdb | ERROR | permission denied for table vehicle
+2026-11-06T08:23:16.501494+00:00 | 20190 | park_it_auditor | grp_parkitdb | ERROR | permission denied to create database
+2026-11-06T08:23:17.396023+00:00 | 20197 | park_it_dba | grp_parkitdb | ERROR | permission denied to create database
+2026-11-06T08:23:17.397194+00:00 | 20197 | park_it_dba | grp_parkitdb | ERROR | permission denied to create role
+2026-11-06T09:38:01.080697+00:00 | 34835 | park_it_dba | grp_parkitdb | ERROR | unrecognized privilege type: "MAINTAIN"
+2026-11-06T09:39:33.204829+00:00 | 35671 | park_it_dba | grp_parkitdb | ERROR | permission denied for function pg_current_logfile
+2026-11-06T09:39:33.205823+00:00 | 35671 | park_it_dba | grp_parkitdb | ERROR | permission denied for function pg_ls_logdir
+
+Severity counts: {'ERROR': 17, 'FATAL': 4}
+No raw SQL, DETAIL/HINT, password values, or other projects' session diagnostics copied.
+Limitations: current user's readable service window only; PID correlation needs an authorization
+inside the window. Pre-authorization failures, rotated history, other sinks and unlogged durations
+are not covered. No observed diagnostic is not proof of no incident.

@@ -1,0 +1,34 @@
+-- Run as park_it_auditor in a new session after maintenance statistics are published.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database();
+         captured_at          |  session_user   |  current_user   | current_database
+------------------------------+-----------------+-----------------+------------------
+ 2026-11-06 17:39:55.12661+08 | park_it_auditor | park_it_auditor | grp_parkitdb
+(1 row)
+
+SELECT relname,n_live_tup,n_dead_tup,n_mod_since_analyze,last_vacuum,last_analyze,
+       vacuum_count,analyze_count FROM pg_stat_user_tables ORDER BY relname;
+   relname    | n_live_tup | n_dead_tup | n_mod_since_analyze |          last_vacuum          |         last_analyze          | vacuum_count | analyze_count
+--------------+------------+------------+---------------------+-------------------------------+-------------------------------+--------------+---------------
+ parking_zone |          0 |          0 |                   0 | 2026-11-06 17:39:50.184795+08 | 2026-11-06 17:39:50.184984+08 |            1 |             2
+ payment      |          0 |          0 |                   0 | 2026-11-06 17:39:50.185585+08 | 2026-11-06 17:39:50.185862+08 |            1 |             2
+ staff_user   |          0 |          0 |                   0 | 2026-11-06 17:39:50.186297+08 | 2026-11-06 17:39:50.186495+08 |            1 |             2
+ transaction  |          0 |          0 |                   0 | 2026-11-06 17:39:50.186895+08 | 2026-11-06 17:39:50.187098+08 |            1 |             2
+ vehicle      |          0 |          0 |                   0 | 2026-11-06 17:39:50.189979+08 | 2026-11-06 17:39:50.190895+08 |            1 |             2
+(5 rows)
+
+SELECT 'parking_zone' AS table_name,count(*) AS rows FROM public.parking_zone
+UNION ALL SELECT 'payment',count(*) FROM public.payment
+UNION ALL SELECT 'staff_user',count(user_id) FROM public.staff_user
+UNION ALL SELECT 'transaction',count(*) FROM public."transaction"
+UNION ALL SELECT 'vehicle',count(*) FROM public.vehicle ORDER BY table_name;
+  table_name  | rows
+--------------+------
+ parking_zone |    0
+ payment      |    0
+ staff_user   |    0
+ transaction  |    0
+ vehicle      |    0
+(5 rows)

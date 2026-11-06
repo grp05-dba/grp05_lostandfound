@@ -1,0 +1,333 @@
+-- Run as park_it_auditor. Read-only inspection; do not select staff passwords.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at, session_user, current_user, current_database(), version();
+          captured_at          |  session_user   |  current_user   | current_database |                                        version
+-------------------------------+-----------------+-----------------+------------------+---------------------------------------------------------------------------------------
+ 2026-11-06 17:39:31.743306+08 | park_it_auditor | park_it_auditor | grp_parkitdb     | PostgreSQL 18.6 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 16.2.1 20260810, 64-bit
+(1 row)
+
+SELECT pg_size_pretty(pg_database_size(current_database())) AS database_size,
+       pg_database_size(current_database()) AS database_bytes;
+ database_size | database_bytes
+---------------+----------------
+ 7990 kB       |        8181439
+(1 row)
+
+SELECT c.relkind, count(*) AS object_count
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+WHERE n.nspname='public' GROUP BY c.relkind ORDER BY c.relkind;
+ relkind | object_count
+---------+--------------
+ S       |            5
+ i       |            9
+ r       |            5
+(3 rows)
+
+SELECT tablename, tableowner FROM pg_tables WHERE schemaname='public' ORDER BY tablename;
+  tablename   | tableowner
+--------------+------------
+ parking_zone | postgres
+ payment      | postgres
+ staff_user   | postgres
+ transaction  | postgres
+ vehicle      | postgres
+(5 rows)
+
+SELECT table_name,column_name,data_type,is_nullable,column_default
+FROM information_schema.columns WHERE table_schema='public'
+ORDER BY table_name,ordinal_position;
+  table_name  |     column_name      |          data_type          | is_nullable |                   column_default
+--------------+----------------------+-----------------------------+-------------+-----------------------------------------------------
+ parking_zone | zone_id              | integer                     | NO          | nextval('parking_zone_zone_id_seq'::regclass)
+ parking_zone | zone_name            | character varying           | NO          |
+ parking_zone | max_capacity         | integer                     | NO          |
+ parking_zone | current_active_count | integer                     | NO          | 0
+ payment      | payment_id           | integer                     | NO          | nextval('payment_payment_id_seq'::regclass)
+ payment      | transaction_id       | integer                     | NO          |
+ payment      | amount               | numeric                     | NO          |
+ payment      | payment_method       | character varying           | NO          |
+ payment      | payment_time         | timestamp without time zone | NO          |
+ staff_user   | user_id              | integer                     | NO          | nextval('staff_user_user_id_seq'::regclass)
+ staff_user   | username             | character varying           | NO          |
+ staff_user   | role                 | character varying           | NO          |
+ transaction  | transaction_id       | integer                     | NO          | nextval('transaction_transaction_id_seq'::regclass)
+ transaction  | vehicle_id           | integer                     | NO          |
+ transaction  | zone_id              | integer                     | NO          |
+ transaction  | entry_time           | timestamp without time zone | NO          |
+ transaction  | exit_time            | timestamp without time zone | YES         |
+ transaction  | status               | character varying           | NO          | 'Active'::character varying
+ transaction  | is_lost_ticket       | boolean                     | NO          | false
+ vehicle      | vehicle_id           | integer                     | NO          | nextval('vehicle_vehicle_id_seq'::regclass)
+ vehicle      | license_plate        | character varying           | NO          |
+ vehicle      | vehicle_type         | character varying           | NO          |
+(22 rows)
+
+SELECT conrelid::regclass AS table_name,conname,pg_get_constraintdef(oid) AS definition
+FROM pg_constraint WHERE connamespace='public'::regnamespace ORDER BY conrelid::regclass::text,conname;
+  table_name  |                  conname                   |                             definition
+--------------+--------------------------------------------+---------------------------------------------------------------------
+ parking_zone | parking_zone_check                         | CHECK ((current_active_count <= max_capacity))
+ parking_zone | parking_zone_current_active_count_not_null | NOT NULL current_active_count
+ parking_zone | parking_zone_max_capacity_not_null         | NOT NULL max_capacity
+ parking_zone | parking_zone_pkey                          | PRIMARY KEY (zone_id)
+ parking_zone | parking_zone_zone_id_not_null              | NOT NULL zone_id
+ parking_zone | parking_zone_zone_name_key                 | UNIQUE (zone_name)
+ parking_zone | parking_zone_zone_name_not_null            | NOT NULL zone_name
+ payment      | payment_amount_check                       | CHECK ((amount >= (0)::numeric))
+ payment      | payment_amount_not_null                    | NOT NULL amount
+ payment      | payment_payment_id_not_null                | NOT NULL payment_id
+ payment      | payment_payment_method_not_null            | NOT NULL payment_method
+ payment      | payment_payment_time_not_null              | NOT NULL payment_time
+ payment      | payment_pkey                               | PRIMARY KEY (payment_id)
+ payment      | payment_transaction_id_fkey                | FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id)
+ payment      | payment_transaction_id_key                 | UNIQUE (transaction_id)
+ payment      | payment_transaction_id_not_null            | NOT NULL transaction_id
+ staff_user   | staff_user_password_hash_not_null          | NOT NULL password_hash
+ staff_user   | staff_user_pkey                            | PRIMARY KEY (user_id)
+ staff_user   | staff_user_role_not_null                   | NOT NULL role
+ staff_user   | staff_user_user_id_not_null                | NOT NULL user_id
+ staff_user   | staff_user_username_key                    | UNIQUE (username)
+ staff_user   | staff_user_username_not_null               | NOT NULL username
+ transaction  | transaction_entry_time_not_null            | NOT NULL entry_time
+ transaction  | transaction_is_lost_ticket_not_null        | NOT NULL is_lost_ticket
+ transaction  | transaction_pkey                           | PRIMARY KEY (transaction_id)
+ transaction  | transaction_status_not_null                | NOT NULL status
+ transaction  | transaction_transaction_id_not_null        | NOT NULL transaction_id
+ transaction  | transaction_vehicle_id_fkey                | FOREIGN KEY (vehicle_id) REFERENCES vehicle(vehicle_id)
+ transaction  | transaction_vehicle_id_not_null            | NOT NULL vehicle_id
+ transaction  | transaction_zone_id_fkey                   | FOREIGN KEY (zone_id) REFERENCES parking_zone(zone_id)
+ transaction  | transaction_zone_id_not_null               | NOT NULL zone_id
+ vehicle      | vehicle_license_plate_key                  | UNIQUE (license_plate)
+ vehicle      | vehicle_license_plate_not_null             | NOT NULL license_plate
+ vehicle      | vehicle_pkey                               | PRIMARY KEY (vehicle_id)
+ vehicle      | vehicle_vehicle_id_not_null                | NOT NULL vehicle_id
+ vehicle      | vehicle_vehicle_type_not_null              | NOT NULL vehicle_type
+(36 rows)
+
+SELECT 'parking_zone' AS table_name,count(*) AS rows FROM public.parking_zone
+UNION ALL SELECT 'payment',count(*) FROM public.payment
+UNION ALL SELECT 'staff_user',count(user_id) FROM public.staff_user
+UNION ALL SELECT 'transaction',count(*) FROM public."transaction"
+UNION ALL SELECT 'vehicle',count(*) FROM public.vehicle ORDER BY table_name;
+  table_name  | rows
+--------------+------
+ parking_zone |    0
+ payment      |    0
+ staff_user   |    0
+ transaction  |    0
+ vehicle      |    0
+(5 rows)
+
+SELECT datname,numbackends,xact_commit,xact_rollback,deadlocks,conflicts,
+       sessions,sessions_abandoned,sessions_fatal,sessions_killed,stats_reset
+FROM pg_stat_database WHERE datname=current_database();
+   datname    | numbackends | xact_commit | xact_rollback | deadlocks | conflicts | sessions | sessions_abandoned | sessions_fatal | sessions_killed | stats_reset
+--------------+-------------+-------------+---------------+-----------+-----------+----------+--------------------+----------------+-----------------+-------------
+ grp_parkitdb |           1 |        1348 |            18 |         0 |         0 |       20 |                  0 |              0 |               3 |
+(1 row)
+
+-- Other users' query text may be hidden. Raw SQL from other sessions is deliberately excluded
+-- because it may include credentials or personal data. Capture own SQL and durations where visible.
+SELECT pid,usename,application_name,state,wait_event_type,wait_event,
+       query_start,CASE WHEN state='active' THEN clock_timestamp()-query_start END AS active_duration,
+       CASE WHEN usename=current_user THEN query ELSE '[other-account SQL omitted; visibility may be restricted]' END AS query
+FROM pg_stat_activity WHERE datname=current_database() ORDER BY query_start NULLS LAST;
+  pid  |     usename     | application_name | state  | wait_event_type | wait_event |          query_start          | active_duration |                                                             query
+-------+-----------------+------------------+--------+-----------------+------------+-------------------------------+-----------------+--------------------------------------------------------------------------------------------------------------------------------
+ 35642 | park_it_auditor | psql             | active |                 |            | 2026-11-06 17:39:31.797084+08 | 00:00:00.002812 | SELECT pid,usename,application_name,state,wait_event_type,wait_event,                                                         +
+       |                 |                  |        |                 |            |                               |                 |        query_start,CASE WHEN state='active' THEN clock_timestamp()-query_start END AS active_duration,                        +
+       |                 |                  |        |                 |            |                               |                 |        CASE WHEN usename=current_user THEN query ELSE '[other-account SQL omitted; visibility may be restricted]' END AS query+
+       |                 |                  |        |                 |            |                               |                 | FROM pg_stat_activity WHERE datname=current_database() ORDER BY query_start NULLS LAST;
+(1 row)
+
+SELECT pid,usename,state,pg_blocking_pids(pid) AS blocking_pids
+FROM pg_stat_activity WHERE datname=current_database();
+  pid  |     usename     | state  | blocking_pids
+-------+-----------------+--------+---------------
+ 35642 | park_it_auditor | active | {}
+(1 row)
+
+SELECT rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolinherit,rolbypassrls,rolreplication
+FROM pg_roles WHERE rolname LIKE 'park_it_%' ORDER BY rolname;
+       rolname        | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolinherit | rolbypassrls | rolreplication
+----------------------+-------------+----------+-------------+---------------+------------+--------------+----------------
+ park_it_admin_grp    | f           | f        | f           | f             | t          | f            | f
+ park_it_app          | t           | f        | f           | f             | t          | f            | f
+ park_it_auditor      | t           | f        | f           | f             | t          | f            | f
+ park_it_dba          | t           | f        | f           | f             | t          | f            | f
+ park_it_readonly_grp | f           | f        | f           | f             | t          | f            | f
+ park_it_runtime_grp  | f           | f        | f           | f             | t          | f            | f
+(6 rows)
+
+SELECT member.rolname AS login,parent.rolname AS group_role,m.admin_option,m.inherit_option,m.set_option
+FROM pg_auth_members m JOIN pg_roles member ON member.oid=m.member
+JOIN pg_roles parent ON parent.oid=m.roleid
+WHERE member.rolname LIKE 'park_it_%' ORDER BY login,group_role;
+      login      |      group_role      | admin_option | inherit_option | set_option
+-----------------+----------------------+--------------+----------------+------------
+ park_it_app     | park_it_runtime_grp  | f            | t              | t
+ park_it_auditor | park_it_readonly_grp | f            | t              | t
+ park_it_dba     | park_it_admin_grp    | f            | t              | t
+(3 rows)
+
+SELECT datname,pg_get_userbyid(datdba) AS owner,datacl
+FROM pg_database WHERE datname IN (current_database(),'postgres') ORDER BY datname;
+   datname    |  owner   |                                                               datacl
+--------------+----------+------------------------------------------------------------------------------------------------------------------------------------
+ grp_parkitdb | postgres | {=Tc/postgres,postgres=CTc/postgres,park_it_admin_grp=CTc/postgres,park_it_runtime_grp=c/postgres,park_it_readonly_grp=c/postgres}
+ postgres     | postgres |
+(2 rows)
+
+SELECT r.rolname,c.relname,p.privilege,
+       has_table_privilege(r.oid,c.oid,p.privilege) AS allowed
+FROM pg_roles r CROSS JOIN pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+CROSS JOIN (VALUES ('SELECT'),('INSERT'),('UPDATE'),('DELETE'),('MAINTAIN')) p(privilege)
+WHERE r.rolname IN ('park_it_app','park_it_auditor','park_it_dba')
+AND n.nspname='public' AND c.relkind='r' ORDER BY r.rolname,c.relname,p.privilege;
+     rolname     |   relname    | privilege | allowed
+-----------------+--------------+-----------+---------
+ park_it_app     | parking_zone | DELETE    | f
+ park_it_app     | parking_zone | INSERT    | f
+ park_it_app     | parking_zone | MAINTAIN  | f
+ park_it_app     | parking_zone | SELECT    | t
+ park_it_app     | parking_zone | UPDATE    | t
+ park_it_app     | payment      | DELETE    | f
+ park_it_app     | payment      | INSERT    | t
+ park_it_app     | payment      | MAINTAIN  | f
+ park_it_app     | payment      | SELECT    | t
+ park_it_app     | payment      | UPDATE    | t
+ park_it_app     | staff_user   | DELETE    | f
+ park_it_app     | staff_user   | INSERT    | f
+ park_it_app     | staff_user   | MAINTAIN  | f
+ park_it_app     | staff_user   | SELECT    | t
+ park_it_app     | staff_user   | UPDATE    | f
+ park_it_app     | transaction  | DELETE    | f
+ park_it_app     | transaction  | INSERT    | t
+ park_it_app     | transaction  | MAINTAIN  | f
+ park_it_app     | transaction  | SELECT    | t
+ park_it_app     | transaction  | UPDATE    | t
+ park_it_app     | vehicle      | DELETE    | t
+ park_it_app     | vehicle      | INSERT    | t
+ park_it_app     | vehicle      | MAINTAIN  | f
+ park_it_app     | vehicle      | SELECT    | t
+ park_it_app     | vehicle      | UPDATE    | t
+ park_it_auditor | parking_zone | DELETE    | f
+ park_it_auditor | parking_zone | INSERT    | f
+ park_it_auditor | parking_zone | MAINTAIN  | f
+ park_it_auditor | parking_zone | SELECT    | t
+ park_it_auditor | parking_zone | UPDATE    | f
+ park_it_auditor | payment      | DELETE    | f
+ park_it_auditor | payment      | INSERT    | f
+ park_it_auditor | payment      | MAINTAIN  | f
+ park_it_auditor | payment      | SELECT    | t
+ park_it_auditor | payment      | UPDATE    | f
+ park_it_auditor | staff_user   | DELETE    | f
+ park_it_auditor | staff_user   | INSERT    | f
+ park_it_auditor | staff_user   | MAINTAIN  | f
+ park_it_auditor | staff_user   | SELECT    | f
+ park_it_auditor | staff_user   | UPDATE    | f
+ park_it_auditor | transaction  | DELETE    | f
+ park_it_auditor | transaction  | INSERT    | f
+ park_it_auditor | transaction  | MAINTAIN  | f
+ park_it_auditor | transaction  | SELECT    | t
+ park_it_auditor | transaction  | UPDATE    | f
+ park_it_auditor | vehicle      | DELETE    | f
+ park_it_auditor | vehicle      | INSERT    | f
+ park_it_auditor | vehicle      | MAINTAIN  | f
+ park_it_auditor | vehicle      | SELECT    | t
+ park_it_auditor | vehicle      | UPDATE    | f
+ park_it_dba     | parking_zone | DELETE    | t
+ park_it_dba     | parking_zone | INSERT    | t
+ park_it_dba     | parking_zone | MAINTAIN  | t
+ park_it_dba     | parking_zone | SELECT    | t
+ park_it_dba     | parking_zone | UPDATE    | t
+ park_it_dba     | payment      | DELETE    | t
+ park_it_dba     | payment      | INSERT    | t
+ park_it_dba     | payment      | MAINTAIN  | t
+ park_it_dba     | payment      | SELECT    | t
+ park_it_dba     | payment      | UPDATE    | t
+ park_it_dba     | staff_user   | DELETE    | t
+ park_it_dba     | staff_user   | INSERT    | t
+ park_it_dba     | staff_user   | MAINTAIN  | t
+ park_it_dba     | staff_user   | SELECT    | t
+ park_it_dba     | staff_user   | UPDATE    | t
+ park_it_dba     | transaction  | DELETE    | t
+ park_it_dba     | transaction  | INSERT    | t
+ park_it_dba     | transaction  | MAINTAIN  | t
+ park_it_dba     | transaction  | SELECT    | t
+ park_it_dba     | transaction  | UPDATE    | t
+ park_it_dba     | vehicle      | DELETE    | t
+ park_it_dba     | vehicle      | INSERT    | t
+ park_it_dba     | vehicle      | MAINTAIN  | t
+ park_it_dba     | vehicle      | SELECT    | t
+ park_it_dba     | vehicle      | UPDATE    | t
+(75 rows)
+
+SELECT has_column_privilege('park_it_auditor','public.staff_user','user_id','SELECT') AS auditor_id,
+       has_column_privilege('park_it_auditor','public.staff_user','username','SELECT') AS auditor_username,
+       has_column_privilege('park_it_auditor','public.staff_user','role','SELECT') AS auditor_role,
+       has_column_privilege('park_it_auditor','public.staff_user','password_hash','SELECT') AS auditor_password_hash;
+ auditor_id | auditor_username | auditor_role | auditor_password_hash
+------------+------------------+--------------+-----------------------
+ t          | t                | t            | f
+(1 row)
+
+SELECT r.rolname,has_database_privilege(r.oid,d.oid,'CONNECT') AS can_connect_to_postgres
+FROM pg_roles r CROSS JOIN pg_database d
+WHERE r.rolname IN ('park_it_app','park_it_auditor','park_it_dba') AND d.datname='postgres';
+     rolname     | can_connect_to_postgres
+-----------------+-------------------------
+ park_it_app     | t
+ park_it_auditor | t
+ park_it_dba     | t
+(3 rows)
+
+SELECT relname,n_live_tup,n_dead_tup,n_mod_since_analyze,last_vacuum,last_autovacuum,
+       last_analyze,last_autoanalyze,vacuum_count,analyze_count
+FROM pg_stat_user_tables ORDER BY relname;
+   relname    | n_live_tup | n_dead_tup | n_mod_since_analyze | last_vacuum | last_autovacuum | last_analyze | last_autoanalyze | vacuum_count | analyze_count
+--------------+------------+------------+---------------------+-------------+-----------------+--------------+------------------+--------------+---------------
+ parking_zone |          0 |          0 |                   0 |             |                 |              |                  |            0 |             0
+ payment      |          0 |          0 |                   0 |             |                 |              |                  |            0 |             0
+ staff_user   |          0 |          0 |                   0 |             |                 |              |                  |            0 |             0
+ transaction  |          0 |          0 |                   0 |             |                 |              |                  |            0 |             0
+ vehicle      |          0 |          2 |                   0 |             |                 |              |                  |            0 |             0
+(5 rows)
+
+SELECT schemaname,tablename,indexname,indexdef FROM pg_indexes
+WHERE schemaname='public' ORDER BY tablename,indexname;
+ schemaname |  tablename   |         indexname          |                                           indexdef
+------------+--------------+----------------------------+-----------------------------------------------------------------------------------------------
+ public     | parking_zone | parking_zone_pkey          | CREATE UNIQUE INDEX parking_zone_pkey ON public.parking_zone USING btree (zone_id)
+ public     | parking_zone | parking_zone_zone_name_key | CREATE UNIQUE INDEX parking_zone_zone_name_key ON public.parking_zone USING btree (zone_name)
+ public     | payment      | payment_pkey               | CREATE UNIQUE INDEX payment_pkey ON public.payment USING btree (payment_id)
+ public     | payment      | payment_transaction_id_key | CREATE UNIQUE INDEX payment_transaction_id_key ON public.payment USING btree (transaction_id)
+ public     | staff_user   | staff_user_pkey            | CREATE UNIQUE INDEX staff_user_pkey ON public.staff_user USING btree (user_id)
+ public     | staff_user   | staff_user_username_key    | CREATE UNIQUE INDEX staff_user_username_key ON public.staff_user USING btree (username)
+ public     | transaction  | transaction_pkey           | CREATE UNIQUE INDEX transaction_pkey ON public.transaction USING btree (transaction_id)
+ public     | vehicle      | vehicle_license_plate_key  | CREATE UNIQUE INDEX vehicle_license_plate_key ON public.vehicle USING btree (license_plate)
+ public     | vehicle      | vehicle_pkey               | CREATE UNIQUE INDEX vehicle_pkey ON public.vehicle USING btree (vehicle_id)
+(9 rows)
+
+SELECT c.relname,c.reltuples,c.relpages,c.reloptions,age(c.relfrozenxid) AS xid_age
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+WHERE n.nspname='public' AND c.relkind='r' ORDER BY c.relname;
+   relname    | reltuples | relpages | reloptions | xid_age
+--------------+-----------+----------+------------+---------
+ parking_zone |        -1 |        0 |            |      46
+ payment      |        -1 |        0 |            |      46
+ staff_user   |        -1 |        0 |            |      46
+ transaction  |        -1 |        0 |            |      46
+ vehicle      |        -1 |        0 |            |      46
+(5 rows)
+
+SELECT name,setting,unit FROM pg_settings
+WHERE name IN ('autovacuum','track_activities','track_counts') ORDER BY name;
+       name       | setting | unit
+------------------+---------+------
+ autovacuum       | on      |
+ track_activities | on      |
+ track_counts     | on      |
+(3 rows)

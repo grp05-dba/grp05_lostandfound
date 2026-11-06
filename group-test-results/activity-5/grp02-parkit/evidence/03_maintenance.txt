@@ -1,0 +1,189 @@
+-- Run directly as park_it_dba against the existing local Activity 4 database.
+-- PostgreSQL 18 table ALL includes MAINTAIN; verify rather than changing grants.
+-- ANALYZE refreshes planner statistics. VACUUM reclaims reusable space and updates visibility.
+-- Five small local tables: ordinary VACUUM is proportionate; no FULL, DDL, grants or seed writes.
+-- Never run with psql --single-transaction: VACUUM must be standalone.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database();
+          captured_at          | session_user | current_user | current_database
+-------------------------------+--------------+--------------+------------------
+ 2026-11-06 17:39:50.176529+08 | park_it_dba  | park_it_dba  | grp_parkitdb
+(1 row)
+
+SET lock_timeout='3s';
+SET
+SET statement_timeout='30s';
+SET
+SELECT c.relname,pg_get_userbyid(c.relowner) AS owner,
+       has_table_privilege(current_user,c.oid,'MAINTAIN') AS can_maintain
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+WHERE n.nspname='public' AND c.relkind='r' ORDER BY c.relname;
+   relname    |  owner   | can_maintain
+--------------+----------+--------------
+ parking_zone | postgres | t
+ payment      | postgres | t
+ staff_user   | postgres | t
+ transaction  | postgres | t
+ vehicle      | postgres | t
+(5 rows)
+
+ANALYZE VERBOSE public.parking_zone;
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:15: INFO:  analyzing "public.parking_zone"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:15: INFO:  "parking_zone": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:15: INFO:  finished analyzing table "grp_parkitdb.public.parking_zone"
+avg read rate: 0.000 MB/s, avg write rate: 3.906 MB/s
+buffer usage: 192 hits, 0 reads, 1 dirtied
+WAL usage: 1 records, 1 full page images, 7323 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.payment;
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:16: INFO:  analyzing "public.payment"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:16: INFO:  "payment": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:16: INFO:  finished analyzing table "grp_parkitdb.public.payment"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 187 hits, 0 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 343 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.staff_user;
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:17: INFO:  analyzing "public.staff_user"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:17: INFO:  "staff_user": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:17: INFO:  finished analyzing table "grp_parkitdb.public.staff_user"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 63 hits, 0 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 327 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public."transaction";
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:18: INFO:  analyzing "public.transaction"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:18: INFO:  "transaction": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:18: INFO:  finished analyzing table "grp_parkitdb.public.transaction"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 91 hits, 0 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 343 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.vehicle;
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:19: INFO:  analyzing "public.vehicle"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:19: INFO:  "vehicle": scanned 1 of 1 pages, containing 0 live rows and 2 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:19: INFO:  finished analyzing table "grp_parkitdb.public.vehicle"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 67 hits, 0 reads, 0 dirtied
+WAL usage: 3 records, 0 full page images, 859 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+VACUUM (VERBOSE, ANALYZE) public.parking_zone;
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:20: INFO:  vacuuming "grp_parkitdb.public.parking_zone"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:20: INFO:  finished vacuuming "grp_parkitdb.public.parking_zone": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1194, which was 0 XIDs old when operation ended
+new relfrozenxid: 1194, which is 46 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 21 hits, 0 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 343 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:20: INFO:  analyzing "public.parking_zone"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:20: INFO:  "parking_zone": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:20: INFO:  finished analyzing table "grp_parkitdb.public.parking_zone"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 13 hits, 0 reads, 0 dirtied
+WAL usage: 0 records, 0 full page images, 0 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.payment;
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:21: INFO:  vacuuming "grp_parkitdb.public.payment"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:21: INFO:  finished vacuuming "grp_parkitdb.public.payment": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1194, which was 0 XIDs old when operation ended
+new relfrozenxid: 1194, which is 46 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 25 hits, 0 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 343 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:21: INFO:  analyzing "public.payment"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:21: INFO:  "payment": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:21: INFO:  finished analyzing table "grp_parkitdb.public.payment"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 14 hits, 0 reads, 0 dirtied
+WAL usage: 0 records, 0 full page images, 0 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.staff_user;
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:22: INFO:  vacuuming "grp_parkitdb.public.staff_user"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:22: INFO:  finished vacuuming "grp_parkitdb.public.staff_user": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1194, which was 0 XIDs old when operation ended
+new relfrozenxid: 1194, which is 46 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 23 hits, 0 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 327 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:22: INFO:  analyzing "public.staff_user"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:22: INFO:  "staff_user": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:22: INFO:  finished analyzing table "grp_parkitdb.public.staff_user"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 13 hits, 0 reads, 0 dirtied
+WAL usage: 0 records, 0 full page images, 0 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public."transaction";
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:23: INFO:  vacuuming "grp_parkitdb.public.transaction"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:23: INFO:  finished vacuuming "grp_parkitdb.public.transaction": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1194, which was 0 XIDs old when operation ended
+new relfrozenxid: 1194, which is 46 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 26 hits, 0 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 343 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:23: INFO:  analyzing "public.transaction"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:23: INFO:  "transaction": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:23: INFO:  finished analyzing table "grp_parkitdb.public.transaction"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 10 hits, 0 reads, 0 dirtied
+WAL usage: 0 records, 0 full page images, 0 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.vehicle;
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:24: INFO:  vacuuming "grp_parkitdb.public.vehicle"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:24: INFO:  table "vehicle": truncated 1 to 0 pages
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:24: INFO:  finished vacuuming "grp_parkitdb.public.vehicle": index scans: 1
+pages: 1 removed, 0 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 2 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1194, which was 1 XIDs old when operation ended
+new relfrozenxid: 1194, which is 46 XIDs ahead of previous value
+frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+visibility map: 1 pages set all-visible, 1 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 2 dead item identifiers removed
+index "vehicle_license_plate_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "vehicle_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 20.889 MB/s
+buffer usage: 52 hits, 0 reads, 7 dirtied
+WAL usage: 11 records, 7 full page images, 33739 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:24: INFO:  analyzing "public.vehicle"
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:24: INFO:  "vehicle": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp02-parkit/sql/03_maintenance.sql:24: INFO:  finished analyzing table "grp_parkitdb.public.vehicle"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 13 hits, 0 reads, 0 dirtied
+WAL usage: 0 records, 0 full page images, 0 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM

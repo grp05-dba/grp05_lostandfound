@@ -1,0 +1,69 @@
+-- Run as park_it_app. Exact live-monitor SELECT from the supplied repository:
+-- park-it/modules/monitoring/api_status.php, $stmtActive, commit
+-- d369a457ce2dc88a024428513360f0ad76473f43.
+-- Only this SELECT is executed, not getParkingSummary(), which can UPDATE occupancy.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database();
+          captured_at          | session_user | current_user | current_database
+-------------------------------+--------------+--------------+------------------
+ 2026-11-06 17:39:54.304588+08 | park_it_app  | park_it_app  | grp_parkitdb
+(1 row)
+
+BEGIN READ ONLY;
+BEGIN
+SET LOCAL statement_timeout='30s';
+SET
+EXPLAIN
+SELECT t.transaction_id, t.entry_time, t.status,
+       v.license_plate, v.vehicle_type, z.zone_name
+FROM public."transaction" t
+JOIN public.vehicle v ON t.vehicle_id = v.vehicle_id
+JOIN public.parking_zone z ON t.zone_id = z.zone_id
+WHERE t.status = 'Active'
+ORDER BY t.entry_time DESC;
+                                   QUERY PLAN
+--------------------------------------------------------------------------------
+ Sort  (cost=0.04..0.04 rows=1 width=364)
+   Sort Key: t.entry_time DESC
+   ->  Nested Loop  (cost=0.00..0.03 rows=1 width=364)
+         Join Filter: (z.zone_id = t.zone_id)
+         ->  Nested Loop  (cost=0.00..0.01 rows=1 width=250)
+               Join Filter: (v.vehicle_id = t.vehicle_id)
+               ->  Seq Scan on transaction t  (cost=0.00..0.00 rows=1 width=78)
+                     Filter: ((status)::text = 'Active'::text)
+               ->  Seq Scan on vehicle v  (cost=0.00..0.00 rows=1 width=180)
+         ->  Seq Scan on parking_zone z  (cost=0.00..0.00 rows=1 width=122)
+(10 rows)
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT t.transaction_id, t.entry_time, t.status,
+       v.license_plate, v.vehicle_type, z.zone_name
+FROM public."transaction" t
+JOIN public.vehicle v ON t.vehicle_id = v.vehicle_id
+JOIN public.parking_zone z ON t.zone_id = z.zone_id
+WHERE t.status = 'Active'
+ORDER BY t.entry_time DESC;
+                                                         QUERY PLAN
+-----------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=0.04..0.04 rows=1 width=364) (actual time=0.058..0.059 rows=0.00 loops=1)
+   Sort Key: t.entry_time DESC
+   Sort Method: quicksort  Memory: 25kB
+   Buffers: shared hit=3
+   ->  Nested Loop  (cost=0.00..0.03 rows=1 width=364) (actual time=0.011..0.012 rows=0.00 loops=1)
+         Join Filter: (z.zone_id = t.zone_id)
+         ->  Nested Loop  (cost=0.00..0.01 rows=1 width=250) (actual time=0.011..0.011 rows=0.00 loops=1)
+               Join Filter: (v.vehicle_id = t.vehicle_id)
+               ->  Seq Scan on transaction t  (cost=0.00..0.00 rows=1 width=78) (actual time=0.010..0.011 rows=0.00 loops=1)
+                     Filter: ((status)::text = 'Active'::text)
+               ->  Seq Scan on vehicle v  (cost=0.00..0.00 rows=1 width=180) (never executed)
+         ->  Seq Scan on parking_zone z  (cost=0.00..0.00 rows=1 width=122) (never executed)
+ Planning:
+   Buffers: shared hit=3
+ Planning Time: 0.238 ms
+ Execution Time: 0.104 ms
+(16 rows)
+
+ROLLBACK;
+ROLLBACK
