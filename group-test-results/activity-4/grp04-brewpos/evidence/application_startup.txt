@@ -1,0 +1,45 @@
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.1.1)
+
+2026-11-06T18:09:20.474+08:00  INFO 8944 --- [brewpos] [           main] com.brewpos.BrewPosApplication           : Starting BrewPosApplication v0.0.1-SNAPSHOT using Java 25.0.2 with PID 8944 (C:\Users\imper\Documents\Codex\2026-11-06\access-github-and-clone-our-repo\work\brewpos\target\brewpos-0.0.1-SNAPSHOT.jar started by imper in C:\Users\imper\Documents\Codex\2026-11-06\access-github-and-clone-our-repo\work\brewpos)
+2026-11-06T18:09:20.486+08:00  INFO 8944 --- [brewpos] [           main] com.brewpos.BrewPosApplication           : No active profile set, falling back to 1 default profile: "default"
+2026-11-06T18:09:22.517+08:00  INFO 8944 --- [brewpos] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-06T18:09:22.668+08:00  INFO 8944 --- [brewpos] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 125 ms. Found 5 JPA repository interfaces.
+2026-11-06T18:09:31.945+08:00  INFO 8944 --- [brewpos] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 18081 (http)
+2026-11-06T18:09:31.986+08:00  INFO 8944 --- [brewpos] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-11-06T18:09:31.986+08:00  INFO 8944 --- [brewpos] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-11-06T18:09:32.083+08:00  INFO 8944 --- [brewpos] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 11437 ms
+2026-11-06T18:09:32.671+08:00  INFO 8944 --- [brewpos] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-11-06T18:09:32.926+08:00  INFO 8944 --- [brewpos] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-11-06T18:09:34.518+08:00  INFO 8944 --- [brewpos] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-06T18:09:34.605+08:00  INFO 8944 --- [brewpos] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-06T18:09:35.127+08:00  INFO 8944 --- [brewpos] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@693f2c89
+2026-11-06T18:09:35.135+08:00  INFO 8944 --- [brewpos] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-06T18:09:35.365+08:00  INFO 8944 --- [brewpos] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://127.0.0.1:55432/grp_brewposdb]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.6
+	Default catalog/schema: grp_brewposdb/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-06T18:09:37.739+08:00  INFO 8944 --- [brewpos] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-06T18:09:37.884+08:00  INFO 8944 --- [brewpos] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-06T18:09:38.113+08:00  INFO 8944 --- [brewpos] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-06T18:09:41.255+08:00  INFO 8944 --- [brewpos] [           main] o.s.b.w.a.WelcomePageHandlerMapping      : Adding welcome page: class path resource [static/index.html]
+2026-11-06T18:09:41.936+08:00  INFO 8944 --- [brewpos] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 18081 (http) with context path '/'
+2026-11-06T18:09:41.975+08:00  INFO 8944 --- [brewpos] [           main] com.brewpos.BrewPosApplication           : Started BrewPosApplication in 22.555 seconds (process running for 23.81)
+2026-11-06T18:09:46.867+08:00  INFO 8944 --- [brewpos] [.1-18081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-11-06T18:09:46.869+08:00  INFO 8944 --- [brewpos] [.1-18081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-11-06T18:09:46.871+08:00  INFO 8944 --- [brewpos] [.1-18081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms

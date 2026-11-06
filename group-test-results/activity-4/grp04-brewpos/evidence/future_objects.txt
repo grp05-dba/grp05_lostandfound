@@ -1,0 +1,51 @@
+### Create future objects as the designated migration owner | account=postgres | expected=allowed | PASS
+SET ROLE brewpos_owner_grp; CREATE TABLE public.e4_future_probe(id serial PRIMARY KEY); CREATE FUNCTION public.e4_future_function() RETURNS integer LANGUAGE sql AS 'SELECT 1';
+SET
+CREATE TABLE
+CREATE FUNCTION
+
+### Future table is not automatically readable | account=brewpos_app | expected=denied | PASS
+SELECT * FROM public.e4_future_probe;
+ERROR:  42501: permission denied for table e4_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### Future function is not publicly executable | account=brewpos_app | expected=denied | PASS
+SELECT public.e4_future_function();
+ERROR:  42501: permission denied for function e4_future_function
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### Future table is not automatically readable | account=brewpos_auditor | expected=denied | PASS
+SELECT * FROM public.e4_future_probe;
+ERROR:  42501: permission denied for table e4_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### Future function is not publicly executable | account=brewpos_auditor | expected=denied | PASS
+SELECT public.e4_future_function();
+ERROR:  42501: permission denied for function e4_future_function
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### DBA can maintain owner-created future objects | account=brewpos_dba | expected=allowed | PASS
+BEGIN; SET ROLE brewpos_owner_grp; INSERT INTO e4_future_probe DEFAULT VALUES; SELECT public.e4_future_function(); ROLLBACK;
+BEGIN
+SET
+INSERT 0 1
+ e4_future_function 
+--------------------
+                  1
+(1 row)
+
+ROLLBACK
+
+### Remove future probes | account=postgres | expected=allowed | PASS
+SET ROLE brewpos_owner_grp; DROP TABLE public.e4_future_probe; DROP FUNCTION public.e4_future_function();
+SET
+DROP TABLE
+DROP FUNCTION
+
+### Verify cleanup | account=postgres | expected=allowed | PASS
+SELECT to_regclass('public.e4_future_probe') IS NULL AS future_table_removed, to_regprocedure('public.e4_future_function()') IS NULL AS future_function_removed;
+ future_table_removed | future_function_removed 
+----------------------+-------------------------
+ t                    | t
+(1 row)
+

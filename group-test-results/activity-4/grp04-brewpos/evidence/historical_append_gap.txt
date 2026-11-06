@@ -1,0 +1,32 @@
+Security finding: INSERT permission also allows adding a new line to an existing order.
+This operation is allowed by the privilege plan but limits the upstream immutability claim.
+Test data was rolled back.
+
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ brewpos_app  | brewpos_app  | grp_brewposdb
+(1 row)
+
+BEGIN;
+BEGIN
+INSERT INTO order_line_item(order_id,item_id,quantity,sold_price)
+SELECT t.order_id,m.item_id,1,m.price
+FROM order_ticket t CROSS JOIN menu_item m
+WHERE NOT EXISTS (SELECT 1 FROM order_line_item l WHERE l.order_id=t.order_id AND l.item_id=m.item_id)
+ORDER BY t.order_id,m.item_id LIMIT 1
+RETURNING order_id,item_id,quantity,sold_price;
+ order_id | item_id | quantity | sold_price 
+----------+---------+----------+------------
+        1 |       1 |        1 |     140.00
+(1 row)
+
+INSERT 0 1
+ROLLBACK;
+ROLLBACK
+SELECT count(*) AS lines_after_rollback FROM order_line_item;
+ lines_after_rollback 
+----------------------
+                    9
+(1 row)
+

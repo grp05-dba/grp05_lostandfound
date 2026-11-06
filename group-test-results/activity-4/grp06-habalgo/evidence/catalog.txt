@@ -1,0 +1,303 @@
+SELECT version(),current_date,current_setting('TimeZone');
+                                 version                                 | current_date | current_setting 
+-------------------------------------------------------------------------+--------------+-----------------
+ PostgreSQL 18.6 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit | 2026-11-06   | Asia/Manila
+(1 row)
+
+SELECT tablename,tableowner FROM pg_tables WHERE schemaname='habalgo' ORDER BY tablename;
+    tablename    |    tableowner     
+-----------------+-------------------
+ booking         | habalgo_owner_grp
+ customer        | habalgo_owner_grp
+ driver          | habalgo_owner_grp
+ driver_vehicle  | habalgo_owner_grp
+ location        | habalgo_owner_grp
+ payment         | habalgo_owner_grp
+ rating_feedback | habalgo_owner_grp
+ vehicle         | habalgo_owner_grp
+(8 rows)
+
+SELECT c.relname,c.relkind,pg_get_userbyid(c.relowner) AS owner,c.relacl FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='habalgo' ORDER BY c.relkind,c.relname;
+            relname            | relkind |       owner       |                                                               relacl                                                               
+-------------------------------+---------+-------------------+------------------------------------------------------------------------------------------------------------------------------------
+ booking_booking_id_seq        | S       | habalgo_owner_grp | {habalgo_owner_grp=rwU/habalgo_owner_grp,habalgo_runtime_grp=U/habalgo_owner_grp}
+ customer_customer_id_seq      | S       | habalgo_owner_grp | {habalgo_owner_grp=rwU/habalgo_owner_grp,habalgo_runtime_grp=U/habalgo_owner_grp}
+ driver_driver_id_seq          | S       | habalgo_owner_grp | {habalgo_owner_grp=rwU/habalgo_owner_grp}
+ location_location_id_seq      | S       | habalgo_owner_grp | {habalgo_owner_grp=rwU/habalgo_owner_grp,habalgo_runtime_grp=U/habalgo_owner_grp}
+ payment_payment_id_seq        | S       | habalgo_owner_grp | {habalgo_owner_grp=rwU/habalgo_owner_grp,habalgo_runtime_grp=U/habalgo_owner_grp}
+ rating_feedback_rating_id_seq | S       | habalgo_owner_grp | {habalgo_owner_grp=rwU/habalgo_owner_grp,habalgo_runtime_grp=U/habalgo_owner_grp}
+ vehicle_vehicle_id_seq        | S       | habalgo_owner_grp | {habalgo_owner_grp=rwU/habalgo_owner_grp,habalgo_runtime_grp=U/habalgo_owner_grp}
+ booking_pkey                  | i       | habalgo_owner_grp | 
+ customer_email_key            | i       | habalgo_owner_grp | 
+ customer_pkey                 | i       | habalgo_owner_grp | 
+ driver_license_no_key         | i       | habalgo_owner_grp | 
+ driver_pkey                   | i       | habalgo_owner_grp | 
+ driver_vehicle_pkey           | i       | habalgo_owner_grp | 
+ idx_booking_customer          | i       | habalgo_owner_grp | 
+ idx_booking_date              | i       | habalgo_owner_grp | 
+ idx_booking_driver            | i       | habalgo_owner_grp | 
+ idx_payment_booking           | i       | habalgo_owner_grp | 
+ idx_rating_booking            | i       | habalgo_owner_grp | 
+ location_pkey                 | i       | habalgo_owner_grp | 
+ payment_pkey                  | i       | habalgo_owner_grp | 
+ rating_feedback_pkey          | i       | habalgo_owner_grp | 
+ uq_rating_booking_customer    | i       | habalgo_owner_grp | 
+ vehicle_pkey                  | i       | habalgo_owner_grp | 
+ vehicle_plate_no_key          | i       | habalgo_owner_grp | 
+ booking                       | r       | habalgo_owner_grp | {habalgo_owner_grp=arwdDxtm/habalgo_owner_grp,habalgo_runtime_grp=arwd/habalgo_owner_grp,habalgo_readonly_grp=r/habalgo_owner_grp}
+ customer                      | r       | habalgo_owner_grp | {habalgo_owner_grp=arwdDxtm/habalgo_owner_grp,habalgo_runtime_grp=arwd/habalgo_owner_grp,habalgo_readonly_grp=r/habalgo_owner_grp}
+ driver                        | r       | habalgo_owner_grp | {habalgo_owner_grp=arwdDxtm/habalgo_owner_grp,habalgo_runtime_grp=r/habalgo_owner_grp,habalgo_readonly_grp=r/habalgo_owner_grp}
+ driver_vehicle                | r       | habalgo_owner_grp | {habalgo_owner_grp=arwdDxtm/habalgo_owner_grp,habalgo_runtime_grp=arwd/habalgo_owner_grp,habalgo_readonly_grp=r/habalgo_owner_grp}
+ location                      | r       | habalgo_owner_grp | {habalgo_owner_grp=arwdDxtm/habalgo_owner_grp,habalgo_runtime_grp=ar/habalgo_owner_grp,habalgo_readonly_grp=r/habalgo_owner_grp}
+ payment                       | r       | habalgo_owner_grp | {habalgo_owner_grp=arwdDxtm/habalgo_owner_grp,habalgo_runtime_grp=arwd/habalgo_owner_grp,habalgo_readonly_grp=r/habalgo_owner_grp}
+ rating_feedback               | r       | habalgo_owner_grp | {habalgo_owner_grp=arwdDxtm/habalgo_owner_grp,habalgo_runtime_grp=arwd/habalgo_owner_grp,habalgo_readonly_grp=r/habalgo_owner_grp}
+ vehicle                       | r       | habalgo_owner_grp | {habalgo_owner_grp=arwdDxtm/habalgo_owner_grp,habalgo_runtime_grp=arwd/habalgo_owner_grp,habalgo_readonly_grp=r/habalgo_owner_grp}
+(32 rows)
+
+SELECT c.relkind,count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='habalgo' GROUP BY c.relkind ORDER BY c.relkind;
+ relkind | count 
+---------+-------
+ S       |     7
+ i       |    17
+ r       |     8
+(3 rows)
+
+SELECT conname,contype,pg_get_constraintdef(oid) FROM pg_constraint WHERE connamespace='habalgo'::regnamespace ORDER BY conname;
+                conname                | contype |                                                                                                   pg_get_constraintdef                                                                                                   
+---------------------------------------+---------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ booking_booking_date_not_null         | n       | NOT NULL booking_date
+ booking_booking_id_not_null           | n       | NOT NULL booking_id
+ booking_booking_status_not_null       | n       | NOT NULL booking_status
+ booking_customer_id_fkey              | f       | FOREIGN KEY (customer_id) REFERENCES habalgo.customer(customer_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ booking_customer_id_not_null          | n       | NOT NULL customer_id
+ booking_driver_id_fkey                | f       | FOREIGN KEY (driver_id) REFERENCES habalgo.driver(driver_id) ON UPDATE CASCADE ON DELETE SET NULL
+ booking_dropoff_location_id_fkey      | f       | FOREIGN KEY (dropoff_location_id) REFERENCES habalgo.location(location_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ booking_dropoff_location_id_not_null  | n       | NOT NULL dropoff_location_id
+ booking_pickup_location_id_fkey       | f       | FOREIGN KEY (pickup_location_id) REFERENCES habalgo.location(location_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ booking_pickup_location_id_not_null   | n       | NOT NULL pickup_location_id
+ booking_pkey                          | p       | PRIMARY KEY (booking_id)
+ ck_assignment_dates                   | c       | CHECK (((assigned_to IS NULL) OR (assigned_to >= assigned_from)))
+ ck_booking_status                     | c       | CHECK (((booking_status)::text = ANY ((ARRAY['Pending'::character varying, 'Confirmed'::character varying, 'In Progress'::character varying, 'Completed'::character varying, 'Cancelled'::character varying])::text[])))
+ customer_customer_id_not_null         | n       | NOT NULL customer_id
+ customer_email_key                    | u       | UNIQUE (email)
+ customer_email_not_null               | n       | NOT NULL email
+ customer_name_not_null                | n       | NOT NULL name
+ customer_phone_not_null               | n       | NOT NULL phone
+ customer_pkey                         | p       | PRIMARY KEY (customer_id)
+ driver_driver_id_not_null             | n       | NOT NULL driver_id
+ driver_license_no_key                 | u       | UNIQUE (license_no)
+ driver_license_no_not_null            | n       | NOT NULL license_no
+ driver_name_not_null                  | n       | NOT NULL name
+ driver_phone_not_null                 | n       | NOT NULL phone
+ driver_pkey                           | p       | PRIMARY KEY (driver_id)
+ driver_vehicle_assigned_from_not_null | n       | NOT NULL assigned_from
+ driver_vehicle_driver_id_fkey         | f       | FOREIGN KEY (driver_id) REFERENCES habalgo.driver(driver_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ driver_vehicle_driver_id_not_null     | n       | NOT NULL driver_id
+ driver_vehicle_pkey                   | p       | PRIMARY KEY (driver_id, vehicle_id)
+ driver_vehicle_vehicle_id_fkey        | f       | FOREIGN KEY (vehicle_id) REFERENCES habalgo.vehicle(vehicle_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ driver_vehicle_vehicle_id_not_null    | n       | NOT NULL vehicle_id
+ location_address_not_null             | n       | NOT NULL address
+ location_city_not_null                | n       | NOT NULL city
+ location_location_id_not_null         | n       | NOT NULL location_id
+ location_pkey                         | p       | PRIMARY KEY (location_id)
+ payment_amount_check                  | c       | CHECK ((amount > (0)::numeric))
+ payment_amount_not_null               | n       | NOT NULL amount
+ payment_booking_id_fkey               | f       | FOREIGN KEY (booking_id) REFERENCES habalgo.booking(booking_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ payment_booking_id_not_null           | n       | NOT NULL booking_id
+ payment_method_not_null               | n       | NOT NULL method
+ payment_payment_id_not_null           | n       | NOT NULL payment_id
+ payment_pkey                          | p       | PRIMARY KEY (payment_id)
+ payment_status_not_null               | n       | NOT NULL status
+ rating_feedback_booking_id_fkey       | f       | FOREIGN KEY (booking_id) REFERENCES habalgo.booking(booking_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ rating_feedback_booking_id_not_null   | n       | NOT NULL booking_id
+ rating_feedback_customer_id_fkey      | f       | FOREIGN KEY (customer_id) REFERENCES habalgo.customer(customer_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ rating_feedback_customer_id_not_null  | n       | NOT NULL customer_id
+ rating_feedback_pkey                  | p       | PRIMARY KEY (rating_id)
+ rating_feedback_rating_check          | c       | CHECK (((rating >= 1) AND (rating <= 5)))
+ rating_feedback_rating_id_not_null    | n       | NOT NULL rating_id
+ rating_feedback_rating_not_null       | n       | NOT NULL rating
+ uq_rating_booking_customer            | u       | UNIQUE (booking_id, customer_id)
+ vehicle_model_not_null                | n       | NOT NULL model
+ vehicle_pkey                          | p       | PRIMARY KEY (vehicle_id)
+ vehicle_plate_no_key                  | u       | UNIQUE (plate_no)
+ vehicle_plate_no_not_null             | n       | NOT NULL plate_no
+ vehicle_vehicle_id_not_null           | n       | NOT NULL vehicle_id
+ vehicle_vehicle_type_not_null         | n       | NOT NULL vehicle_type
+(58 rows)
+
+SELECT rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolinherit,rolreplication,rolbypassrls FROM pg_roles WHERE rolname LIKE 'habalgo_%' ORDER BY rolname;
+       rolname        | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolinherit | rolreplication | rolbypassrls 
+----------------------+-------------+----------+-------------+---------------+------------+----------------+--------------
+ habalgo_app          | t           | f        | f           | f             | t          | f              | f
+ habalgo_auditor      | t           | f        | f           | f             | t          | f              | f
+ habalgo_dba          | t           | f        | f           | f             | t          | f              | f
+ habalgo_owner_grp    | f           | f        | f           | f             | t          | f              | f
+ habalgo_readonly_grp | f           | f        | f           | f             | t          | f              | f
+ habalgo_runtime_grp  | f           | f        | f           | f             | t          | f              | f
+(6 rows)
+
+SELECT member.rolname AS login,parent.rolname AS group_role,m.admin_option,m.inherit_option,m.set_option FROM pg_auth_members m JOIN pg_roles member ON member.oid=m.member JOIN pg_roles parent ON parent.oid=m.roleid WHERE member.rolname LIKE 'habalgo_%';
+      login      |      group_role      | admin_option | inherit_option | set_option 
+-----------------+----------------------+--------------+----------------+------------
+ habalgo_dba     | habalgo_owner_grp    | f            | t              | t
+ habalgo_app     | habalgo_runtime_grp  | f            | t              | t
+ habalgo_auditor | habalgo_readonly_grp | f            | t              | t
+(3 rows)
+
+SELECT datname,pg_get_userbyid(datdba) AS owner,datacl FROM pg_database ORDER BY datname;
+       datname       |       owner       |                                                           datacl                                                           
+---------------------+-------------------+----------------------------------------------------------------------------------------------------------------------------
+ brewpos_unrelateddb | postgres          | {postgres=CTc/postgres}
+ grp00_habalgodb     | habalgo_owner_grp | {habalgo_owner_grp=CTc/habalgo_owner_grp,habalgo_runtime_grp=c/habalgo_owner_grp,habalgo_readonly_grp=c/habalgo_owner_grp}
+ grp_brewposdb       | brewpos_owner_grp | {brewpos_owner_grp=CTc/brewpos_owner_grp,brewpos_runtime_grp=c/brewpos_owner_grp,brewpos_readonly_grp=c/brewpos_owner_grp}
+ habalgo_unrelateddb | postgres          | {postgres=CTc/postgres}
+ postgres            | postgres          | {postgres=CTc/postgres}
+ template0           | postgres          | {=c/postgres,postgres=CTc/postgres}
+ template1           | postgres          | {postgres=CTc/postgres}
+(7 rows)
+
+SELECT nspname,pg_get_userbyid(nspowner) AS owner,nspacl FROM pg_namespace WHERE nspname IN ('public','habalgo');
+ nspname |       owner       |                                                          nspacl                                                           
+---------+-------------------+---------------------------------------------------------------------------------------------------------------------------
+ public  | pg_database_owner | {pg_database_owner=UC/pg_database_owner}
+ habalgo | habalgo_owner_grp | {habalgo_owner_grp=UC/habalgo_owner_grp,habalgo_runtime_grp=U/habalgo_owner_grp,habalgo_readonly_grp=U/habalgo_owner_grp}
+(2 rows)
+
+SELECT grantee,table_name,privilege_type FROM information_schema.table_privileges WHERE table_schema='habalgo' ORDER BY grantee,table_name,privilege_type;
+       grantee        |   table_name    | privilege_type 
+----------------------+-----------------+----------------
+ habalgo_owner_grp    | booking         | DELETE
+ habalgo_owner_grp    | booking         | INSERT
+ habalgo_owner_grp    | booking         | REFERENCES
+ habalgo_owner_grp    | booking         | SELECT
+ habalgo_owner_grp    | booking         | TRIGGER
+ habalgo_owner_grp    | booking         | TRUNCATE
+ habalgo_owner_grp    | booking         | UPDATE
+ habalgo_owner_grp    | customer        | DELETE
+ habalgo_owner_grp    | customer        | INSERT
+ habalgo_owner_grp    | customer        | REFERENCES
+ habalgo_owner_grp    | customer        | SELECT
+ habalgo_owner_grp    | customer        | TRIGGER
+ habalgo_owner_grp    | customer        | TRUNCATE
+ habalgo_owner_grp    | customer        | UPDATE
+ habalgo_owner_grp    | driver          | DELETE
+ habalgo_owner_grp    | driver          | INSERT
+ habalgo_owner_grp    | driver          | REFERENCES
+ habalgo_owner_grp    | driver          | SELECT
+ habalgo_owner_grp    | driver          | TRIGGER
+ habalgo_owner_grp    | driver          | TRUNCATE
+ habalgo_owner_grp    | driver          | UPDATE
+ habalgo_owner_grp    | driver_vehicle  | DELETE
+ habalgo_owner_grp    | driver_vehicle  | INSERT
+ habalgo_owner_grp    | driver_vehicle  | REFERENCES
+ habalgo_owner_grp    | driver_vehicle  | SELECT
+ habalgo_owner_grp    | driver_vehicle  | TRIGGER
+ habalgo_owner_grp    | driver_vehicle  | TRUNCATE
+ habalgo_owner_grp    | driver_vehicle  | UPDATE
+ habalgo_owner_grp    | location        | DELETE
+ habalgo_owner_grp    | location        | INSERT
+ habalgo_owner_grp    | location        | REFERENCES
+ habalgo_owner_grp    | location        | SELECT
+ habalgo_owner_grp    | location        | TRIGGER
+ habalgo_owner_grp    | location        | TRUNCATE
+ habalgo_owner_grp    | location        | UPDATE
+ habalgo_owner_grp    | payment         | DELETE
+ habalgo_owner_grp    | payment         | INSERT
+ habalgo_owner_grp    | payment         | REFERENCES
+ habalgo_owner_grp    | payment         | SELECT
+ habalgo_owner_grp    | payment         | TRIGGER
+ habalgo_owner_grp    | payment         | TRUNCATE
+ habalgo_owner_grp    | payment         | UPDATE
+ habalgo_owner_grp    | rating_feedback | DELETE
+ habalgo_owner_grp    | rating_feedback | INSERT
+ habalgo_owner_grp    | rating_feedback | REFERENCES
+ habalgo_owner_grp    | rating_feedback | SELECT
+ habalgo_owner_grp    | rating_feedback | TRIGGER
+ habalgo_owner_grp    | rating_feedback | TRUNCATE
+ habalgo_owner_grp    | rating_feedback | UPDATE
+ habalgo_owner_grp    | vehicle         | DELETE
+ habalgo_owner_grp    | vehicle         | INSERT
+ habalgo_owner_grp    | vehicle         | REFERENCES
+ habalgo_owner_grp    | vehicle         | SELECT
+ habalgo_owner_grp    | vehicle         | TRIGGER
+ habalgo_owner_grp    | vehicle         | TRUNCATE
+ habalgo_owner_grp    | vehicle         | UPDATE
+ habalgo_readonly_grp | booking         | SELECT
+ habalgo_readonly_grp | customer        | SELECT
+ habalgo_readonly_grp | driver          | SELECT
+ habalgo_readonly_grp | driver_vehicle  | SELECT
+ habalgo_readonly_grp | location        | SELECT
+ habalgo_readonly_grp | payment         | SELECT
+ habalgo_readonly_grp | rating_feedback | SELECT
+ habalgo_readonly_grp | vehicle         | SELECT
+ habalgo_runtime_grp  | booking         | DELETE
+ habalgo_runtime_grp  | booking         | INSERT
+ habalgo_runtime_grp  | booking         | SELECT
+ habalgo_runtime_grp  | booking         | UPDATE
+ habalgo_runtime_grp  | customer        | DELETE
+ habalgo_runtime_grp  | customer        | INSERT
+ habalgo_runtime_grp  | customer        | SELECT
+ habalgo_runtime_grp  | customer        | UPDATE
+ habalgo_runtime_grp  | driver          | SELECT
+ habalgo_runtime_grp  | driver_vehicle  | DELETE
+ habalgo_runtime_grp  | driver_vehicle  | INSERT
+ habalgo_runtime_grp  | driver_vehicle  | SELECT
+ habalgo_runtime_grp  | driver_vehicle  | UPDATE
+ habalgo_runtime_grp  | location        | INSERT
+ habalgo_runtime_grp  | location        | SELECT
+ habalgo_runtime_grp  | payment         | DELETE
+ habalgo_runtime_grp  | payment         | INSERT
+ habalgo_runtime_grp  | payment         | SELECT
+ habalgo_runtime_grp  | payment         | UPDATE
+ habalgo_runtime_grp  | rating_feedback | DELETE
+ habalgo_runtime_grp  | rating_feedback | INSERT
+ habalgo_runtime_grp  | rating_feedback | SELECT
+ habalgo_runtime_grp  | rating_feedback | UPDATE
+ habalgo_runtime_grp  | vehicle         | DELETE
+ habalgo_runtime_grp  | vehicle         | INSERT
+ habalgo_runtime_grp  | vehicle         | SELECT
+ habalgo_runtime_grp  | vehicle         | UPDATE
+(91 rows)
+
+SELECT defaclrole::regrole,defaclnamespace,defaclobjtype,defaclacl FROM pg_default_acl;
+    defaclrole     | defaclnamespace | defaclobjtype |                defaclacl                
+-------------------+-----------------+---------------+-----------------------------------------
+ habalgo_owner_grp |               0 | f             | {habalgo_owner_grp=X/habalgo_owner_grp}
+(1 row)
+
+SELECT (SELECT count(*) FROM habalgo.customer) AS customer, (SELECT count(*) FROM habalgo.driver) AS driver, (SELECT count(*) FROM habalgo.vehicle) AS vehicle, (SELECT count(*) FROM habalgo.driver_vehicle) AS driver_vehicle, (SELECT count(*) FROM habalgo.location) AS location, (SELECT count(*) FROM habalgo.booking) AS booking, (SELECT count(*) FROM habalgo.payment) AS payment, (SELECT count(*) FROM habalgo.rating_feedback) AS rating_feedback;
+ customer | driver | vehicle | driver_vehicle | location | booking | payment | rating_feedback 
+----------+--------+---------+----------------+----------+---------+---------+-----------------
+        0 |     10 |       0 |              0 |        0 |       0 |       0 |               0
+(1 row)
+
+SELECT to_regclass('habalgo.e4_forbidden') IS NULL AND to_regclass('habalgo.e4_ddl_probe') IS NULL AS probe_tables_absent;
+ probe_tables_absent 
+---------------------
+ t
+(1 row)
+
+SELECT count(*) AS forbidden_database_count FROM pg_database WHERE datname='habalgo_e4_forbidden';
+ forbidden_database_count 
+--------------------------
+                        0
+(1 row)
+
+SELECT count(*) AS forbidden_role_count FROM pg_roles WHERE rolname='habalgo_e4_forbidden';
+ forbidden_role_count 
+----------------------
+                    0
+(1 row)
+
+SELECT count(*) AS leftover_probe_customers FROM habalgo.customer WHERE email LIKE '%@example.invalid';
+ leftover_probe_customers 
+--------------------------
+                        0
+(1 row)
+
+SELECT count(*) AS leftover_probe_drivers FROM habalgo.driver WHERE license_no LIKE 'E4%';
+ leftover_probe_drivers 
+------------------------
+                      0
+(1 row)
+

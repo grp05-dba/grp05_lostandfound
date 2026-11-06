@@ -1,0 +1,149 @@
+-- =============================================================================
+-- CampusSafe: Database Sanity and Integrity Verification (verify.sql)
+-- Run to verify tables, row counts, constraints, and indexes.
+-- =============================================================================
+\echo '=== 1. TABLE ROW COUNTS ==='
+=== 1. TABLE ROW COUNTS ===
+SELECT 'role' AS table_name, COUNT(*) AS total_rows FROM role
+UNION ALL SELECT 'app_user', COUNT(*) FROM app_user
+UNION ALL SELECT 'hazard_category', COUNT(*) FROM hazard_category
+UNION ALL SELECT 'campus_location', COUNT(*) FROM campus_location
+UNION ALL SELECT 'hazard_report', COUNT(*) FROM hazard_report
+UNION ALL SELECT 'assignment', COUNT(*) FROM assignment
+UNION ALL SELECT 'report_status_history', COUNT(*) FROM report_status_history
+UNION ALL SELECT 'maintenance_action', COUNT(*) FROM maintenance_action
+UNION ALL SELECT 'attachment', COUNT(*) FROM attachment;
+      table_name       | total_rows 
+-----------------------+------------
+ role                  |          5
+ app_user              |          6
+ hazard_category       |          6
+ campus_location       |         10
+ hazard_report         |         16
+ assignment            |         12
+ report_status_history |         60
+ maintenance_action    |          9
+ attachment            |          5
+(9 rows)
+
+\echo '=== 2. STATUS DISTRIBUTION ==='
+=== 2. STATUS DISTRIBUTION ===
+SELECT status, priority, COUNT(*) AS count
+FROM hazard_report
+GROUP BY status, priority
+ORDER BY status, priority;
+   status    | priority | count 
+-------------+----------+-------
+ Assigned    | Critical |     2
+ Assigned    | High     |     1
+ Closed      | High     |     1
+ Closed      | Low      |     1
+ Closed      | Medium   |     1
+ In Progress | High     |     1
+ In Progress | Medium   |     2
+ Resolved    | High     |     2
+ Resolved    | Low      |     1
+ Submitted   |          |     2
+ Verified    | High     |     1
+ Verified    | Medium   |     1
+(12 rows)
+
+\echo '=== 3. CONSTRAINT INTEGRITY AUDIT ==='
+=== 3. CONSTRAINT INTEGRITY AUDIT ===
+-- A: Check if any unverified report has a verifier or priority (Should return 0)
+SELECT COUNT(*) AS violation_unverified_with_verifier
+FROM hazard_report
+WHERE status = 'Submitted' AND (verified_by_user_id IS NOT NULL OR verified_at IS NOT NULL);
+ violation_unverified_with_verifier 
+------------------------------------
+                                  0
+(1 row)
+
+-- B: Check if any Resolved/Closed report is missing resolved_at (Should return 0)
+SELECT COUNT(*) AS violation_resolved_missing_timestamp
+FROM hazard_report
+WHERE status IN ('Resolved', 'Closed') AND resolved_at IS NULL;
+ violation_resolved_missing_timestamp 
+--------------------------------------
+                                    0
+(1 row)
+
+-- C: Check for any orphaned assignments or actions (Should return 0)
+SELECT COUNT(*) AS orphaned_assignments
+FROM assignment a
+LEFT JOIN hazard_report r ON a.report_id = r.report_id
+WHERE r.report_id IS NULL;
+ orphaned_assignments 
+----------------------
+                    0
+(1 row)
+
+\echo '=== 4. RELATIONAL JOIN TEST (Sample Report Summary) ==='
+=== 4. RELATIONAL JOIN TEST (Sample Report Summary) ===
+SELECT
+    r.report_id,
+    u.full_name AS reporter,
+    c.category_name AS category,
+    l.building || ' - ' || l.room_area AS location,
+    r.priority,
+    r.status,
+    COALESCE(m.full_name, 'Unassigned') AS assigned_tech,
+    COUNT(h.history_id) AS history_steps
+FROM hazard_report r
+JOIN app_user u ON r.reporter_user_id = u.user_id
+JOIN hazard_category c ON r.category_id = c.category_id
+JOIN campus_location l ON r.location_id = l.location_id
+LEFT JOIN assignment a ON r.report_id = a.report_id
+LEFT JOIN app_user m ON a.maintenance_user_id = m.user_id
+LEFT JOIN report_status_history h ON r.report_id = h.report_id
+GROUP BY r.report_id, u.full_name, c.category_name, l.building, l.room_area, r.priority, r.status, m.full_name
+ORDER BY r.report_id
+LIMIT 10;
+ report_id |            reporter            |   category   |                       location                       | priority |   status    |       assigned_tech        | history_steps 
+-----------+--------------------------------+--------------+------------------------------------------------------+----------+-------------+----------------------------+---------------
+         1 | Maria Santos (Student)         | Electrical   | Science & Technology Hall - Room 304                 |          | Submitted   | Unassigned                 |             1
+         2 | Dr. Robert Hernandez (Faculty) | Other Safety | Main Academic Complex - Room 101                     |          | Submitted   | Unassigned                 |             1
+         3 | Maria Santos (Student)         | Equipment    | Engineering Wing - Machine Shop 12                   | High     | Verified    | Unassigned                 |             2
+         4 | Dr. Robert Hernandez (Faculty) | Structural   | Central Library - Periodicals Wing                   | Medium   | Verified    | Unassigned                 |             2
+         5 | Maria Santos (Student)         | Sanitation   | Student Activities Center - West Cafeteria           | High     | Assigned    | Alex Davis (Senior Tech)   |             3
+         6 | Dr. Robert Hernandez (Faculty) | Electrical   | University Gymnasium - Locker Room B                 | Critical | Assigned    | Carlos Reyes (Electrician) |             3
+         7 | Maria Santos (Student)         | Fire Safety  | Administration Pavilion - Executive Boardroom        | Critical | Assigned    | Alex Davis (Senior Tech)   |             3
+         8 | Maria Santos (Student)         | Structural   | Arts & Humanities Building - Studio 215              | Medium   | In Progress | Alex Davis (Senior Tech)   |             4
+         9 | Dr. Robert Hernandez (Faculty) | Equipment    | Information Technology Center - Server Corridor 108  | High     | In Progress | Carlos Reyes (Electrician) |             4
+        10 | Maria Santos (Student)         | Other Safety | North Campus Parking Structure - Northeast Stairwell | Medium   | In Progress | Carlos Reyes (Electrician) |             4
+(10 rows)
+
+\echo '=== 5. INDEX STATUS ==='
+=== 5. INDEX STATUS ===
+SELECT tablename, indexname, indexdef
+FROM pg_indexes
+WHERE schemaname = 'public'
+ORDER BY tablename, indexname;
+       tablename       |                  indexname                   |                                                              indexdef                                                              
+-----------------------+----------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------
+ app_user              | app_user_email_key                           | CREATE UNIQUE INDEX app_user_email_key ON public.app_user USING btree (email)
+ app_user              | app_user_pkey                                | CREATE UNIQUE INDEX app_user_pkey ON public.app_user USING btree (user_id)
+ app_user              | app_user_username_key                        | CREATE UNIQUE INDEX app_user_username_key ON public.app_user USING btree (username)
+ assignment            | assignment_pkey                              | CREATE UNIQUE INDEX assignment_pkey ON public.assignment USING btree (assignment_id)
+ assignment            | assignment_report_id_maintenance_user_id_key | CREATE UNIQUE INDEX assignment_report_id_maintenance_user_id_key ON public.assignment USING btree (report_id, maintenance_user_id)
+ assignment            | idx_assign_maint                             | CREATE INDEX idx_assign_maint ON public.assignment USING btree (maintenance_user_id)
+ assignment            | idx_assign_report                            | CREATE INDEX idx_assign_report ON public.assignment USING btree (report_id)
+ attachment            | attachment_pkey                              | CREATE UNIQUE INDEX attachment_pkey ON public.attachment USING btree (attachment_id)
+ attachment            | idx_attach_report                            | CREATE INDEX idx_attach_report ON public.attachment USING btree (report_id)
+ campus_location       | campus_location_pkey                         | CREATE UNIQUE INDEX campus_location_pkey ON public.campus_location USING btree (location_id)
+ hazard_category       | hazard_category_category_name_key            | CREATE UNIQUE INDEX hazard_category_category_name_key ON public.hazard_category USING btree (category_name)
+ hazard_category       | hazard_category_pkey                         | CREATE UNIQUE INDEX hazard_category_pkey ON public.hazard_category USING btree (category_id)
+ hazard_report         | hazard_report_pkey                           | CREATE UNIQUE INDEX hazard_report_pkey ON public.hazard_report USING btree (report_id)
+ hazard_report         | idx_report_category                          | CREATE INDEX idx_report_category ON public.hazard_report USING btree (category_id)
+ hazard_report         | idx_report_location                          | CREATE INDEX idx_report_location ON public.hazard_report USING btree (location_id)
+ hazard_report         | idx_report_reporter                          | CREATE INDEX idx_report_reporter ON public.hazard_report USING btree (reporter_user_id)
+ hazard_report         | idx_report_status                            | CREATE INDEX idx_report_status ON public.hazard_report USING btree (status)
+ hazard_report         | idx_report_submitted                         | CREATE INDEX idx_report_submitted ON public.hazard_report USING btree (submitted_at)
+ maintenance_action    | idx_action_report                            | CREATE INDEX idx_action_report ON public.maintenance_action USING btree (report_id)
+ maintenance_action    | maintenance_action_pkey                      | CREATE UNIQUE INDEX maintenance_action_pkey ON public.maintenance_action USING btree (action_id)
+ report_status_history | idx_history_report                           | CREATE INDEX idx_history_report ON public.report_status_history USING btree (report_id)
+ report_status_history | report_status_history_pkey                   | CREATE UNIQUE INDEX report_status_history_pkey ON public.report_status_history USING btree (history_id)
+ role                  | role_pkey                                    | CREATE UNIQUE INDEX role_pkey ON public.role USING btree (role_id)
+ role                  | role_role_name_key                           | CREATE UNIQUE INDEX role_role_name_key ON public.role USING btree (role_name)
+(24 rows)
+

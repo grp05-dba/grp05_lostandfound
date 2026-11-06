@@ -1,0 +1,11 @@
+SELECT (SELECT count(*) FROM habalgo.customer) AS customer, (SELECT count(*) FROM habalgo.driver) AS driver, (SELECT count(*) FROM habalgo.vehicle) AS vehicle, (SELECT count(*) FROM habalgo.driver_vehicle) AS driver_vehicle, (SELECT count(*) FROM habalgo.location) AS location, (SELECT count(*) FROM habalgo.booking) AS booking, (SELECT count(*) FROM habalgo.payment) AS payment, (SELECT count(*) FROM habalgo.rating_feedback) AS rating_feedback; SELECT count(*) AS probes_remaining FROM pg_class WHERE relnamespace='habalgo'::regnamespace AND relname LIKE 'e4_%';
+ customer | driver | vehicle | driver_vehicle | location | booking | payment | rating_feedback 
+----------+--------+---------+----------------+----------+---------+---------+-----------------
+        0 |     10 |       0 |              0 |        0 |       0 |       0 |               0
+(1 row)
+
+ probes_remaining 
+------------------
+                0
+(1 row)
+

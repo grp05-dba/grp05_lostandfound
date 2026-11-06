@@ -1,0 +1,221 @@
+### roles/databases
+\set ON_ERROR_STOP on
+-- Fresh evaluation setup. Connect as provisioning administrator to postgres.
+CREATE ROLE campussafe_owner_grp NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE campussafe_runtime_grp NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE campussafe_readonly_grp NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE campussafe_backup_grp NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE campussafe_app LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE campussafe_report LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE campussafe_backup LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE campussafe_dba LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+GRANT campussafe_runtime_grp TO campussafe_app;
+GRANT ROLE
+GRANT campussafe_readonly_grp TO campussafe_report;
+GRANT ROLE
+GRANT campussafe_backup_grp TO campussafe_backup;
+GRANT ROLE
+GRANT campussafe_owner_grp TO campussafe_dba;
+GRANT ROLE
+CREATE DATABASE grp07_campussafedb OWNER campussafe_owner_grp;
+CREATE DATABASE
+CREATE DATABASE campussafe_unrelateddb;
+CREATE DATABASE
+REVOKE ALL ON DATABASE grp07_campussafedb FROM PUBLIC;
+REVOKE
+REVOKE ALL ON DATABASE campussafe_unrelateddb FROM PUBLIC;
+REVOKE
+GRANT CONNECT ON DATABASE grp07_campussafedb TO campussafe_runtime_grp, campussafe_readonly_grp, campussafe_backup_grp;
+GRANT
+-- Assign distinct private passwords locally after creation, never in this script.
+
+### lab isolation
+\set ON_ERROR_STOP on
+-- ONLY for this owned, isolated evaluation cluster. Preserve existing project grants.
+-- Review legitimate users before adapting any PUBLIC revokes to a shared server.
+REVOKE CONNECT, TEMPORARY ON DATABASE postgres FROM PUBLIC;
+REVOKE
+REVOKE CONNECT, TEMPORARY ON DATABASE template1 FROM PUBLIC;
+REVOKE
+REVOKE CONNECT, TEMPORARY ON DATABASE grp_brewposdb FROM PUBLIC;
+REVOKE
+REVOKE CONNECT, TEMPORARY ON DATABASE brewpos_unrelateddb FROM PUBLIC;
+REVOKE
+REVOKE CONNECT, TEMPORARY ON DATABASE grp00_habalgodb FROM PUBLIC;
+REVOKE
+REVOKE CONNECT, TEMPORARY ON DATABASE habalgo_unrelateddb FROM PUBLIC;
+REVOKE
+
+### Confirm fresh empty target before destructive upstream scripts
+SELECT count(*) AS existing_tables FROM pg_tables WHERE schemaname='public';
+ existing_tables 
+-----------------
+               0
+(1 row)
+
+
+### Unchanged upstream schema: database/01_schema.sql
+SHA256=e8a25c9f2147c48b990325e9706225a519a900f95606515f3f0f92054fe107b1
+SQL echo disabled to exclude seed credentials/hashes.
+SET
+SET
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+DROP TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+NOTICE:  00000: table "attachment" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1506
+NOTICE:  00000: table "maintenance_action" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1506
+NOTICE:  00000: table "report_status_history" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1506
+NOTICE:  00000: table "assignment" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1506
+NOTICE:  00000: table "hazard_report" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1506
+NOTICE:  00000: table "campus_location" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1506
+NOTICE:  00000: table "hazard_category" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1506
+NOTICE:  00000: table "app_user" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1506
+NOTICE:  00000: table "role" does not exist, skipping
+LOCATION:  DropErrorMsgNonExistent, tablecmds.c:1506
+
+### Unchanged upstream seed: database/02_seed.sql
+SHA256=1eaa0cc9bc58d963502744ba10e49a143fc3ef48f93e1117b70242e8fd65e7ff
+SQL echo disabled to exclude seed credentials/hashes.
+SET
+SET
+TRUNCATE TABLE
+INSERT 0 5
+ setval 
+--------
+      5
+(1 row)
+
+INSERT 0 6
+ setval 
+--------
+      6
+(1 row)
+
+INSERT 0 6
+ setval 
+--------
+      6
+(1 row)
+
+INSERT 0 10
+ setval 
+--------
+     10
+(1 row)
+
+INSERT 0 16
+ setval 
+--------
+     16
+(1 row)
+
+INSERT 0 12
+ setval 
+--------
+     12
+(1 row)
+
+INSERT 0 60
+INSERT 0 9
+INSERT 0 5
+ setval 
+--------
+      5
+(1 row)
+
+
+### evaluated privileges
+\set ON_ERROR_STOP on
+-- Target grp07_campussafedb; schema and seed have been loaded as the owner group.
+ALTER SCHEMA public OWNER TO campussafe_owner_grp;
+ALTER SCHEMA
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC;
+REVOKE
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC;
+REVOKE
+GRANT USAGE ON SCHEMA public TO campussafe_runtime_grp, campussafe_readonly_grp, campussafe_backup_grp;
+GRANT
+GRANT SELECT ON public.role, public.app_user, public.hazard_category,
+    public.campus_location, public.hazard_report, public.assignment,
+    public.report_status_history, public.maintenance_action, public.attachment
+    TO campussafe_runtime_grp, campussafe_backup_grp;
+GRANT
+GRANT INSERT ON public.app_user, public.hazard_category, public.campus_location,
+    public.hazard_report, public.assignment, public.report_status_history,
+    public.maintenance_action, public.attachment TO campussafe_runtime_grp;
+GRANT
+GRANT UPDATE ON public.app_user, public.hazard_category, public.campus_location,
+    public.hazard_report, public.assignment TO campussafe_runtime_grp;
+GRANT
+GRANT DELETE ON public.attachment TO campussafe_runtime_grp;
+GRANT
+GRANT USAGE ON SEQUENCE public.app_user_user_id_seq,
+    public.hazard_category_category_id_seq, public.campus_location_location_id_seq,
+    public.hazard_report_report_id_seq, public.assignment_assignment_id_seq,
+    public.report_status_history_history_id_seq, public.maintenance_action_action_id_seq,
+    public.attachment_attachment_id_seq TO campussafe_runtime_grp;
+GRANT
+-- Auditor may inspect the role dictionary and operational records, not app_user.
+GRANT SELECT ON public.role, public.hazard_category, public.campus_location,
+    public.hazard_report, public.assignment, public.report_status_history,
+    public.maintenance_action, public.attachment TO campussafe_readonly_grp;
+GRANT
+-- Backup operator can read sequence states but cannot nextval/setval.
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO campussafe_backup_grp;
+GRANT
+ALTER DEFAULT PRIVILEGES FOR ROLE campussafe_owner_grp IN SCHEMA public REVOKE ALL ON TABLES FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES FOR ROLE campussafe_owner_grp IN SCHEMA public REVOKE ALL ON SEQUENCES FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES FOR ROLE campussafe_owner_grp REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES
+-- New objects require reviewed grants, including for the backup operator.
+ALTER ROLE campussafe_app IN DATABASE grp07_campussafedb SET search_path = public;
+ALTER ROLE
+ALTER ROLE campussafe_app IN DATABASE grp07_campussafedb SET statement_timeout = '30s';
+ALTER ROLE
+ALTER ROLE campussafe_app IN DATABASE grp07_campussafedb SET lock_timeout = '10s';
+ALTER ROLE

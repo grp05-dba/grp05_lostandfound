@@ -1,0 +1,359 @@
+SELECT version(),current_date,current_setting('TimeZone');
+                                 version                                 | current_date | current_setting 
+-------------------------------------------------------------------------+--------------+-----------------
+ PostgreSQL 18.6 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit | 2026-11-06   | Asia/Manila
+(1 row)
+
+SELECT tablename,tableowner FROM pg_tables WHERE schemaname='public' ORDER BY tablename;
+       tablename       |      tableowner      
+-----------------------+----------------------
+ app_user              | campussafe_owner_grp
+ assignment            | campussafe_owner_grp
+ attachment            | campussafe_owner_grp
+ campus_location       | campussafe_owner_grp
+ hazard_category       | campussafe_owner_grp
+ hazard_report         | campussafe_owner_grp
+ maintenance_action    | campussafe_owner_grp
+ report_status_history | campussafe_owner_grp
+ role                  | campussafe_owner_grp
+(9 rows)
+
+SELECT c.relname,c.relkind,pg_get_userbyid(c.relowner) AS owner,c.relacl FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' ORDER BY c.relkind,c.relname;
+                   relname                    | relkind |        owner         |                                                                                              relacl                                                                                              
+----------------------------------------------+---------+----------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ app_user_user_id_seq                         | S       | campussafe_owner_grp | {campussafe_owner_grp=rwU/campussafe_owner_grp,campussafe_runtime_grp=U/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp}
+ assignment_assignment_id_seq                 | S       | campussafe_owner_grp | {campussafe_owner_grp=rwU/campussafe_owner_grp,campussafe_runtime_grp=U/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp}
+ attachment_attachment_id_seq                 | S       | campussafe_owner_grp | {campussafe_owner_grp=rwU/campussafe_owner_grp,campussafe_runtime_grp=U/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp}
+ campus_location_location_id_seq              | S       | campussafe_owner_grp | {campussafe_owner_grp=rwU/campussafe_owner_grp,campussafe_runtime_grp=U/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp}
+ hazard_category_category_id_seq              | S       | campussafe_owner_grp | {campussafe_owner_grp=rwU/campussafe_owner_grp,campussafe_runtime_grp=U/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp}
+ hazard_report_report_id_seq                  | S       | campussafe_owner_grp | {campussafe_owner_grp=rwU/campussafe_owner_grp,campussafe_runtime_grp=U/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp}
+ maintenance_action_action_id_seq             | S       | campussafe_owner_grp | {campussafe_owner_grp=rwU/campussafe_owner_grp,campussafe_runtime_grp=U/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp}
+ report_status_history_history_id_seq         | S       | campussafe_owner_grp | {campussafe_owner_grp=rwU/campussafe_owner_grp,campussafe_runtime_grp=U/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp}
+ role_role_id_seq                             | S       | campussafe_owner_grp | {campussafe_owner_grp=rwU/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp}
+ app_user_email_key                           | i       | campussafe_owner_grp | 
+ app_user_pkey                                | i       | campussafe_owner_grp | 
+ app_user_username_key                        | i       | campussafe_owner_grp | 
+ assignment_pkey                              | i       | campussafe_owner_grp | 
+ assignment_report_id_maintenance_user_id_key | i       | campussafe_owner_grp | 
+ attachment_pkey                              | i       | campussafe_owner_grp | 
+ campus_location_pkey                         | i       | campussafe_owner_grp | 
+ hazard_category_category_name_key            | i       | campussafe_owner_grp | 
+ hazard_category_pkey                         | i       | campussafe_owner_grp | 
+ hazard_report_pkey                           | i       | campussafe_owner_grp | 
+ idx_action_report                            | i       | campussafe_owner_grp | 
+ idx_assign_maint                             | i       | campussafe_owner_grp | 
+ idx_assign_report                            | i       | campussafe_owner_grp | 
+ idx_attach_report                            | i       | campussafe_owner_grp | 
+ idx_history_report                           | i       | campussafe_owner_grp | 
+ idx_report_category                          | i       | campussafe_owner_grp | 
+ idx_report_location                          | i       | campussafe_owner_grp | 
+ idx_report_reporter                          | i       | campussafe_owner_grp | 
+ idx_report_status                            | i       | campussafe_owner_grp | 
+ idx_report_submitted                         | i       | campussafe_owner_grp | 
+ maintenance_action_pkey                      | i       | campussafe_owner_grp | 
+ report_status_history_pkey                   | i       | campussafe_owner_grp | 
+ role_pkey                                    | i       | campussafe_owner_grp | 
+ role_role_name_key                           | i       | campussafe_owner_grp | 
+ app_user                                     | r       | campussafe_owner_grp | {campussafe_owner_grp=arwdDxtm/campussafe_owner_grp,campussafe_runtime_grp=arw/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp}
+ assignment                                   | r       | campussafe_owner_grp | {campussafe_owner_grp=arwdDxtm/campussafe_owner_grp,campussafe_runtime_grp=arw/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp,campussafe_readonly_grp=r/campussafe_owner_grp}
+ attachment                                   | r       | campussafe_owner_grp | {campussafe_owner_grp=arwdDxtm/campussafe_owner_grp,campussafe_runtime_grp=ard/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp,campussafe_readonly_grp=r/campussafe_owner_grp}
+ campus_location                              | r       | campussafe_owner_grp | {campussafe_owner_grp=arwdDxtm/campussafe_owner_grp,campussafe_runtime_grp=arw/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp,campussafe_readonly_grp=r/campussafe_owner_grp}
+ hazard_category                              | r       | campussafe_owner_grp | {campussafe_owner_grp=arwdDxtm/campussafe_owner_grp,campussafe_runtime_grp=arw/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp,campussafe_readonly_grp=r/campussafe_owner_grp}
+ hazard_report                                | r       | campussafe_owner_grp | {campussafe_owner_grp=arwdDxtm/campussafe_owner_grp,campussafe_runtime_grp=arw/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp,campussafe_readonly_grp=r/campussafe_owner_grp}
+ maintenance_action                           | r       | campussafe_owner_grp | {campussafe_owner_grp=arwdDxtm/campussafe_owner_grp,campussafe_runtime_grp=ar/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp,campussafe_readonly_grp=r/campussafe_owner_grp}
+ report_status_history                        | r       | campussafe_owner_grp | {campussafe_owner_grp=arwdDxtm/campussafe_owner_grp,campussafe_runtime_grp=ar/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp,campussafe_readonly_grp=r/campussafe_owner_grp}
+ role                                         | r       | campussafe_owner_grp | {campussafe_owner_grp=arwdDxtm/campussafe_owner_grp,campussafe_runtime_grp=r/campussafe_owner_grp,campussafe_backup_grp=r/campussafe_owner_grp,campussafe_readonly_grp=r/campussafe_owner_grp}
+(42 rows)
+
+SELECT c.relkind,count(*) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' GROUP BY c.relkind ORDER BY c.relkind;
+ relkind | count 
+---------+-------
+ S       |     9
+ i       |    24
+ r       |     9
+(3 rows)
+
+SELECT conname,contype,pg_get_constraintdef(oid) FROM pg_constraint WHERE connamespace='public'::regnamespace ORDER BY conname;
+                      conname                      | contype |                                                                                                             pg_get_constraintdef                                                                                                             
+---------------------------------------------------+---------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ app_user_account_status_check                     | c       | CHECK (((account_status)::text = ANY ((ARRAY['active'::character varying, 'inactive'::character varying, 'suspended'::character varying])::text[])))
+ app_user_account_status_not_null                  | n       | NOT NULL account_status
+ app_user_created_at_not_null                      | n       | NOT NULL created_at
+ app_user_email_key                                | u       | UNIQUE (email)
+ app_user_email_not_null                           | n       | NOT NULL email
+ app_user_full_name_not_null                       | n       | NOT NULL full_name
+ app_user_password_hash_not_null                   | n       | NOT NULL password_hash
+ app_user_pkey                                     | p       | PRIMARY KEY (user_id)
+ app_user_role_id_fkey                             | f       | FOREIGN KEY (role_id) REFERENCES role(role_id)
+ app_user_role_id_not_null                         | n       | NOT NULL role_id
+ app_user_user_id_not_null                         | n       | NOT NULL user_id
+ app_user_username_key                             | u       | UNIQUE (username)
+ app_user_username_not_null                        | n       | NOT NULL username
+ assignment_assigned_at_not_null                   | n       | NOT NULL assigned_at
+ assignment_assigned_by_user_id_fkey               | f       | FOREIGN KEY (assigned_by_user_id) REFERENCES app_user(user_id)
+ assignment_assigned_by_user_id_not_null           | n       | NOT NULL assigned_by_user_id
+ assignment_assignment_id_not_null                 | n       | NOT NULL assignment_id
+ assignment_assignment_status_check                | c       | CHECK (((assignment_status)::text = ANY ((ARRAY['Assigned'::character varying, 'In Progress'::character varying, 'Completed'::character varying, 'Cancelled'::character varying])::text[])))
+ assignment_assignment_status_not_null             | n       | NOT NULL assignment_status
+ assignment_maintenance_user_id_fkey               | f       | FOREIGN KEY (maintenance_user_id) REFERENCES app_user(user_id)
+ assignment_maintenance_user_id_not_null           | n       | NOT NULL maintenance_user_id
+ assignment_pkey                                   | p       | PRIMARY KEY (assignment_id)
+ assignment_report_id_fkey                         | f       | FOREIGN KEY (report_id) REFERENCES hazard_report(report_id) ON DELETE CASCADE
+ assignment_report_id_maintenance_user_id_key      | u       | UNIQUE (report_id, maintenance_user_id)
+ assignment_report_id_not_null                     | n       | NOT NULL report_id
+ attachment_attachment_id_not_null                 | n       | NOT NULL attachment_id
+ attachment_file_name_not_null                     | n       | NOT NULL file_name
+ attachment_file_path_or_url_not_null              | n       | NOT NULL file_path_or_url
+ attachment_pkey                                   | p       | PRIMARY KEY (attachment_id)
+ attachment_report_id_fkey                         | f       | FOREIGN KEY (report_id) REFERENCES hazard_report(report_id) ON DELETE CASCADE
+ attachment_report_id_not_null                     | n       | NOT NULL report_id
+ attachment_uploaded_at_not_null                   | n       | NOT NULL uploaded_at
+ attachment_uploaded_by_user_id_fkey               | f       | FOREIGN KEY (uploaded_by_user_id) REFERENCES app_user(user_id)
+ attachment_uploaded_by_user_id_not_null           | n       | NOT NULL uploaded_by_user_id
+ campus_location_building_not_null                 | n       | NOT NULL building
+ campus_location_is_active_not_null                | n       | NOT NULL is_active
+ campus_location_location_id_not_null              | n       | NOT NULL location_id
+ campus_location_pkey                              | p       | PRIMARY KEY (location_id)
+ campus_location_room_area_not_null                | n       | NOT NULL room_area
+ chk_resolved_has_date                             | c       | CHECK ((((status)::text <> ALL ((ARRAY['Resolved'::character varying, 'Closed'::character varying])::text[])) OR (resolved_at IS NOT NULL)))
+ chk_verified_pair                                 | c       | CHECK ((((verified_by_user_id IS NULL) AND (verified_at IS NULL)) OR ((verified_by_user_id IS NOT NULL) AND (verified_at IS NOT NULL))))
+ hazard_category_category_id_not_null              | n       | NOT NULL category_id
+ hazard_category_category_name_key                 | u       | UNIQUE (category_name)
+ hazard_category_category_name_not_null            | n       | NOT NULL category_name
+ hazard_category_is_active_not_null                | n       | NOT NULL is_active
+ hazard_category_pkey                              | p       | PRIMARY KEY (category_id)
+ hazard_report_category_id_fkey                    | f       | FOREIGN KEY (category_id) REFERENCES hazard_category(category_id)
+ hazard_report_category_id_not_null                | n       | NOT NULL category_id
+ hazard_report_description_not_null                | n       | NOT NULL description
+ hazard_report_location_id_fkey                    | f       | FOREIGN KEY (location_id) REFERENCES campus_location(location_id)
+ hazard_report_location_id_not_null                | n       | NOT NULL location_id
+ hazard_report_pkey                                | p       | PRIMARY KEY (report_id)
+ hazard_report_priority_check                      | c       | CHECK (((priority)::text = ANY ((ARRAY['Low'::character varying, 'Medium'::character varying, 'High'::character varying, 'Critical'::character varying])::text[])))
+ hazard_report_report_id_not_null                  | n       | NOT NULL report_id
+ hazard_report_reporter_user_id_fkey               | f       | FOREIGN KEY (reporter_user_id) REFERENCES app_user(user_id)
+ hazard_report_reporter_user_id_not_null           | n       | NOT NULL reporter_user_id
+ hazard_report_status_check                        | c       | CHECK (((status)::text = ANY ((ARRAY['Submitted'::character varying, 'Verified'::character varying, 'Assigned'::character varying, 'In Progress'::character varying, 'Resolved'::character varying, 'Closed'::character varying])::text[])))
+ hazard_report_status_not_null                     | n       | NOT NULL status
+ hazard_report_submitted_at_not_null               | n       | NOT NULL submitted_at
+ hazard_report_verified_by_user_id_fkey            | f       | FOREIGN KEY (verified_by_user_id) REFERENCES app_user(user_id)
+ maintenance_action_action_date_not_null           | n       | NOT NULL action_date
+ maintenance_action_action_details_not_null        | n       | NOT NULL action_details
+ maintenance_action_action_id_not_null             | n       | NOT NULL action_id
+ maintenance_action_is_resolution_not_null         | n       | NOT NULL is_resolution
+ maintenance_action_maintenance_user_id_fkey       | f       | FOREIGN KEY (maintenance_user_id) REFERENCES app_user(user_id)
+ maintenance_action_maintenance_user_id_not_null   | n       | NOT NULL maintenance_user_id
+ maintenance_action_pkey                           | p       | PRIMARY KEY (action_id)
+ maintenance_action_report_id_fkey                 | f       | FOREIGN KEY (report_id) REFERENCES hazard_report(report_id) ON DELETE CASCADE
+ maintenance_action_report_id_not_null             | n       | NOT NULL report_id
+ report_status_history_changed_at_not_null         | n       | NOT NULL changed_at
+ report_status_history_changed_by_user_id_fkey     | f       | FOREIGN KEY (changed_by_user_id) REFERENCES app_user(user_id)
+ report_status_history_changed_by_user_id_not_null | n       | NOT NULL changed_by_user_id
+ report_status_history_history_id_not_null         | n       | NOT NULL history_id
+ report_status_history_pkey                        | p       | PRIMARY KEY (history_id)
+ report_status_history_report_id_fkey              | f       | FOREIGN KEY (report_id) REFERENCES hazard_report(report_id) ON DELETE CASCADE
+ report_status_history_report_id_not_null          | n       | NOT NULL report_id
+ report_status_history_status_check                | c       | CHECK (((status)::text = ANY ((ARRAY['Submitted'::character varying, 'Verified'::character varying, 'Assigned'::character varying, 'In Progress'::character varying, 'Resolved'::character varying, 'Closed'::character varying])::text[])))
+ report_status_history_status_not_null             | n       | NOT NULL status
+ role_pkey                                         | p       | PRIMARY KEY (role_id)
+ role_role_id_not_null                             | n       | NOT NULL role_id
+ role_role_name_key                                | u       | UNIQUE (role_name)
+ role_role_name_not_null                           | n       | NOT NULL role_name
+(82 rows)
+
+SELECT rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolinherit,rolreplication,rolbypassrls FROM pg_roles WHERE rolname LIKE 'campussafe_%' ORDER BY rolname;
+         rolname         | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolinherit | rolreplication | rolbypassrls 
+-------------------------+-------------+----------+-------------+---------------+------------+----------------+--------------
+ campussafe_app          | t           | f        | f           | f             | t          | f              | f
+ campussafe_backup       | t           | f        | f           | f             | t          | f              | f
+ campussafe_backup_grp   | f           | f        | f           | f             | t          | f              | f
+ campussafe_dba          | t           | f        | f           | f             | t          | f              | f
+ campussafe_owner_grp    | f           | f        | f           | f             | t          | f              | f
+ campussafe_readonly_grp | f           | f        | f           | f             | t          | f              | f
+ campussafe_report       | t           | f        | f           | f             | t          | f              | f
+ campussafe_runtime_grp  | f           | f        | f           | f             | t          | f              | f
+(8 rows)
+
+SELECT member.rolname AS login,parent.rolname AS group_role,m.admin_option,m.inherit_option,m.set_option FROM pg_auth_members m JOIN pg_roles member ON member.oid=m.member JOIN pg_roles parent ON parent.oid=m.roleid WHERE member.rolname LIKE 'campussafe_%';
+       login       |       group_role        | admin_option | inherit_option | set_option 
+-------------------+-------------------------+--------------+----------------+------------
+ campussafe_dba    | campussafe_owner_grp    | f            | t              | t
+ campussafe_app    | campussafe_runtime_grp  | f            | t              | t
+ campussafe_report | campussafe_readonly_grp | f            | t              | t
+ campussafe_backup | campussafe_backup_grp   | f            | t              | t
+(4 rows)
+
+SELECT datname,pg_get_userbyid(datdba) AS owner,datacl FROM pg_database ORDER BY datname;
+        datname         |        owner         |                                                                                          datacl                                                                                           
+------------------------+----------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ brewpos_unrelateddb    | postgres             | {postgres=CTc/postgres}
+ campussafe_unrelateddb | postgres             | {postgres=CTc/postgres}
+ grp00_habalgodb        | habalgo_owner_grp    | {habalgo_owner_grp=CTc/habalgo_owner_grp,habalgo_runtime_grp=c/habalgo_owner_grp,habalgo_readonly_grp=c/habalgo_owner_grp}
+ grp07_campussafedb     | campussafe_owner_grp | {campussafe_owner_grp=CTc/campussafe_owner_grp,campussafe_runtime_grp=c/campussafe_owner_grp,campussafe_readonly_grp=c/campussafe_owner_grp,campussafe_backup_grp=c/campussafe_owner_grp}
+ grp_brewposdb          | brewpos_owner_grp    | {brewpos_owner_grp=CTc/brewpos_owner_grp,brewpos_runtime_grp=c/brewpos_owner_grp,brewpos_readonly_grp=c/brewpos_owner_grp}
+ habalgo_unrelateddb    | postgres             | {postgres=CTc/postgres}
+ postgres               | postgres             | {postgres=CTc/postgres}
+ template0              | postgres             | {=c/postgres,postgres=CTc/postgres}
+ template1              | postgres             | {postgres=CTc/postgres}
+(9 rows)
+
+SELECT nspname,pg_get_userbyid(nspowner) AS owner,nspacl FROM pg_namespace WHERE nspname='public';
+ nspname |        owner         |                                                                                          nspacl                                                                                          
+---------+----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ public  | campussafe_owner_grp | {campussafe_owner_grp=UC/campussafe_owner_grp,campussafe_runtime_grp=U/campussafe_owner_grp,campussafe_readonly_grp=U/campussafe_owner_grp,campussafe_backup_grp=U/campussafe_owner_grp}
+(1 row)
+
+SELECT grantee,table_name,privilege_type FROM information_schema.table_privileges WHERE table_schema='public' ORDER BY grantee,table_name,privilege_type;
+         grantee         |      table_name       | privilege_type 
+-------------------------+-----------------------+----------------
+ campussafe_backup_grp   | app_user              | SELECT
+ campussafe_backup_grp   | assignment            | SELECT
+ campussafe_backup_grp   | attachment            | SELECT
+ campussafe_backup_grp   | campus_location       | SELECT
+ campussafe_backup_grp   | hazard_category       | SELECT
+ campussafe_backup_grp   | hazard_report         | SELECT
+ campussafe_backup_grp   | maintenance_action    | SELECT
+ campussafe_backup_grp   | report_status_history | SELECT
+ campussafe_backup_grp   | role                  | SELECT
+ campussafe_owner_grp    | app_user              | DELETE
+ campussafe_owner_grp    | app_user              | INSERT
+ campussafe_owner_grp    | app_user              | REFERENCES
+ campussafe_owner_grp    | app_user              | SELECT
+ campussafe_owner_grp    | app_user              | TRIGGER
+ campussafe_owner_grp    | app_user              | TRUNCATE
+ campussafe_owner_grp    | app_user              | UPDATE
+ campussafe_owner_grp    | assignment            | DELETE
+ campussafe_owner_grp    | assignment            | INSERT
+ campussafe_owner_grp    | assignment            | REFERENCES
+ campussafe_owner_grp    | assignment            | SELECT
+ campussafe_owner_grp    | assignment            | TRIGGER
+ campussafe_owner_grp    | assignment            | TRUNCATE
+ campussafe_owner_grp    | assignment            | UPDATE
+ campussafe_owner_grp    | attachment            | DELETE
+ campussafe_owner_grp    | attachment            | INSERT
+ campussafe_owner_grp    | attachment            | REFERENCES
+ campussafe_owner_grp    | attachment            | SELECT
+ campussafe_owner_grp    | attachment            | TRIGGER
+ campussafe_owner_grp    | attachment            | TRUNCATE
+ campussafe_owner_grp    | attachment            | UPDATE
+ campussafe_owner_grp    | campus_location       | DELETE
+ campussafe_owner_grp    | campus_location       | INSERT
+ campussafe_owner_grp    | campus_location       | REFERENCES
+ campussafe_owner_grp    | campus_location       | SELECT
+ campussafe_owner_grp    | campus_location       | TRIGGER
+ campussafe_owner_grp    | campus_location       | TRUNCATE
+ campussafe_owner_grp    | campus_location       | UPDATE
+ campussafe_owner_grp    | hazard_category       | DELETE
+ campussafe_owner_grp    | hazard_category       | INSERT
+ campussafe_owner_grp    | hazard_category       | REFERENCES
+ campussafe_owner_grp    | hazard_category       | SELECT
+ campussafe_owner_grp    | hazard_category       | TRIGGER
+ campussafe_owner_grp    | hazard_category       | TRUNCATE
+ campussafe_owner_grp    | hazard_category       | UPDATE
+ campussafe_owner_grp    | hazard_report         | DELETE
+ campussafe_owner_grp    | hazard_report         | INSERT
+ campussafe_owner_grp    | hazard_report         | REFERENCES
+ campussafe_owner_grp    | hazard_report         | SELECT
+ campussafe_owner_grp    | hazard_report         | TRIGGER
+ campussafe_owner_grp    | hazard_report         | TRUNCATE
+ campussafe_owner_grp    | hazard_report         | UPDATE
+ campussafe_owner_grp    | maintenance_action    | DELETE
+ campussafe_owner_grp    | maintenance_action    | INSERT
+ campussafe_owner_grp    | maintenance_action    | REFERENCES
+ campussafe_owner_grp    | maintenance_action    | SELECT
+ campussafe_owner_grp    | maintenance_action    | TRIGGER
+ campussafe_owner_grp    | maintenance_action    | TRUNCATE
+ campussafe_owner_grp    | maintenance_action    | UPDATE
+ campussafe_owner_grp    | report_status_history | DELETE
+ campussafe_owner_grp    | report_status_history | INSERT
+ campussafe_owner_grp    | report_status_history | REFERENCES
+ campussafe_owner_grp    | report_status_history | SELECT
+ campussafe_owner_grp    | report_status_history | TRIGGER
+ campussafe_owner_grp    | report_status_history | TRUNCATE
+ campussafe_owner_grp    | report_status_history | UPDATE
+ campussafe_owner_grp    | role                  | DELETE
+ campussafe_owner_grp    | role                  | INSERT
+ campussafe_owner_grp    | role                  | REFERENCES
+ campussafe_owner_grp    | role                  | SELECT
+ campussafe_owner_grp    | role                  | TRIGGER
+ campussafe_owner_grp    | role                  | TRUNCATE
+ campussafe_owner_grp    | role                  | UPDATE
+ campussafe_readonly_grp | assignment            | SELECT
+ campussafe_readonly_grp | attachment            | SELECT
+ campussafe_readonly_grp | campus_location       | SELECT
+ campussafe_readonly_grp | hazard_category       | SELECT
+ campussafe_readonly_grp | hazard_report         | SELECT
+ campussafe_readonly_grp | maintenance_action    | SELECT
+ campussafe_readonly_grp | report_status_history | SELECT
+ campussafe_readonly_grp | role                  | SELECT
+ campussafe_runtime_grp  | app_user              | INSERT
+ campussafe_runtime_grp  | app_user              | SELECT
+ campussafe_runtime_grp  | app_user              | UPDATE
+ campussafe_runtime_grp  | assignment            | INSERT
+ campussafe_runtime_grp  | assignment            | SELECT
+ campussafe_runtime_grp  | assignment            | UPDATE
+ campussafe_runtime_grp  | attachment            | DELETE
+ campussafe_runtime_grp  | attachment            | INSERT
+ campussafe_runtime_grp  | attachment            | SELECT
+ campussafe_runtime_grp  | campus_location       | INSERT
+ campussafe_runtime_grp  | campus_location       | SELECT
+ campussafe_runtime_grp  | campus_location       | UPDATE
+ campussafe_runtime_grp  | hazard_category       | INSERT
+ campussafe_runtime_grp  | hazard_category       | SELECT
+ campussafe_runtime_grp  | hazard_category       | UPDATE
+ campussafe_runtime_grp  | hazard_report         | INSERT
+ campussafe_runtime_grp  | hazard_report         | SELECT
+ campussafe_runtime_grp  | hazard_report         | UPDATE
+ campussafe_runtime_grp  | maintenance_action    | INSERT
+ campussafe_runtime_grp  | maintenance_action    | SELECT
+ campussafe_runtime_grp  | report_status_history | INSERT
+ campussafe_runtime_grp  | report_status_history | SELECT
+ campussafe_runtime_grp  | role                  | SELECT
+(103 rows)
+
+SELECT defaclrole::regrole,defaclnamespace,defaclobjtype,defaclacl FROM pg_default_acl;
+      defaclrole      | defaclnamespace | defaclobjtype |                   defaclacl                   
+----------------------+-----------------+---------------+-----------------------------------------------
+ campussafe_owner_grp |               0 | f             | {campussafe_owner_grp=X/campussafe_owner_grp}
+(1 row)
+
+SELECT (SELECT count(*) FROM public.role) AS role, (SELECT count(*) FROM public.app_user) AS app_user, (SELECT count(*) FROM public.hazard_category) AS hazard_category, (SELECT count(*) FROM public.campus_location) AS campus_location, (SELECT count(*) FROM public.hazard_report) AS hazard_report, (SELECT count(*) FROM public.assignment) AS assignment, (SELECT count(*) FROM public.report_status_history) AS report_status_history, (SELECT count(*) FROM public.maintenance_action) AS maintenance_action, (SELECT count(*) FROM public.attachment) AS attachment;
+ role | app_user | hazard_category | campus_location | hazard_report | assignment | report_status_history | maintenance_action | attachment 
+------+----------+-----------------+-----------------+---------------+------------+-----------------------+--------------------+------------
+    5 |        6 |               6 |              10 |            16 |         12 |                    60 |                  9 |          5
+(1 row)
+
+SELECT status,count(*) FROM hazard_report GROUP BY status ORDER BY status;
+   status    | count 
+-------------+-------
+ Assigned    |     3
+ Closed      |     3
+ In Progress |     3
+ Resolved    |     3
+ Submitted   |     2
+ Verified    |     2
+(6 rows)
+
+SELECT to_regclass('public.e4_forbidden') IS NULL AND to_regclass('public.e4_ddl_probe') IS NULL AS probes_absent;
+ probes_absent 
+---------------
+ t
+(1 row)
+
+SELECT count(*) AS forbidden_database_count FROM pg_database WHERE datname='campussafe_e4_forbidden';
+ forbidden_database_count 
+--------------------------
+                        0
+(1 row)
+
+SELECT count(*) AS forbidden_role_count FROM pg_roles WHERE rolname='campussafe_e4_forbidden';
+ forbidden_role_count 
+----------------------
+                    0
+(1 row)
+
+SELECT count(*) AS leftover_users FROM app_user WHERE username='e4_test_user';
+ leftover_users 
+----------------
+              0
+(1 row)
+

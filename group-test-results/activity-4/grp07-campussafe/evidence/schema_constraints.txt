@@ -1,0 +1,19 @@
+### verification pair | expected constraint denial | PASS
+BEGIN; INSERT INTO hazard_report(reporter_user_id,location_id,category_id,description,verified_by_user_id) VALUES (4,1,1,'E4 invalid verifier pair',1); ROLLBACK;
+BEGIN
+ERROR:  23514: new row for relation "hazard_report" violates check constraint "chk_verified_pair"
+DETAIL:  Failing row contains (18, 4, 1, 1, E4 invalid verifier pair, null, Submitted, 2026-11-06 18:35:03.242993, 1, null, null).
+SCHEMA NAME:  public
+TABLE NAME:  hazard_report
+CONSTRAINT NAME:  chk_verified_pair
+LOCATION:  ExecConstraints, execMain.c:2081
+
+### resolution timestamp | expected constraint denial | PASS
+BEGIN; INSERT INTO hazard_report(reporter_user_id,location_id,category_id,description,status) VALUES (4,1,1,'E4 invalid missing timestamp','Resolved'); ROLLBACK;
+BEGIN
+ERROR:  23514: new row for relation "hazard_report" violates check constraint "chk_resolved_has_date"
+DETAIL:  Failing row contains (19, 4, 1, 1, E4 invalid missing timestamp, null, Resolved, 2026-11-06 18:35:03.353961, null, null, null).
+SCHEMA NAME:  public
+TABLE NAME:  hazard_report
+CONSTRAINT NAME:  chk_resolved_has_date
+LOCATION:  ExecConstraints, execMain.c:2081

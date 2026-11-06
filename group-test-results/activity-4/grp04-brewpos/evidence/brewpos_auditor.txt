@@ -1,0 +1,161 @@
+### identity-brewpos_auditor | database=grp_brewposdb | expected=allowed | PASS
+SELECT session_user, current_user, current_database();
+  session_user   |  current_user   | current_database 
+-----------------+-----------------+------------------
+ brewpos_auditor | brewpos_auditor | grp_brewposdb
+(1 row)
+
+
+### read-brewpos_auditor | database=grp_brewposdb | expected=allowed | PASS
+SELECT (SELECT count(*) FROM staff) AS staff, (SELECT count(*) FROM menu_category) AS categories, (SELECT count(*) FROM menu_item) AS items, (SELECT count(*) FROM order_ticket) AS orders, (SELECT count(*) FROM order_line_item) AS lines;
+ staff | categories | items | orders | lines 
+-------+------------+-------+--------+-------
+     2 |          3 |    11 |      5 |     9
+(1 row)
+
+
+### auditor-deny-insert-staff | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO staff DEFAULT VALUES;
+ERROR:  42501: permission denied for table staff
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-staff | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE staff SET full_name=full_name WHERE false;
+ERROR:  42501: permission denied for table staff
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-staff | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM staff WHERE false;
+ERROR:  42501: permission denied for table staff
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-insert-menu_category | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO menu_category DEFAULT VALUES;
+ERROR:  42501: permission denied for table menu_category
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-menu_category | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE menu_category SET category_name=category_name WHERE false;
+ERROR:  42501: permission denied for table menu_category
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-menu_category | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM menu_category WHERE false;
+ERROR:  42501: permission denied for table menu_category
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-insert-menu_item | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO menu_item DEFAULT VALUES;
+ERROR:  42501: permission denied for table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-menu_item | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE menu_item SET price=price WHERE false;
+ERROR:  42501: permission denied for table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-menu_item | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM menu_item WHERE false;
+ERROR:  42501: permission denied for table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-insert-order_ticket | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO order_ticket DEFAULT VALUES;
+ERROR:  42501: permission denied for table order_ticket
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-order_ticket | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE order_ticket SET payment_method=payment_method WHERE false;
+ERROR:  42501: permission denied for table order_ticket
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-order_ticket | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM order_ticket WHERE false;
+ERROR:  42501: permission denied for table order_ticket
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-insert-order_line_item | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO order_line_item DEFAULT VALUES;
+ERROR:  42501: permission denied for table order_line_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-order_line_item | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE order_line_item SET quantity=quantity WHERE false;
+ERROR:  42501: permission denied for table order_line_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-order_line_item | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM order_line_item WHERE false;
+ERROR:  42501: permission denied for table order_line_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-sequence | database=grp_brewposdb | expected=denied | PASS
+SELECT nextval('order_ticket_order_id_seq');
+ERROR:  42501: permission denied for sequence order_ticket_order_id_seq
+LOCATION:  nextval_internal, sequence.c:655
+
+### auditor-deny-create-table | database=grp_brewposdb | expected=denied | PASS
+BEGIN; CREATE TABLE public.e4_forbidden(id integer); ROLLBACK;
+BEGIN
+ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.e4_forbidden(id integer);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-owner | database=grp_brewposdb | expected=denied | PASS
+SET ROLE brewpos_owner_grp;
+ERROR:  42501: permission denied to set role "brewpos_owner_grp"
+LOCATION:  call_string_check_hook, guc.c:6945
+
+### deny-createdb-brewpos_auditor | database=grp_brewposdb | expected=denied | PASS
+CREATE DATABASE e4_forbidden_database;
+ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+### deny-createrole-brewpos_auditor | database=grp_brewposdb | expected=denied | PASS
+CREATE ROLE e4_forbidden_role NOLOGIN;
+ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+### isolation-brewpos_auditor-brewpos_unrelateddb | database=brewpos_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "brewpos_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-brewpos_auditor-postgres | database=postgres | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-brewpos_auditor-template1 | database=template1 | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.

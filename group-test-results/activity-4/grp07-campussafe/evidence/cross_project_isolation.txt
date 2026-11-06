@@ -1,0 +1,39 @@
+### brewpos_app denied access to CampusSafe | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp07_campussafedb"
+DETAIL:  User does not have CONNECT privilege.
+
+### brewpos_auditor denied access to CampusSafe | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp07_campussafedb"
+DETAIL:  User does not have CONNECT privilege.
+
+### brewpos_dba denied access to CampusSafe | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp07_campussafedb"
+DETAIL:  User does not have CONNECT privilege.
+
+### brewpos_app retains own database access | PASS
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ brewpos_app  | brewpos_app  | grp_brewposdb
+(1 row)
+
+
+### habalgo_app denied access to CampusSafe | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp07_campussafedb"
+DETAIL:  User does not have CONNECT privilege.
+
+### habalgo_auditor denied access to CampusSafe | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp07_campussafedb"
+DETAIL:  User does not have CONNECT privilege.
+
+### habalgo_dba denied access to CampusSafe | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp07_campussafedb"
+DETAIL:  User does not have CONNECT privilege.
+
+### habalgo_app retains own database access | PASS
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ habalgo_app  | habalgo_app  | grp00_habalgodb
+(1 row)
+

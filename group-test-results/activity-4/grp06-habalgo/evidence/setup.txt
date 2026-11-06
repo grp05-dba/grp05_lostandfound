@@ -1,0 +1,192 @@
+### roles and databases
+\set ON_ERROR_STOP on
+-- Fresh project setup in the isolated evaluation cluster; connect to postgres.
+CREATE ROLE habalgo_owner_grp NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE habalgo_runtime_grp NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE habalgo_readonly_grp NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE habalgo_app LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE habalgo_auditor LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE habalgo_dba LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+GRANT habalgo_runtime_grp TO habalgo_app;
+GRANT ROLE
+GRANT habalgo_readonly_grp TO habalgo_auditor;
+GRANT ROLE
+GRANT habalgo_owner_grp TO habalgo_dba;
+GRANT ROLE
+CREATE DATABASE grp00_habalgodb OWNER habalgo_owner_grp;
+CREATE DATABASE
+CREATE DATABASE habalgo_unrelateddb;
+CREATE DATABASE
+REVOKE ALL ON DATABASE grp00_habalgodb FROM PUBLIC;
+REVOKE
+REVOKE ALL ON DATABASE habalgo_unrelateddb FROM PUBLIC;
+REVOKE
+GRANT CONNECT ON DATABASE grp00_habalgodb TO habalgo_runtime_grp, habalgo_readonly_grp;
+GRANT
+-- Set distinct private passwords locally; no passwords are stored in this script.
+-- Other databases require their own CONNECT review; see 03_lab_isolation.sql.
+
+### cluster isolation
+\set ON_ERROR_STOP on
+-- ISOLATED LAB ONLY: all databases below belong to this evaluation environment.
+-- Do not blindly apply PUBLIC revokes to a shared/production cluster.
+-- Preserve any legitimate users' explicit grants before adapting these commands.
+REVOKE CONNECT, TEMPORARY ON DATABASE postgres FROM PUBLIC;
+REVOKE
+REVOKE CONNECT, TEMPORARY ON DATABASE template1 FROM PUBLIC;
+REVOKE
+REVOKE CONNECT, TEMPORARY ON DATABASE grp_brewposdb FROM PUBLIC;
+REVOKE
+REVOKE CONNECT, TEMPORARY ON DATABASE brewpos_unrelateddb FROM PUBLIC;
+REVOKE
+-- The existing Group 4 explicit grants/ownership remain intact.
+
+### unchanged upstream schema
+SET ROLE habalgo_owner_grp;
+SET
+CREATE SCHEMA IF NOT EXISTS habalgo;
+CREATE SCHEMA
+CREATE TABLE IF NOT EXISTS habalgo.customer (
+    customer_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE
+);
+CREATE TABLE
+CREATE TABLE IF NOT EXISTS habalgo.driver (
+    driver_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    license_no VARCHAR(50) NOT NULL UNIQUE
+);
+CREATE TABLE
+CREATE TABLE IF NOT EXISTS habalgo.vehicle (
+    vehicle_id SERIAL PRIMARY KEY,
+    plate_no VARCHAR(20) NOT NULL UNIQUE,
+    vehicle_type VARCHAR(50) NOT NULL,
+    model VARCHAR(50) NOT NULL
+);
+CREATE TABLE
+CREATE TABLE IF NOT EXISTS habalgo.driver_vehicle (
+    driver_id INT NOT NULL REFERENCES habalgo.driver(driver_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    vehicle_id INT NOT NULL REFERENCES habalgo.vehicle(vehicle_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    assigned_from TIMESTAMP NOT NULL,
+    assigned_to TIMESTAMP NULL,
+    PRIMARY KEY (driver_id, vehicle_id),
+    CONSTRAINT ck_assignment_dates CHECK (assigned_to IS NULL OR assigned_to >= assigned_from)
+);
+CREATE TABLE
+CREATE TABLE IF NOT EXISTS habalgo.location (
+    location_id SERIAL PRIMARY KEY,
+    address VARCHAR(255) NOT NULL,
+    city VARCHAR(100) NOT NULL
+);
+CREATE TABLE
+CREATE TABLE IF NOT EXISTS habalgo.booking (
+    booking_id SERIAL PRIMARY KEY,
+    customer_id INT NOT NULL REFERENCES habalgo.customer(customer_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    driver_id INT NULL REFERENCES habalgo.driver(driver_id) ON UPDATE CASCADE ON DELETE SET NULL,
+    pickup_location_id INT NOT NULL REFERENCES habalgo.location(location_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    dropoff_location_id INT NOT NULL REFERENCES habalgo.location(location_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    booking_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    booking_status VARCHAR(50) NOT NULL DEFAULT 'Pending',
+    CONSTRAINT ck_booking_status CHECK (booking_status IN ('Pending', 'Confirmed', 'In Progress', 'Completed', 'Cancelled'))
+);
+CREATE TABLE
+CREATE TABLE IF NOT EXISTS habalgo.payment (
+    payment_id SERIAL PRIMARY KEY,
+    booking_id INT NOT NULL REFERENCES habalgo.booking(booking_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    amount NUMERIC(10,2) NOT NULL CHECK (amount > 0),
+    method VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL DEFAULT 'Pending'
+);
+CREATE TABLE
+CREATE TABLE IF NOT EXISTS habalgo.rating_feedback (
+    rating_id SERIAL PRIMARY KEY,
+    booking_id INT NOT NULL REFERENCES habalgo.booking(booking_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    customer_id INT NOT NULL REFERENCES habalgo.customer(customer_id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    feedback TEXT NULL,
+    CONSTRAINT uq_rating_booking_customer UNIQUE (booking_id, customer_id)
+);
+CREATE TABLE
+CREATE INDEX IF NOT EXISTS idx_booking_customer ON habalgo.booking(customer_id);
+CREATE INDEX
+CREATE INDEX IF NOT EXISTS idx_booking_driver ON habalgo.booking(driver_id);
+CREATE INDEX
+CREATE INDEX IF NOT EXISTS idx_booking_date ON habalgo.booking(booking_date);
+CREATE INDEX
+CREATE INDEX IF NOT EXISTS idx_payment_booking ON habalgo.payment(booking_id);
+CREATE INDEX
+CREATE INDEX IF NOT EXISTS idx_rating_booking ON habalgo.rating_feedback(booking_id);
+CREATE INDEX
+
+### unchanged documented sample data
+SET ROLE habalgo_owner_grp;
+SET
+SET search_path TO habalgo;
+SET
+-- Insert 10 random drivers
+INSERT INTO habalgo.driver (name, phone, license_no) VALUES
+('Juan Bautista', '09175550101', 'N01-23-000001'),
+('Carlos Gomez', '09175550102', 'N01-23-000002'),
+('Miguel Santos', '09175550103', 'N01-23-000003'),
+('Antonio Reyes', '09175550104', 'N01-23-000004'),
+('Jose Rizal Aquino', '09175550105', 'N01-23-000005'),
+('Andres Bonifacio', '09175550106', 'N01-23-000006'),
+('Emilio Jacinto', '09175550107', 'N01-23-000007'),
+('Apolinario Mabini', '09175550108', 'N01-23-000008'),
+('Francisco Baltazar', '09175550109', 'N01-23-000009'),
+('Melchora Aquino', '09175550110', 'N01-23-000010');
+INSERT 0 10
+
+### privileges
+\set ON_ERROR_STOP on
+-- Run as provisioning administrator in grp00_habalgodb after importing upstream
+-- schema.sql and "sample data.sql" with SET ROLE habalgo_owner_grp.
+ALTER SCHEMA habalgo OWNER TO habalgo_owner_grp;
+ALTER SCHEMA
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE
+REVOKE ALL ON SCHEMA habalgo FROM PUBLIC;
+REVOKE
+REVOKE ALL ON ALL TABLES IN SCHEMA habalgo FROM PUBLIC;
+REVOKE
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA habalgo FROM PUBLIC;
+REVOKE
+GRANT USAGE ON SCHEMA habalgo TO habalgo_runtime_grp, habalgo_readonly_grp;
+GRANT
+GRANT SELECT ON habalgo.customer, habalgo.driver, habalgo.vehicle,
+    habalgo.driver_vehicle, habalgo.location, habalgo.booking,
+    habalgo.payment, habalgo.rating_feedback
+    TO habalgo_runtime_grp, habalgo_readonly_grp;
+GRANT
+GRANT INSERT, UPDATE, DELETE ON habalgo.customer, habalgo.vehicle,
+    habalgo.driver_vehicle, habalgo.booking, habalgo.payment, habalgo.rating_feedback
+    TO habalgo_runtime_grp;
+GRANT
+GRANT INSERT ON habalgo.location TO habalgo_runtime_grp;
+GRANT
+GRANT USAGE ON SEQUENCE habalgo.customer_customer_id_seq,
+    habalgo.vehicle_vehicle_id_seq, habalgo.location_location_id_seq,
+    habalgo.booking_booking_id_seq, habalgo.payment_payment_id_seq,
+    habalgo.rating_feedback_rating_id_seq TO habalgo_runtime_grp;
+GRANT
+ALTER DEFAULT PRIVILEGES FOR ROLE habalgo_owner_grp IN SCHEMA habalgo REVOKE ALL ON TABLES FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES FOR ROLE habalgo_owner_grp IN SCHEMA habalgo REVOKE ALL ON SEQUENCES FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES FOR ROLE habalgo_owner_grp REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES
+ALTER ROLE habalgo_app IN DATABASE grp00_habalgodb SET search_path = habalgo;
+ALTER ROLE
+ALTER ROLE habalgo_app IN DATABASE grp00_habalgodb SET statement_timeout = '30s';
+ALTER ROLE
+ALTER ROLE habalgo_app IN DATABASE grp00_habalgodb SET lock_timeout = '10s';
+ALTER ROLE

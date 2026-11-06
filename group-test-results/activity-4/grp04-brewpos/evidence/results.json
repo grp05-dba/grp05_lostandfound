@@ -1,0 +1,582 @@
+[
+  {
+    "id": "identity-brewpos_app",
+    "role": "brewpos_app",
+    "sql": "SELECT session_user, current_user, current_database();\n",
+    "expected": "allowed",
+    "token": "brewpos_app",
+    "db": "grp_brewposdb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "read-brewpos_app",
+    "role": "brewpos_app",
+    "sql": "SELECT (SELECT count(*) FROM staff) AS staff, (SELECT count(*) FROM menu_category) AS categories, (SELECT count(*) FROM menu_item) AS items, (SELECT count(*) FROM order_ticket) AS orders, (SELECT count(*) FROM order_line_item) AS lines;",
+    "expected": "allowed",
+    "token": "(1 row)",
+    "db": "grp_brewposdb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "identity-brewpos_auditor",
+    "role": "brewpos_auditor",
+    "sql": "SELECT session_user, current_user, current_database();\n",
+    "expected": "allowed",
+    "token": "brewpos_auditor",
+    "db": "grp_brewposdb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "read-brewpos_auditor",
+    "role": "brewpos_auditor",
+    "sql": "SELECT (SELECT count(*) FROM staff) AS staff, (SELECT count(*) FROM menu_category) AS categories, (SELECT count(*) FROM menu_item) AS items, (SELECT count(*) FROM order_ticket) AS orders, (SELECT count(*) FROM order_line_item) AS lines;",
+    "expected": "allowed",
+    "token": "(1 row)",
+    "db": "grp_brewposdb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "identity-brewpos_dba",
+    "role": "brewpos_dba",
+    "sql": "SELECT session_user, current_user, current_database();\n",
+    "expected": "allowed",
+    "token": "brewpos_dba",
+    "db": "grp_brewposdb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "read-brewpos_dba",
+    "role": "brewpos_dba",
+    "sql": "SELECT (SELECT count(*) FROM staff) AS staff, (SELECT count(*) FROM menu_category) AS categories, (SELECT count(*) FROM menu_item) AS items, (SELECT count(*) FROM order_ticket) AS orders, (SELECT count(*) FROM order_line_item) AS lines;",
+    "expected": "allowed",
+    "token": "(1 row)",
+    "db": "grp_brewposdb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-catalog-write",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nINSERT INTO menu_category(category_name) VALUES ('E4 temporary category') RETURNING category_id \\gset\nUPDATE menu_category SET category_name='E4 renamed category' WHERE category_id=:category_id RETURNING category_name;\nINSERT INTO menu_item(category_id,item_name,price) VALUES (:category_id,'E4 temporary item',10) RETURNING item_id \\gset\nUPDATE menu_item SET price=12.50,is_active=false WHERE item_id=:item_id RETURNING price,is_active;\nROLLBACK;\nSELECT count(*) AS leftover_categories FROM menu_category WHERE category_name LIKE 'E4%';\nSELECT count(*) AS leftover_items FROM menu_item WHERE item_name LIKE 'E4%';",
+    "expected": "allowed",
+    "token": "12.50",
+    "db": "grp_brewposdb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-category-delete",
+    "role": "brewpos_app",
+    "sql": "BEGIN; INSERT INTO menu_category(category_name) VALUES ('E4 delete probe') RETURNING category_id \\gset\nDELETE FROM menu_category WHERE category_id=:category_id RETURNING category_name; ROLLBACK;",
+    "expected": "allowed",
+    "token": "DELETE 1",
+    "db": "grp_brewposdb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-checkout",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nINSERT INTO order_ticket(staff_id,payment_method) SELECT min(staff_id),'CASH' FROM staff RETURNING order_id \\gset\nINSERT INTO order_line_item(order_id,item_id,quantity,sold_price) SELECT :order_id,item_id,2,price FROM menu_item WHERE is_active AND item_name='Americano' ORDER BY item_id LIMIT 1;\nSELECT order_id,SUM(quantity*sold_price) AS total FROM order_line_item WHERE order_id=:order_id GROUP BY order_id;\nROLLBACK;\nSELECT (SELECT count(*) FROM staff) AS staff, (SELECT count(*) FROM menu_category) AS categories, (SELECT count(*) FROM menu_item) AS items, (SELECT count(*) FROM order_ticket) AS orders, (SELECT count(*) FROM order_line_item) AS lines;",
+    "expected": "allowed",
+    "token": "180.00",
+    "db": "grp_brewposdb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-staff-insert",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nINSERT INTO staff(full_name,role) VALUES ('E4 probe','CASHIER');\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-staff-update",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nUPDATE staff SET full_name=full_name WHERE staff_id=1;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-staff-delete",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nDELETE FROM staff WHERE staff_id=1;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-item-delete",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nDELETE FROM menu_item WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-order-update",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nUPDATE order_ticket SET payment_method=payment_method WHERE order_id=1;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-order-delete",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nDELETE FROM order_ticket WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-line-update",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nUPDATE order_line_item SET sold_price=sold_price WHERE order_id=1;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-line-delete",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nDELETE FROM order_line_item WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-truncate",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nTRUNCATE order_line_item;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-create-table",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nCREATE TABLE public.e4_forbidden(id integer);\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-create-schema",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nCREATE SCHEMA e4_forbidden;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-alter-table",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nALTER TABLE staff ADD COLUMN e4_forbidden integer;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-staff-sequence",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nSELECT nextval('staff_staff_id_seq');\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-sequence-reset",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nSELECT setval('order_ticket_order_id_seq',1);\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-owner-escalation",
+    "role": "brewpos_app",
+    "sql": "BEGIN;\nSET ROLE brewpos_owner_grp;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-staff",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nINSERT INTO staff DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-staff",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nUPDATE staff SET full_name=full_name WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-staff",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nDELETE FROM staff WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-menu_category",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nINSERT INTO menu_category DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-menu_category",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nUPDATE menu_category SET category_name=category_name WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-menu_category",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nDELETE FROM menu_category WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-menu_item",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nINSERT INTO menu_item DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-menu_item",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nUPDATE menu_item SET price=price WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-menu_item",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nDELETE FROM menu_item WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-order_ticket",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nINSERT INTO order_ticket DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-order_ticket",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nUPDATE order_ticket SET payment_method=payment_method WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-order_ticket",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nDELETE FROM order_ticket WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-order_line_item",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nINSERT INTO order_line_item DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-order_line_item",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nUPDATE order_line_item SET quantity=quantity WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-order_line_item",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN;\nDELETE FROM order_line_item WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-sequence",
+    "role": "brewpos_auditor",
+    "sql": "SELECT nextval('order_ticket_order_id_seq');",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-create-table",
+    "role": "brewpos_auditor",
+    "sql": "BEGIN; CREATE TABLE public.e4_forbidden(id integer); ROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-owner",
+    "role": "brewpos_auditor",
+    "sql": "SET ROLE brewpos_owner_grp;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "dba-maintenance",
+    "role": "brewpos_dba",
+    "sql": "BEGIN;\nSET ROLE brewpos_owner_grp;\nINSERT INTO staff(full_name,role) VALUES ('E4 DBA probe','MANAGER') RETURNING staff_id;\nUPDATE menu_item SET price=price WHERE item_id=1;\nALTER TABLE staff ADD COLUMN e4_probe text;\nCREATE TABLE public.e4_ddl_probe(id integer);\nDROP TABLE public.e4_ddl_probe;\nROLLBACK;\nSELECT to_regclass('public.e4_ddl_probe') IS NULL AS ddl_rolled_back;\nSELECT count(*) AS leftover_staff FROM staff WHERE full_name='E4 DBA probe';",
+    "expected": "allowed",
+    "token": "ALTER TABLE",
+    "db": "grp_brewposdb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createdb-brewpos_app",
+    "role": "brewpos_app",
+    "sql": "CREATE DATABASE e4_forbidden_database;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createrole-brewpos_app",
+    "role": "brewpos_app",
+    "sql": "CREATE ROLE e4_forbidden_role NOLOGIN;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-brewpos_app-brewpos_unrelateddb",
+    "role": "brewpos_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "brewpos_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-brewpos_app-postgres",
+    "role": "brewpos_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "postgres",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-brewpos_app-template1",
+    "role": "brewpos_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "template1",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createdb-brewpos_auditor",
+    "role": "brewpos_auditor",
+    "sql": "CREATE DATABASE e4_forbidden_database;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createrole-brewpos_auditor",
+    "role": "brewpos_auditor",
+    "sql": "CREATE ROLE e4_forbidden_role NOLOGIN;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-brewpos_auditor-brewpos_unrelateddb",
+    "role": "brewpos_auditor",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "brewpos_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-brewpos_auditor-postgres",
+    "role": "brewpos_auditor",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "postgres",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-brewpos_auditor-template1",
+    "role": "brewpos_auditor",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "template1",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createdb-brewpos_dba",
+    "role": "brewpos_dba",
+    "sql": "CREATE DATABASE e4_forbidden_database;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createrole-brewpos_dba",
+    "role": "brewpos_dba",
+    "sql": "CREATE ROLE e4_forbidden_role NOLOGIN;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp_brewposdb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-brewpos_dba-brewpos_unrelateddb",
+    "role": "brewpos_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "brewpos_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-brewpos_dba-postgres",
+    "role": "brewpos_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "postgres",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-brewpos_dba-template1",
+    "role": "brewpos_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "template1",
+    "exit_code": 2,
+    "status": "PASS"
+  }
+]

@@ -1,0 +1,218 @@
+SELECT version(), current_date, current_setting('TimeZone');
+                                 version                                 | current_date | current_setting 
+-------------------------------------------------------------------------+--------------+-----------------
+ PostgreSQL 18.6 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit | 2026-11-06   | Asia/Manila
+(1 row)
+
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ postgres     | postgres     | grp_brewposdb
+(1 row)
+
+SELECT tablename,tableowner FROM pg_tables WHERE schemaname='public' ORDER BY tablename;
+    tablename    |    tableowner     
+-----------------+-------------------
+ menu_category   | brewpos_owner_grp
+ menu_item       | brewpos_owner_grp
+ order_line_item | brewpos_owner_grp
+ order_ticket    | brewpos_owner_grp
+ staff           | brewpos_owner_grp
+(5 rows)
+
+SELECT c.relname,c.relkind,pg_get_userbyid(c.relowner) AS owner,c.relacl FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' ORDER BY c.relkind,c.relname;
+            relname            | relkind |       owner       |                                                               relacl                                                               
+-------------------------------+---------+-------------------+------------------------------------------------------------------------------------------------------------------------------------
+ menu_category_category_id_seq | S       | brewpos_owner_grp | {brewpos_owner_grp=rwU/brewpos_owner_grp,brewpos_runtime_grp=U/brewpos_owner_grp}
+ menu_item_item_id_seq         | S       | brewpos_owner_grp | {brewpos_owner_grp=rwU/brewpos_owner_grp,brewpos_runtime_grp=U/brewpos_owner_grp}
+ order_ticket_order_id_seq     | S       | brewpos_owner_grp | {brewpos_owner_grp=rwU/brewpos_owner_grp,brewpos_runtime_grp=U/brewpos_owner_grp}
+ staff_staff_id_seq            | S       | brewpos_owner_grp | {brewpos_owner_grp=rwU/brewpos_owner_grp}
+ idx_order_line_item_item_id   | i       | brewpos_owner_grp | 
+ idx_order_ticket_timestamp    | i       | brewpos_owner_grp | 
+ menu_category_pkey            | i       | brewpos_owner_grp | 
+ menu_item_pkey                | i       | brewpos_owner_grp | 
+ order_ticket_pkey             | i       | brewpos_owner_grp | 
+ pk_order_line_item            | i       | brewpos_owner_grp | 
+ staff_pkey                    | i       | brewpos_owner_grp | 
+ uq_menu_category_name         | i       | brewpos_owner_grp | 
+ uq_menu_item_category_name    | i       | brewpos_owner_grp | 
+ menu_category                 | r       | brewpos_owner_grp | {brewpos_owner_grp=arwdDxtm/brewpos_owner_grp,brewpos_runtime_grp=arwd/brewpos_owner_grp,brewpos_readonly_grp=r/brewpos_owner_grp}
+ menu_item                     | r       | brewpos_owner_grp | {brewpos_owner_grp=arwdDxtm/brewpos_owner_grp,brewpos_runtime_grp=arw/brewpos_owner_grp,brewpos_readonly_grp=r/brewpos_owner_grp}
+ order_line_item               | r       | brewpos_owner_grp | {brewpos_owner_grp=arwdDxtm/brewpos_owner_grp,brewpos_runtime_grp=ar/brewpos_owner_grp,brewpos_readonly_grp=r/brewpos_owner_grp}
+ order_ticket                  | r       | brewpos_owner_grp | {brewpos_owner_grp=arwdDxtm/brewpos_owner_grp,brewpos_runtime_grp=ar/brewpos_owner_grp,brewpos_readonly_grp=r/brewpos_owner_grp}
+ staff                         | r       | brewpos_owner_grp | {brewpos_owner_grp=arwdDxtm/brewpos_owner_grp,brewpos_runtime_grp=r/brewpos_owner_grp,brewpos_readonly_grp=r/brewpos_owner_grp}
+(18 rows)
+
+SELECT conname,contype,pg_get_constraintdef(oid) FROM pg_constraint WHERE connamespace='public'::regnamespace ORDER BY conname;
+                conname                | contype |                                               pg_get_constraintdef                                               
+---------------------------------------+---------+------------------------------------------------------------------------------------------------------------------
+ chk_menu_item_price                   | c       | CHECK ((price >= (0)::numeric))
+ chk_order_line_quantity               | c       | CHECK ((quantity > 0))
+ chk_order_line_sold_price             | c       | CHECK ((sold_price >= (0)::numeric))
+ chk_order_ticket_payment              | c       | CHECK (((payment_method)::text = ANY ((ARRAY['CASH'::character varying, 'ONLINE'::character varying])::text[])))
+ chk_staff_role                        | c       | CHECK (((role)::text = ANY ((ARRAY['CASHIER'::character varying, 'MANAGER'::character varying])::text[])))
+ fk_menu_item_category                 | f       | FOREIGN KEY (category_id) REFERENCES menu_category(category_id)
+ fk_order_line_item                    | f       | FOREIGN KEY (item_id) REFERENCES menu_item(item_id)
+ fk_order_line_order                   | f       | FOREIGN KEY (order_id) REFERENCES order_ticket(order_id)
+ fk_order_ticket_staff                 | f       | FOREIGN KEY (staff_id) REFERENCES staff(staff_id)
+ menu_category_category_id_not_null    | n       | NOT NULL category_id
+ menu_category_category_name_not_null  | n       | NOT NULL category_name
+ menu_category_pkey                    | p       | PRIMARY KEY (category_id)
+ menu_item_category_id_not_null        | n       | NOT NULL category_id
+ menu_item_is_active_not_null          | n       | NOT NULL is_active
+ menu_item_item_id_not_null            | n       | NOT NULL item_id
+ menu_item_item_name_not_null          | n       | NOT NULL item_name
+ menu_item_pkey                        | p       | PRIMARY KEY (item_id)
+ menu_item_price_not_null              | n       | NOT NULL price
+ order_line_item_item_id_not_null      | n       | NOT NULL item_id
+ order_line_item_order_id_not_null     | n       | NOT NULL order_id
+ order_line_item_quantity_not_null     | n       | NOT NULL quantity
+ order_line_item_sold_price_not_null   | n       | NOT NULL sold_price
+ order_ticket_order_id_not_null        | n       | NOT NULL order_id
+ order_ticket_order_timestamp_not_null | n       | NOT NULL order_timestamp
+ order_ticket_payment_method_not_null  | n       | NOT NULL payment_method
+ order_ticket_pkey                     | p       | PRIMARY KEY (order_id)
+ order_ticket_staff_id_not_null        | n       | NOT NULL staff_id
+ pk_order_line_item                    | p       | PRIMARY KEY (order_id, item_id)
+ staff_full_name_not_null              | n       | NOT NULL full_name
+ staff_pkey                            | p       | PRIMARY KEY (staff_id)
+ staff_role_not_null                   | n       | NOT NULL role
+ staff_staff_id_not_null               | n       | NOT NULL staff_id
+ uq_menu_category_name                 | u       | UNIQUE (category_name)
+ uq_menu_item_category_name            | u       | UNIQUE (category_id, item_name)
+(34 rows)
+
+SELECT rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolinherit,rolreplication,rolbypassrls FROM pg_roles WHERE rolname LIKE 'brewpos_%' ORDER BY rolname;
+       rolname        | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolinherit | rolreplication | rolbypassrls 
+----------------------+-------------+----------+-------------+---------------+------------+----------------+--------------
+ brewpos_app          | t           | f        | f           | f             | t          | f              | f
+ brewpos_auditor      | t           | f        | f           | f             | t          | f              | f
+ brewpos_dba          | t           | f        | f           | f             | t          | f              | f
+ brewpos_owner_grp    | f           | f        | f           | f             | t          | f              | f
+ brewpos_readonly_grp | f           | f        | f           | f             | t          | f              | f
+ brewpos_runtime_grp  | f           | f        | f           | f             | t          | f              | f
+(6 rows)
+
+SELECT member.rolname AS login,parent.rolname AS group_role,m.admin_option,m.inherit_option,m.set_option FROM pg_auth_members m JOIN pg_roles member ON member.oid=m.member JOIN pg_roles parent ON parent.oid=m.roleid WHERE member.rolname LIKE 'brewpos_%';
+      login      |      group_role      | admin_option | inherit_option | set_option 
+-----------------+----------------------+--------------+----------------+------------
+ brewpos_dba     | brewpos_owner_grp    | f            | t              | t
+ brewpos_app     | brewpos_runtime_grp  | f            | t              | t
+ brewpos_auditor | brewpos_readonly_grp | f            | t              | t
+(3 rows)
+
+SELECT datname,pg_get_userbyid(datdba) AS owner,datacl FROM pg_database ORDER BY datname;
+       datname       |       owner       |                                                           datacl                                                           
+---------------------+-------------------+----------------------------------------------------------------------------------------------------------------------------
+ brewpos_unrelateddb | postgres          | {postgres=CTc/postgres}
+ grp_brewposdb       | brewpos_owner_grp | {brewpos_owner_grp=CTc/brewpos_owner_grp,brewpos_runtime_grp=c/brewpos_owner_grp,brewpos_readonly_grp=c/brewpos_owner_grp}
+ postgres            | postgres          | {postgres=CTc/postgres}
+ template0           | postgres          | {=c/postgres,postgres=CTc/postgres}
+ template1           | postgres          | {postgres=CTc/postgres}
+(5 rows)
+
+SELECT nspname,pg_get_userbyid(nspowner) AS owner,nspacl FROM pg_namespace WHERE nspname='public';
+ nspname |       owner       |                                                          nspacl                                                           
+---------+-------------------+---------------------------------------------------------------------------------------------------------------------------
+ public  | brewpos_owner_grp | {brewpos_owner_grp=UC/brewpos_owner_grp,brewpos_runtime_grp=U/brewpos_owner_grp,brewpos_readonly_grp=U/brewpos_owner_grp}
+(1 row)
+
+SELECT grantee,table_name,privilege_type FROM information_schema.table_privileges WHERE table_schema='public' ORDER BY grantee,table_name,privilege_type;
+       grantee        |   table_name    | privilege_type 
+----------------------+-----------------+----------------
+ brewpos_owner_grp    | menu_category   | DELETE
+ brewpos_owner_grp    | menu_category   | INSERT
+ brewpos_owner_grp    | menu_category   | REFERENCES
+ brewpos_owner_grp    | menu_category   | SELECT
+ brewpos_owner_grp    | menu_category   | TRIGGER
+ brewpos_owner_grp    | menu_category   | TRUNCATE
+ brewpos_owner_grp    | menu_category   | UPDATE
+ brewpos_owner_grp    | menu_item       | DELETE
+ brewpos_owner_grp    | menu_item       | INSERT
+ brewpos_owner_grp    | menu_item       | REFERENCES
+ brewpos_owner_grp    | menu_item       | SELECT
+ brewpos_owner_grp    | menu_item       | TRIGGER
+ brewpos_owner_grp    | menu_item       | TRUNCATE
+ brewpos_owner_grp    | menu_item       | UPDATE
+ brewpos_owner_grp    | order_line_item | DELETE
+ brewpos_owner_grp    | order_line_item | INSERT
+ brewpos_owner_grp    | order_line_item | REFERENCES
+ brewpos_owner_grp    | order_line_item | SELECT
+ brewpos_owner_grp    | order_line_item | TRIGGER
+ brewpos_owner_grp    | order_line_item | TRUNCATE
+ brewpos_owner_grp    | order_line_item | UPDATE
+ brewpos_owner_grp    | order_ticket    | DELETE
+ brewpos_owner_grp    | order_ticket    | INSERT
+ brewpos_owner_grp    | order_ticket    | REFERENCES
+ brewpos_owner_grp    | order_ticket    | SELECT
+ brewpos_owner_grp    | order_ticket    | TRIGGER
+ brewpos_owner_grp    | order_ticket    | TRUNCATE
+ brewpos_owner_grp    | order_ticket    | UPDATE
+ brewpos_owner_grp    | staff           | DELETE
+ brewpos_owner_grp    | staff           | INSERT
+ brewpos_owner_grp    | staff           | REFERENCES
+ brewpos_owner_grp    | staff           | SELECT
+ brewpos_owner_grp    | staff           | TRIGGER
+ brewpos_owner_grp    | staff           | TRUNCATE
+ brewpos_owner_grp    | staff           | UPDATE
+ brewpos_readonly_grp | menu_category   | SELECT
+ brewpos_readonly_grp | menu_item       | SELECT
+ brewpos_readonly_grp | order_line_item | SELECT
+ brewpos_readonly_grp | order_ticket    | SELECT
+ brewpos_readonly_grp | staff           | SELECT
+ brewpos_runtime_grp  | menu_category   | DELETE
+ brewpos_runtime_grp  | menu_category   | INSERT
+ brewpos_runtime_grp  | menu_category   | SELECT
+ brewpos_runtime_grp  | menu_category   | UPDATE
+ brewpos_runtime_grp  | menu_item       | INSERT
+ brewpos_runtime_grp  | menu_item       | SELECT
+ brewpos_runtime_grp  | menu_item       | UPDATE
+ brewpos_runtime_grp  | order_line_item | INSERT
+ brewpos_runtime_grp  | order_line_item | SELECT
+ brewpos_runtime_grp  | order_ticket    | INSERT
+ brewpos_runtime_grp  | order_ticket    | SELECT
+ brewpos_runtime_grp  | staff           | SELECT
+(52 rows)
+
+SELECT defaclrole::regrole,defaclnamespace,defaclobjtype,defaclacl FROM pg_default_acl;
+    defaclrole     | defaclnamespace | defaclobjtype |                defaclacl                
+-------------------+-----------------+---------------+-----------------------------------------
+ brewpos_owner_grp |               0 | f             | {brewpos_owner_grp=X/brewpos_owner_grp}
+(1 row)
+
+SELECT usename,datname,client_addr FROM pg_stat_activity WHERE usename LIKE 'brewpos_%';
+ usename | datname | client_addr 
+---------+---------+-------------
+(0 rows)
+
+SELECT (SELECT count(*) FROM staff) AS staff, (SELECT count(*) FROM menu_category) AS categories, (SELECT count(*) FROM menu_item) AS items, (SELECT count(*) FROM order_ticket) AS orders, (SELECT count(*) FROM order_line_item) AS lines;
+ staff | categories | items | orders | lines 
+-------+------------+-------+--------+-------
+     2 |          3 |    11 |      5 |     9
+(1 row)
+
+SELECT t.order_timestamp::date AS sales_date,count(DISTINCT t.order_id) AS orders,SUM(l.quantity*l.sold_price) AS total FROM order_ticket t JOIN order_line_item l USING(order_id) GROUP BY t.order_timestamp::date ORDER BY sales_date;
+ sales_date | orders | total  
+------------+--------+--------
+ 2026-11-05 |      2 | 440.00
+ 2026-11-06 |      3 | 915.50
+(2 rows)
+
+SELECT to_regclass('public.e4_forbidden') IS NULL AND to_regclass('public.e4_ddl_probe') IS NULL AS probe_tables_absent;
+ probe_tables_absent 
+---------------------
+ t
+(1 row)
+
+SELECT count(*) AS forbidden_database_count FROM pg_database WHERE datname='e4_forbidden_database';
+ forbidden_database_count 
+--------------------------
+                        0
+(1 row)
+
+SELECT count(*) AS forbidden_role_count FROM pg_roles WHERE rolname='e4_forbidden_role';
+ forbidden_role_count 
+----------------------
+                    0
+(1 row)
+

@@ -1,0 +1,51 @@
+### Owner creates future table and function | account=postgres | expected=allowed | PASS
+SET ROLE habalgo_owner_grp; CREATE TABLE habalgo.e4_future_probe(id serial PRIMARY KEY); CREATE FUNCTION habalgo.e4_future_function() RETURNS integer LANGUAGE sql AS 'SELECT 1';
+SET
+CREATE TABLE
+CREATE FUNCTION
+
+### Future table remains ungranted | account=habalgo_app | expected=denied | PASS
+SELECT * FROM habalgo.e4_future_probe;
+ERROR:  42501: permission denied for table e4_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### Future function not PUBLIC executable | account=habalgo_app | expected=denied | PASS
+SELECT habalgo.e4_future_function();
+ERROR:  42501: permission denied for function e4_future_function
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### Future table remains ungranted | account=habalgo_auditor | expected=denied | PASS
+SELECT * FROM habalgo.e4_future_probe;
+ERROR:  42501: permission denied for table e4_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### Future function not PUBLIC executable | account=habalgo_auditor | expected=denied | PASS
+SELECT habalgo.e4_future_function();
+ERROR:  42501: permission denied for function e4_future_function
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### DBA maintains future objects | account=habalgo_dba | expected=allowed | PASS
+BEGIN; SET ROLE habalgo_owner_grp; INSERT INTO habalgo.e4_future_probe DEFAULT VALUES; SELECT habalgo.e4_future_function(); ROLLBACK;
+BEGIN
+SET
+INSERT 0 1
+ e4_future_function 
+--------------------
+                  1
+(1 row)
+
+ROLLBACK
+
+### Drop future probes | account=postgres | expected=allowed | PASS
+SET ROLE habalgo_owner_grp; DROP TABLE habalgo.e4_future_probe; DROP FUNCTION habalgo.e4_future_function();
+SET
+DROP TABLE
+DROP FUNCTION
+
+### Future probes absent | account=postgres | expected=allowed | PASS
+SELECT to_regclass('habalgo.e4_future_probe') IS NULL AS table_removed, to_regprocedure('habalgo.e4_future_function()') IS NULL AS function_removed;
+ table_removed | function_removed 
+---------------+------------------
+ t             | t
+(1 row)
+

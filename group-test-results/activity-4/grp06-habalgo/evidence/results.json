@@ -1,0 +1,702 @@
+[
+  {
+    "id": "identity-habalgo_app",
+    "role": "habalgo_app",
+    "sql": "SELECT session_user,current_user,current_database();",
+    "expected": "allowed",
+    "token": "habalgo_app",
+    "db": "grp00_habalgodb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "read-habalgo_app",
+    "role": "habalgo_app",
+    "sql": "SELECT (SELECT count(*) FROM habalgo.customer) AS customer, (SELECT count(*) FROM habalgo.driver) AS driver, (SELECT count(*) FROM habalgo.vehicle) AS vehicle, (SELECT count(*) FROM habalgo.driver_vehicle) AS driver_vehicle, (SELECT count(*) FROM habalgo.location) AS location, (SELECT count(*) FROM habalgo.booking) AS booking, (SELECT count(*) FROM habalgo.payment) AS payment, (SELECT count(*) FROM habalgo.rating_feedback) AS rating_feedback;",
+    "expected": "allowed",
+    "token": "(1 row)",
+    "db": "grp00_habalgodb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "identity-habalgo_auditor",
+    "role": "habalgo_auditor",
+    "sql": "SELECT session_user,current_user,current_database();",
+    "expected": "allowed",
+    "token": "habalgo_auditor",
+    "db": "grp00_habalgodb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "read-habalgo_auditor",
+    "role": "habalgo_auditor",
+    "sql": "SELECT (SELECT count(*) FROM habalgo.customer) AS customer, (SELECT count(*) FROM habalgo.driver) AS driver, (SELECT count(*) FROM habalgo.vehicle) AS vehicle, (SELECT count(*) FROM habalgo.driver_vehicle) AS driver_vehicle, (SELECT count(*) FROM habalgo.location) AS location, (SELECT count(*) FROM habalgo.booking) AS booking, (SELECT count(*) FROM habalgo.payment) AS payment, (SELECT count(*) FROM habalgo.rating_feedback) AS rating_feedback;",
+    "expected": "allowed",
+    "token": "(1 row)",
+    "db": "grp00_habalgodb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "identity-habalgo_dba",
+    "role": "habalgo_dba",
+    "sql": "SELECT session_user,current_user,current_database();",
+    "expected": "allowed",
+    "token": "habalgo_dba",
+    "db": "grp00_habalgodb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "read-habalgo_dba",
+    "role": "habalgo_dba",
+    "sql": "SELECT (SELECT count(*) FROM habalgo.customer) AS customer, (SELECT count(*) FROM habalgo.driver) AS driver, (SELECT count(*) FROM habalgo.vehicle) AS vehicle, (SELECT count(*) FROM habalgo.driver_vehicle) AS driver_vehicle, (SELECT count(*) FROM habalgo.location) AS location, (SELECT count(*) FROM habalgo.booking) AS booking, (SELECT count(*) FROM habalgo.payment) AS payment, (SELECT count(*) FROM habalgo.rating_feedback) AS rating_feedback;",
+    "expected": "allowed",
+    "token": "(1 row)",
+    "db": "grp00_habalgodb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-full-workflow",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nINSERT INTO habalgo.customer(name,phone,email) VALUES ('E4 customer','09000000000','e4-customer@example.invalid') RETURNING customer_id \\gset\nINSERT INTO habalgo.vehicle(plate_no,vehicle_type,model) VALUES ('E4-TEST','Motorcycle','E4 model') RETURNING vehicle_id \\gset\nSELECT min(driver_id) AS driver_id FROM habalgo.driver \\gset\nINSERT INTO habalgo.driver_vehicle(driver_id,vehicle_id,assigned_from) VALUES (:driver_id,:vehicle_id,now());\nINSERT INTO habalgo.location(address,city) VALUES ('E4 pickup','Manila') RETURNING location_id AS pickup_id \\gset\nINSERT INTO habalgo.location(address,city) VALUES ('E4 dropoff','Manila') RETURNING location_id AS dropoff_id \\gset\nINSERT INTO habalgo.booking(customer_id,driver_id,pickup_location_id,dropoff_location_id,booking_status)\nVALUES (:customer_id,:driver_id,:pickup_id,:dropoff_id,'Completed') RETURNING booking_id \\gset\n\nINSERT INTO habalgo.payment(booking_id,amount,method,status) VALUES (:booking_id,150,'Cash','Paid') RETURNING payment_id \\gset\nINSERT INTO habalgo.rating_feedback(booking_id,customer_id,rating,feedback) VALUES (:booking_id,:customer_id,5,'E4 test') RETURNING rating_id \\gset\nUPDATE habalgo.customer SET name='E4 updated customer' WHERE customer_id=:customer_id;\nUPDATE habalgo.vehicle SET model='E4 updated model' WHERE vehicle_id=:vehicle_id;\nUPDATE habalgo.driver_vehicle SET assigned_to=now() WHERE driver_id=:driver_id AND vehicle_id=:vehicle_id;\nUPDATE habalgo.booking SET booking_status='Confirmed' WHERE booking_id=:booking_id;\nUPDATE habalgo.payment SET amount=175 WHERE payment_id=:payment_id;\nUPDATE habalgo.rating_feedback SET rating=4 WHERE rating_id=:rating_id;\nSELECT b.booking_status,p.amount,r.rating FROM habalgo.booking b JOIN habalgo.payment p USING(booking_id) JOIN habalgo.rating_feedback r USING(booking_id) WHERE b.booking_id=:booking_id;\nDELETE FROM habalgo.rating_feedback WHERE rating_id=:rating_id;\nDELETE FROM habalgo.payment WHERE payment_id=:payment_id;\nDELETE FROM habalgo.booking WHERE booking_id=:booking_id;\nDELETE FROM habalgo.driver_vehicle WHERE driver_id=:driver_id AND vehicle_id=:vehicle_id;\nDELETE FROM habalgo.vehicle WHERE vehicle_id=:vehicle_id;\nDELETE FROM habalgo.customer WHERE customer_id=:customer_id;\nROLLBACK;\nSELECT (SELECT count(*) FROM habalgo.customer) AS customer, (SELECT count(*) FROM habalgo.driver) AS driver, (SELECT count(*) FROM habalgo.vehicle) AS vehicle, (SELECT count(*) FROM habalgo.driver_vehicle) AS driver_vehicle, (SELECT count(*) FROM habalgo.location) AS location, (SELECT count(*) FROM habalgo.booking) AS booking, (SELECT count(*) FROM habalgo.payment) AS payment, (SELECT count(*) FROM habalgo.rating_feedback) AS rating_feedback;",
+    "expected": "allowed",
+    "token": "175.00",
+    "db": "grp00_habalgodb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-driver-insert",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nINSERT INTO habalgo.driver(name,phone,license_no) VALUES ('E4 forbidden','09000000000','E4-FORBIDDEN');\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-driver-update",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nUPDATE habalgo.driver SET name=name WHERE driver_id=1;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-driver-delete",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nDELETE FROM habalgo.driver WHERE driver_id=1;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-location-update",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nUPDATE habalgo.location SET address=address WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-location-delete",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nDELETE FROM habalgo.location WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-truncate",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nTRUNCATE habalgo.payment;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-create-table",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nCREATE TABLE habalgo.e4_forbidden(id integer);\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-create-schema",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nCREATE SCHEMA e4_forbidden;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-public-create",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nCREATE TABLE public.e4_forbidden(id integer);\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-create-temp",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nCREATE TEMP TABLE e4_forbidden(id integer);\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-alter-table",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nALTER TABLE habalgo.customer ADD COLUMN e4_forbidden integer;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-driver-sequence",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nSELECT nextval('habalgo.driver_driver_id_seq');\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-sequence-reset",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nSELECT setval('habalgo.booking_booking_id_seq',1);\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-owner-escalation",
+    "role": "habalgo_app",
+    "sql": "BEGIN;\nSET ROLE habalgo_owner_grp;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-customer",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nINSERT INTO habalgo.customer DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-customer",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nUPDATE habalgo.customer SET name=name WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-customer",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nDELETE FROM habalgo.customer WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-driver",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nINSERT INTO habalgo.driver DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-driver",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nUPDATE habalgo.driver SET name=name WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-driver",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nDELETE FROM habalgo.driver WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-vehicle",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nINSERT INTO habalgo.vehicle DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-vehicle",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nUPDATE habalgo.vehicle SET model=model WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-vehicle",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nDELETE FROM habalgo.vehicle WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-driver_vehicle",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nINSERT INTO habalgo.driver_vehicle DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-driver_vehicle",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nUPDATE habalgo.driver_vehicle SET assigned_from=assigned_from WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-driver_vehicle",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nDELETE FROM habalgo.driver_vehicle WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-location",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nINSERT INTO habalgo.location DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-location",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nUPDATE habalgo.location SET address=address WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-location",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nDELETE FROM habalgo.location WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-booking",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nINSERT INTO habalgo.booking DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-booking",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nUPDATE habalgo.booking SET booking_status=booking_status WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-booking",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nDELETE FROM habalgo.booking WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-payment",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nINSERT INTO habalgo.payment DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-payment",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nUPDATE habalgo.payment SET amount=amount WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-payment",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nDELETE FROM habalgo.payment WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-insert-rating_feedback",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nINSERT INTO habalgo.rating_feedback DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-update-rating_feedback",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nUPDATE habalgo.rating_feedback SET rating=rating WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-delete-rating_feedback",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN;\nDELETE FROM habalgo.rating_feedback WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-sequence",
+    "role": "habalgo_auditor",
+    "sql": "SELECT nextval('habalgo.customer_customer_id_seq');",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-create",
+    "role": "habalgo_auditor",
+    "sql": "BEGIN; CREATE TABLE habalgo.e4_forbidden(id integer); ROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-owner",
+    "role": "habalgo_auditor",
+    "sql": "SET ROLE habalgo_owner_grp;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "dba-maintenance",
+    "role": "habalgo_dba",
+    "sql": "BEGIN;\nSET ROLE habalgo_owner_grp;\nINSERT INTO habalgo.driver(name,phone,license_no) VALUES ('E4 DBA driver','09000000000','E4-DBA-TEST') RETURNING driver_id;\nALTER TABLE habalgo.customer ADD COLUMN e4_probe text;\nCREATE TABLE habalgo.e4_ddl_probe(id integer);\nDROP TABLE habalgo.e4_ddl_probe;\nROLLBACK;\nSELECT to_regclass('habalgo.e4_ddl_probe') IS NULL AS ddl_removed;\nSELECT count(*) AS leftover_drivers FROM habalgo.driver WHERE license_no='E4-DBA-TEST';",
+    "expected": "allowed",
+    "token": "ALTER TABLE",
+    "db": "grp00_habalgodb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createdb-habalgo_app",
+    "role": "habalgo_app",
+    "sql": "CREATE DATABASE habalgo_e4_forbidden;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createrole-habalgo_app",
+    "role": "habalgo_app",
+    "sql": "CREATE ROLE habalgo_e4_forbidden NOLOGIN;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_app-habalgo_unrelateddb",
+    "role": "habalgo_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "habalgo_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_app-grp_brewposdb",
+    "role": "habalgo_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "grp_brewposdb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_app-brewpos_unrelateddb",
+    "role": "habalgo_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "brewpos_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_app-postgres",
+    "role": "habalgo_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "postgres",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_app-template1",
+    "role": "habalgo_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "template1",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createdb-habalgo_auditor",
+    "role": "habalgo_auditor",
+    "sql": "CREATE DATABASE habalgo_e4_forbidden;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createrole-habalgo_auditor",
+    "role": "habalgo_auditor",
+    "sql": "CREATE ROLE habalgo_e4_forbidden NOLOGIN;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_auditor-habalgo_unrelateddb",
+    "role": "habalgo_auditor",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "habalgo_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_auditor-grp_brewposdb",
+    "role": "habalgo_auditor",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "grp_brewposdb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_auditor-brewpos_unrelateddb",
+    "role": "habalgo_auditor",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "brewpos_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_auditor-postgres",
+    "role": "habalgo_auditor",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "postgres",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_auditor-template1",
+    "role": "habalgo_auditor",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "template1",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createdb-habalgo_dba",
+    "role": "habalgo_dba",
+    "sql": "CREATE DATABASE habalgo_e4_forbidden;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createrole-habalgo_dba",
+    "role": "habalgo_dba",
+    "sql": "CREATE ROLE habalgo_e4_forbidden NOLOGIN;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp00_habalgodb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_dba-habalgo_unrelateddb",
+    "role": "habalgo_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "habalgo_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_dba-grp_brewposdb",
+    "role": "habalgo_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "grp_brewposdb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_dba-brewpos_unrelateddb",
+    "role": "habalgo_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "brewpos_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_dba-postgres",
+    "role": "habalgo_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "postgres",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-habalgo_dba-template1",
+    "role": "habalgo_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "template1",
+    "exit_code": 2,
+    "status": "PASS"
+  }
+]

@@ -1,0 +1,79 @@
+### identity-habalgo_dba | database=grp00_habalgodb | expected=allowed | PASS
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ habalgo_dba  | habalgo_dba  | grp00_habalgodb
+(1 row)
+
+
+### read-habalgo_dba | database=grp00_habalgodb | expected=allowed | PASS
+SELECT (SELECT count(*) FROM habalgo.customer) AS customer, (SELECT count(*) FROM habalgo.driver) AS driver, (SELECT count(*) FROM habalgo.vehicle) AS vehicle, (SELECT count(*) FROM habalgo.driver_vehicle) AS driver_vehicle, (SELECT count(*) FROM habalgo.location) AS location, (SELECT count(*) FROM habalgo.booking) AS booking, (SELECT count(*) FROM habalgo.payment) AS payment, (SELECT count(*) FROM habalgo.rating_feedback) AS rating_feedback;
+ customer | driver | vehicle | driver_vehicle | location | booking | payment | rating_feedback 
+----------+--------+---------+----------------+----------+---------+---------+-----------------
+        0 |     10 |       0 |              0 |        0 |       0 |       0 |               0
+(1 row)
+
+
+### dba-maintenance | database=grp00_habalgodb | expected=allowed | PASS
+BEGIN;
+BEGIN
+SET ROLE habalgo_owner_grp;
+SET
+INSERT INTO habalgo.driver(name,phone,license_no) VALUES ('E4 DBA driver','09000000000','E4-DBA-TEST') RETURNING driver_id;
+ driver_id 
+-----------
+        11
+(1 row)
+
+INSERT 0 1
+ALTER TABLE habalgo.customer ADD COLUMN e4_probe text;
+ALTER TABLE
+CREATE TABLE habalgo.e4_ddl_probe(id integer);
+CREATE TABLE
+DROP TABLE habalgo.e4_ddl_probe;
+DROP TABLE
+ROLLBACK;
+ROLLBACK
+SELECT to_regclass('habalgo.e4_ddl_probe') IS NULL AS ddl_removed;
+ ddl_removed 
+-------------
+ t
+(1 row)
+
+SELECT count(*) AS leftover_drivers FROM habalgo.driver WHERE license_no='E4-DBA-TEST';
+ leftover_drivers 
+------------------
+                0
+(1 row)
+
+
+### deny-createdb-habalgo_dba | database=grp00_habalgodb | expected=denied | PASS
+CREATE DATABASE habalgo_e4_forbidden;
+ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+### deny-createrole-habalgo_dba | database=grp00_habalgodb | expected=denied | PASS
+CREATE ROLE habalgo_e4_forbidden NOLOGIN;
+ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+### isolation-habalgo_dba-habalgo_unrelateddb | database=habalgo_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "habalgo_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-habalgo_dba-grp_brewposdb | database=grp_brewposdb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp_brewposdb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-habalgo_dba-brewpos_unrelateddb | database=brewpos_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "brewpos_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-habalgo_dba-postgres | database=postgres | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-habalgo_dba-template1 | database=template1 | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.

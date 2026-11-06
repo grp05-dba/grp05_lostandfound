@@ -1,0 +1,159 @@
+HabalGo application validation - 6 November 2026 (Asia/Manila)
+PHP 8.2.12 with PDO_PGSQL enabled; unmodified upstream tracked source.
+Loopback PHP development server on port 18082, PostgreSQL port 55432.
+Process environment supplies DB_HOST, DB_PORT, DB_NAME, DB_USER=habalgo_app and private DB_PASS.
+No .env loader, source edit, published credential or superuser runtime was used.
+No authentication cookies or authorization headers were supplied to any API operation.
+These are HTTP/API checks, not interactive browser tests.
+
+GET /
+HTTP 200
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HabalGo - Ride and Booking Management</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="p">
+  <div class="a"><div class="lg">Habal<b>Go</b></div><nav id="nav"></nav></div>
+  <div class="m" id="main"></div>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>
+
+GET /api.php?t=dashboard
+HTTP 200
+{"stats":{"customers":0,"active":0,"revenue":"0","avg_rating":null},"byStatus":[],"recent":[]}
+
+GET /api.php?t=options
+HTTP 200
+{"cities":[["Manila","Manila"],["Quezon City","Quezon City"],["Caloocan","Caloocan"],["Davao City","Davao City"],["Cebu City","Cebu City"],["Zamboanga City","Zamboanga City"],["Antipolo","Antipolo"],["Taguig","Taguig"],["Pasig","Pasig"],["Cagayan de Oro","Cagayan de Oro"],["Dasmarinas","Dasmarinas"],["Imus","Imus"],["Bacoor","Bacoor"],["General Mariano Alvarez","General Mariano Alvarez"],["Tagaytay","Tagaytay"]],"drivers":[[6,"Andres Bonifacio"],[4,"Antonio Reyes"],[8,"Apolinario Mabini"],[2,"Carlos Gomez"],[7,"Emilio Jacinto"],[9,"Francisco Baltazar"],[5,"Jose Rizal Aquino"],[1,"Juan Bautista"],[10,"Melchora Aquino"],[3,"Miguel Santos"]],"bookings":[],"completed":[]}
+
+GET /api.php?t=customers
+HTTP 200
+[]
+
+GET /api.php?t=vehicles
+HTTP 200
+[]
+
+GET /api.php?t=bookings
+HTTP 200
+[]
+
+GET /api.php?t=payments
+HTTP 200
+[]
+
+GET /api.php?t=ratings
+HTTP 200
+[]
+
+GET /api.php?t=nonexistent
+HTTP 404
+{"error":"Unknown resource."}
+
+POST /api.php?t=customers
+HTTP 200
+{"ok":true,"id":5}
+
+POST /api.php?t=vehicles
+HTTP 200
+{"ok":true,"id":4}
+
+POST /api.php?t=bookings
+HTTP 200
+{"ok":true,"id":4}
+
+GET /api.php?t=bookings
+HTTP 200
+[{"id":4,"customer_id":5,"customer":"E4 HTTP customer","pickup":"E4 HTTP pickup","pickup_city":"Manila","dropoff":"E4 HTTP dropoff","dropoff_city":"Manila","driver_id":6,"driver":"Andres Bonifacio","booking_status":"Confirmed","date":"Nov 06"}]
+
+POST /api.php?t=ratings
+HTTP 400
+{"error":"Only completed bookings can be rated."}
+
+PUT /api.php?t=bookings&id=4
+HTTP 200
+{"ok":true,"id":4}
+
+POST /api.php?t=payments
+HTTP 200
+{"ok":true,"id":3}
+
+POST /api.php?t=ratings
+HTTP 200
+{"ok":true,"id":4}
+
+PUT /api.php?t=customers&id=5
+HTTP 200
+{"ok":true,"id":5}
+
+PUT /api.php?t=vehicles&id=4
+HTTP 200
+{"ok":true,"id":4}
+
+PUT /api.php?t=payments&id=3
+HTTP 200
+{"ok":true,"id":3}
+
+PUT /api.php?t=ratings&id=4
+HTTP 200
+{"ok":true,"id":4}
+
+GET /api.php?t=dashboard
+HTTP 200
+{"stats":{"customers":1,"active":0,"revenue":"175","avg_rating":"4"},"byStatus":[{"s":"Completed","n":1}],"recent":[{"id":4,"customer_id":5,"customer":"E4 HTTP renamed customer","pickup":"E4 HTTP pickup","pickup_city":"Manila","dropoff":"E4 HTTP dropoff","dropoff_city":"Manila","driver_id":6,"driver":"Andres Bonifacio","booking_status":"Completed","date":"Nov 06"}]}
+
+DELETE /api.php?t=ratings&id=4
+HTTP 200
+{"ok":true}
+
+DELETE /api.php?t=payments&id=3
+HTTP 200
+{"ok":true}
+
+DELETE /api.php?t=bookings&id=4
+HTTP 200
+{"ok":true}
+
+DELETE /api.php?t=vehicles&id=4
+HTTP 200
+{"ok":true}
+
+DELETE /api.php?t=customers&id=5
+HTTP 200
+{"ok":true}
+
+Provisioning cleanup of marked HTTP test fixtures only:
+BEGIN;
+BEGIN
+DELETE FROM habalgo.rating_feedback WHERE customer_id IN (SELECT customer_id FROM habalgo.customer WHERE email='e4-http@example.invalid');
+DELETE 0
+DELETE FROM habalgo.payment WHERE booking_id IN (SELECT booking_id FROM habalgo.booking WHERE customer_id IN (SELECT customer_id FROM habalgo.customer WHERE email='e4-http@example.invalid'));
+DELETE 0
+DELETE FROM habalgo.booking WHERE customer_id IN (SELECT customer_id FROM habalgo.customer WHERE email='e4-http@example.invalid');
+DELETE 0
+DELETE FROM habalgo.driver_vehicle WHERE vehicle_id IN (SELECT vehicle_id FROM habalgo.vehicle WHERE plate_no='E4-HTTP');
+DELETE 0
+DELETE FROM habalgo.vehicle WHERE plate_no='E4-HTTP';
+DELETE 0
+DELETE FROM habalgo.customer WHERE email='e4-http@example.invalid';
+DELETE 0
+DELETE FROM habalgo.location WHERE address IN ('E4 HTTP pickup','E4 HTTP dropoff') AND city='Manila';
+DELETE 2
+COMMIT;
+COMMIT
+
+GET /api.php?t=bookings
+HTTP 200
+[]
+
+GET /api.php?t=customers
+HTTP 200
+[]

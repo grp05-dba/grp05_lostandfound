@@ -1,0 +1,87 @@
+### identity-campussafe_dba | database=grp07_campussafedb | expected=allowed | PASS
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  |  current_database  
+----------------+----------------+--------------------
+ campussafe_dba | campussafe_dba | grp07_campussafedb
+(1 row)
+
+
+### read-campussafe_dba | database=grp07_campussafedb | expected=allowed | PASS
+SELECT (SELECT count(*) FROM public.role) AS role, (SELECT count(*) FROM public.app_user) AS app_user, (SELECT count(*) FROM public.hazard_category) AS hazard_category, (SELECT count(*) FROM public.campus_location) AS campus_location, (SELECT count(*) FROM public.hazard_report) AS hazard_report, (SELECT count(*) FROM public.assignment) AS assignment, (SELECT count(*) FROM public.report_status_history) AS report_status_history, (SELECT count(*) FROM public.maintenance_action) AS maintenance_action, (SELECT count(*) FROM public.attachment) AS attachment;
+ role | app_user | hazard_category | campus_location | hazard_report | assignment | report_status_history | maintenance_action | attachment 
+------+----------+-----------------+-----------------+---------------+------------+-----------------------+--------------------+------------
+    5 |        6 |               6 |              10 |            16 |         12 |                    60 |                  9 |          5
+(1 row)
+
+
+### dba-maintenance | database=grp07_campussafedb | expected=allowed | PASS
+BEGIN;
+BEGIN
+SET ROLE campussafe_owner_grp;
+SET
+INSERT INTO role(role_name) VALUES ('E4 DBA role') RETURNING role_id;
+ role_id 
+---------
+       6
+(1 row)
+
+INSERT 0 1
+ALTER TABLE role ADD COLUMN e4_probe text;
+ALTER TABLE
+CREATE TABLE public.e4_ddl_probe(id integer);
+CREATE TABLE
+DROP TABLE public.e4_ddl_probe;
+DROP TABLE
+ROLLBACK;
+ROLLBACK
+SELECT to_regclass('public.e4_ddl_probe') IS NULL AS probe_removed;
+ probe_removed 
+---------------
+ t
+(1 row)
+
+SELECT count(*) AS leftover_roles FROM role WHERE role_name='E4 DBA role';
+ leftover_roles 
+----------------
+              0
+(1 row)
+
+
+### deny-createdb-campussafe_dba | database=grp07_campussafedb | expected=denied | PASS
+CREATE DATABASE campussafe_e4_forbidden;
+ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+### deny-createrole-campussafe_dba | database=grp07_campussafedb | expected=denied | PASS
+CREATE ROLE campussafe_e4_forbidden NOLOGIN;
+ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+### isolation-campussafe_dba-campussafe_unrelateddb | database=campussafe_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "campussafe_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_dba-grp00_habalgodb | database=grp00_habalgodb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp00_habalgodb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_dba-habalgo_unrelateddb | database=habalgo_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "habalgo_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_dba-grp_brewposdb | database=grp_brewposdb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp_brewposdb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_dba-brewpos_unrelateddb | database=brewpos_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "brewpos_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_dba-postgres | database=postgres | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_dba-template1 | database=template1 | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.

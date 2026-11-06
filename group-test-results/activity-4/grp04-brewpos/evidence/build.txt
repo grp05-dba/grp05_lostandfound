@@ -1,0 +1,40 @@
+[INFO] Scanning for projects...
+[INFO] Loaded 24388 auto-discovered prefixes for remote repository central (prefixes-central.txt)
+[INFO] 
+[INFO] ------------------------< com.brewpos:brewpos >-------------------------
+[INFO] Building BrewPos 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ brewpos ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 8 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.15.0:compile (default-compile) @ brewpos ---
+[INFO] Loaded 64 auto-discovered prefixes for remote repository apache.snapshots (prefixes-apache.snapshots.txt)
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 45 source files with javac [debug parameters release 17] to target\classes
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ brewpos ---
+[INFO] skip non existing resourceDirectory C:\Users\imper\Documents\Codex\2026-11-06\access-github-and-clone-our-repo\work\brewpos\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.15.0:testCompile (default-testCompile) @ brewpos ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 5 source files with javac [debug parameters release 17] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ brewpos ---
+[INFO] Tests are skipped.
+[INFO] 
+[INFO] --- jar:3.5.1:jar (default-jar) @ brewpos ---
+[INFO] Building jar: C:\Users\imper\Documents\Codex\2026-11-06\access-github-and-clone-our-repo\work\brewpos\target\brewpos-0.0.1-SNAPSHOT.jar
+[INFO] 
+[INFO] --- spring-boot:4.1.1:repackage (repackage) @ brewpos ---
+[INFO] Loaded 50 auto-discovered prefixes for remote repository ow2-snapshot (prefixes-ow2-snapshot.txt)
+[INFO] Replacing main artifact C:\Users\imper\Documents\Codex\2026-11-06\access-github-and-clone-our-repo\work\brewpos\target\brewpos-0.0.1-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to C:\Users\imper\Documents\Codex\2026-11-06\access-github-and-clone-our-repo\work\brewpos\target\brewpos-0.0.1-SNAPSHOT.jar.original
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  07:33 min
+[INFO] Finished at: 2026-11-06T18:08:14+08:00
+[INFO] ------------------------------------------------------------------------

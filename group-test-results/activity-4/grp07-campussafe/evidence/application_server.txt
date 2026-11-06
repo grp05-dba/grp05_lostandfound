@@ -1,0 +1,113 @@
+[Fri Nov  6 18:35:49 2026] PHP 8.2.12 Development Server (http://127.0.0.1:18083) started
+[Fri Nov  6 18:38:03 2026] 127.0.0.1:61141 Accepted
+[Fri Nov  6 18:38:03 2026] 127.0.0.1:61141 [302]: GET /reports/new.php
+[Fri Nov  6 18:38:03 2026] 127.0.0.1:61141 Closing
+[Fri Nov  6 18:38:03 2026] 127.0.0.1:53806 Accepted
+[Fri Nov  6 18:38:03 2026] 127.0.0.1:53806 [200]: GET /login.php
+[Fri Nov  6 18:38:03 2026] 127.0.0.1:53806 Closing
+[Fri Nov  6 18:38:03 2026] 127.0.0.1:53810 Accepted
+[Fri Nov  6 18:38:03 2026] 127.0.0.1:53810 [302]: POST /login.php
+[Fri Nov  6 18:38:03 2026] 127.0.0.1:53810 Closing
+[Fri Nov  6 18:38:03 2026] 127.0.0.1:53812 Accepted
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:53812 [200]: GET /
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:53812 Closing
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:53814 Accepted
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:53814 [200]: GET /login.php
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:53814 Closing
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:53816 Accepted
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:53816 [302]: POST /login.php
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:53816 Closing
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:53818 Accepted
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:53818 [200]: GET /
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:53818 Closing
+[Fri Nov  6 18:38:04 2026] 127.0.0.1:56060 Accepted
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56060 [200]: GET /login.php
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56060 Closing
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56062 Accepted
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56062 [302]: POST /login.php
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56062 Closing
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56064 Accepted
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56064 [200]: GET /
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56064 Closing
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56066 Accepted
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56066 [200]: GET /login.php
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56066 Closing
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56074 Accepted
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56074 [302]: POST /login.php
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56074 Closing
+[Fri Nov  6 18:38:05 2026] 127.0.0.1:56076 Accepted
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56076 [200]: GET /
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56076 Closing
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56078 Accepted
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56078 [200]: GET /login.php
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56078 Closing
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56080 Accepted
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56080 [302]: POST /login.php
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56080 Closing
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56084 Accepted
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56084 [200]: GET /
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56084 Closing
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56091 Accepted
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56091 [403]: GET /admin/users.php
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56091 Closing
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56094 Accepted
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56094 [403]: GET /admin/verify.php
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56094 Closing
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56095 Accepted
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56095 [200]: GET /admin/stats.php
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56095 Closing
+[Fri Nov  6 18:38:06 2026] 127.0.0.1:56097 Accepted
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56097 [302]: GET /reports/view.php?id=2
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56097 Closing
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56099 Accepted
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56099 [403]: POST /reports/new.php
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56099 Closing
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56101 Accepted
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56101 [200]: GET /reports/new.php
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56101 Closing
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56103 Accepted
+[Fri Nov  6 18:38:07 2026] PHP Notice:  PHP Request Startup: file created in the system's temporary directory in Unknown on line 0
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56103 [302]: POST /reports/new.php
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56103 Closing
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56119 Accepted
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56119 [200]: GET /attachment.php?id=7
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:56119 Closing
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:51199 Accepted
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:51199 [200]: GET /admin/verify.php?id=20
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:51199 Closing
+[Fri Nov  6 18:38:07 2026] 127.0.0.1:51206 Accepted
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:51206 [302]: POST /admin/verify.php
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:51206 Closing
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:51209 Accepted
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:51209 [200]: GET /admin/assign.php?id=20
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:51209 Closing
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:51212 Accepted
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:51212 [302]: POST /admin/assign.php
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:51212 Closing
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:63041 Accepted
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:63041 [302]: GET /maintenance/update.php?id=20
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:63041 Closing
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:63043 Accepted
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:63043 [200]: GET /maintenance/index.php
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:63043 Closing
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:63057 Accepted
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:63057 [302]: POST /maintenance/index.php
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:63057 Closing
+[Fri Nov  6 18:38:08 2026] 127.0.0.1:63069 Accepted
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63069 [200]: GET /maintenance/update.php?id=20
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63069 Closing
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63074 Accepted
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63074 [302]: POST /maintenance/update.php?id=20
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63074 Closing
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63080 Accepted
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63080 [200]: GET /reports/view.php?id=20
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63080 Closing
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63084 Accepted
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63084 [302]: POST /reports/view.php?id=20
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63084 Closing
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63087 Accepted
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63087 [200]: GET /reports/new.php
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63087 Closing
+[Fri Nov  6 18:38:09 2026] 127.0.0.1:63100 Accepted
+[Fri Nov  6 18:38:10 2026] 127.0.0.1:63100 [302]: POST /reports/new.php
+[Fri Nov  6 18:38:10 2026] 127.0.0.1:63100 Closing

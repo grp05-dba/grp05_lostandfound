@@ -1,0 +1,1332 @@
+[
+  {
+    "id": "identity-campussafe_app",
+    "role": "campussafe_app",
+    "sql": "SELECT session_user,current_user,current_database();",
+    "expected": "allowed",
+    "token": "campussafe_app",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "read-campussafe_app",
+    "role": "campussafe_app",
+    "sql": "SELECT (SELECT count(*) FROM public.role) AS role, (SELECT count(*) FROM public.app_user) AS app_user, (SELECT count(*) FROM public.hazard_category) AS hazard_category, (SELECT count(*) FROM public.campus_location) AS campus_location, (SELECT count(*) FROM public.hazard_report) AS hazard_report, (SELECT count(*) FROM public.assignment) AS assignment, (SELECT count(*) FROM public.report_status_history) AS report_status_history, (SELECT count(*) FROM public.maintenance_action) AS maintenance_action, (SELECT count(*) FROM public.attachment) AS attachment;",
+    "expected": "allowed",
+    "token": "(1 row)",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "identity-campussafe_report",
+    "role": "campussafe_report",
+    "sql": "SELECT session_user,current_user,current_database();",
+    "expected": "allowed",
+    "token": "campussafe_report",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "read-campussafe_report",
+    "role": "campussafe_report",
+    "sql": "SELECT (SELECT count(*) FROM role) AS role, (SELECT count(*) FROM hazard_category) AS hazard_category, (SELECT count(*) FROM campus_location) AS campus_location, (SELECT count(*) FROM hazard_report) AS hazard_report, (SELECT count(*) FROM assignment) AS assignment, (SELECT count(*) FROM report_status_history) AS report_status_history, (SELECT count(*) FROM maintenance_action) AS maintenance_action, (SELECT count(*) FROM attachment) AS attachment;",
+    "expected": "allowed",
+    "token": "(1 row)",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "identity-campussafe_backup",
+    "role": "campussafe_backup",
+    "sql": "SELECT session_user,current_user,current_database();",
+    "expected": "allowed",
+    "token": "campussafe_backup",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "read-campussafe_backup",
+    "role": "campussafe_backup",
+    "sql": "SELECT (SELECT count(*) FROM public.role) AS role, (SELECT count(*) FROM public.app_user) AS app_user, (SELECT count(*) FROM public.hazard_category) AS hazard_category, (SELECT count(*) FROM public.campus_location) AS campus_location, (SELECT count(*) FROM public.hazard_report) AS hazard_report, (SELECT count(*) FROM public.assignment) AS assignment, (SELECT count(*) FROM public.report_status_history) AS report_status_history, (SELECT count(*) FROM public.maintenance_action) AS maintenance_action, (SELECT count(*) FROM public.attachment) AS attachment;",
+    "expected": "allowed",
+    "token": "(1 row)",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "identity-campussafe_dba",
+    "role": "campussafe_dba",
+    "sql": "SELECT session_user,current_user,current_database();",
+    "expected": "allowed",
+    "token": "campussafe_dba",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "read-campussafe_dba",
+    "role": "campussafe_dba",
+    "sql": "SELECT (SELECT count(*) FROM public.role) AS role, (SELECT count(*) FROM public.app_user) AS app_user, (SELECT count(*) FROM public.hazard_category) AS hazard_category, (SELECT count(*) FROM public.campus_location) AS campus_location, (SELECT count(*) FROM public.hazard_report) AS hazard_report, (SELECT count(*) FROM public.assignment) AS assignment, (SELECT count(*) FROM public.report_status_history) AS report_status_history, (SELECT count(*) FROM public.maintenance_action) AS maintenance_action, (SELECT count(*) FROM public.attachment) AS attachment;",
+    "expected": "allowed",
+    "token": "(1 row)",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-workflow",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nINSERT INTO app_user(role_id,full_name,email,username,password_hash) VALUES (1,'E4 test user','e4-test@example.invalid','e4_test_user','[test-only]') RETURNING user_id \\gset\nINSERT INTO hazard_category(category_name) VALUES ('E4 test category') RETURNING category_id \\gset\nINSERT INTO campus_location(building,room_area) VALUES ('E4 test building','E4 test room') RETURNING location_id \\gset\nINSERT INTO hazard_report(reporter_user_id,location_id,category_id,description) VALUES (:user_id,:location_id,:category_id,'E4 transactional hazard probe') RETURNING report_id \\gset\nINSERT INTO report_status_history(report_id,changed_by_user_id,status) VALUES (:report_id,:user_id,'Submitted');\nUPDATE app_user SET account_status='inactive' WHERE user_id=:user_id;\nUPDATE hazard_category SET is_active=false WHERE category_id=:category_id;\nUPDATE campus_location SET is_active=false WHERE location_id=:location_id;\nUPDATE hazard_report SET status='Verified',priority='High',verified_by_user_id=1,verified_at=now() WHERE report_id=:report_id;\nINSERT INTO assignment(report_id,maintenance_user_id,assigned_by_user_id) VALUES (:report_id,2,1) RETURNING assignment_id \\gset\nUPDATE assignment SET assignment_status='In Progress' WHERE assignment_id=:assignment_id;\nINSERT INTO maintenance_action(report_id,maintenance_user_id,action_details) VALUES (:report_id,2,'E4 test action');\nINSERT INTO attachment(report_id,uploaded_by_user_id,file_name,file_path_or_url) VALUES (:report_id,:user_id,'e4-test.png','uploads/e4-test.png') RETURNING attachment_id \\gset\nDELETE FROM attachment WHERE attachment_id=:attachment_id;\nSELECT h.status,h.priority,a.assignment_status FROM hazard_report h JOIN assignment a USING(report_id) WHERE h.report_id=:report_id;\nROLLBACK;\nSELECT (SELECT count(*) FROM public.role) AS role, (SELECT count(*) FROM public.app_user) AS app_user, (SELECT count(*) FROM public.hazard_category) AS hazard_category, (SELECT count(*) FROM public.campus_location) AS campus_location, (SELECT count(*) FROM public.hazard_report) AS hazard_report, (SELECT count(*) FROM public.assignment) AS assignment, (SELECT count(*) FROM public.report_status_history) AS report_status_history, (SELECT count(*) FROM public.maintenance_action) AS maintenance_action, (SELECT count(*) FROM public.attachment) AS attachment;",
+    "expected": "allowed",
+    "token": "In Progress",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-role-insert",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nINSERT INTO role(role_name) VALUES ('E4 forbidden');\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-role-update",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nUPDATE role SET description=description WHERE role_id=1;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-role-delete",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nDELETE FROM role WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-user-delete",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nDELETE FROM app_user WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-category-delete",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nDELETE FROM hazard_category WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-location-delete",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nDELETE FROM campus_location WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-report-delete",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nDELETE FROM hazard_report WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-assignment-delete",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nDELETE FROM assignment WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-history-update",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nUPDATE report_status_history SET notes=notes WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-history-delete",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nDELETE FROM report_status_history WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-action-update",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nUPDATE maintenance_action SET notes=notes WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-action-delete",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nDELETE FROM maintenance_action WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-attachment-update",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nUPDATE attachment SET file_name=file_name WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-truncate",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nTRUNCATE report_status_history;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-create-table",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nCREATE TABLE public.e4_forbidden(id integer);\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-create-schema",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nCREATE SCHEMA e4_forbidden;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-create-temp",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nCREATE TEMP TABLE e4_forbidden(id integer);\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-alter-table",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nALTER TABLE role ADD COLUMN e4_forbidden integer;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-role-sequence",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nSELECT nextval('role_role_id_seq');\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-sequence-reset",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nSELECT setval('hazard_report_report_id_seq',1);\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "runtime-deny-owner-escalation",
+    "role": "campussafe_app",
+    "sql": "BEGIN;\nSET ROLE campussafe_owner_grp;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-users",
+    "role": "campussafe_report",
+    "sql": "SELECT user_id FROM app_user LIMIT 0;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "auditor-deny-hashes",
+    "role": "campussafe_report",
+    "sql": "SELECT password_hash FROM app_user LIMIT 0;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "backup-hash-column-readable",
+    "role": "campussafe_backup",
+    "sql": "SELECT password_hash IS NOT NULL AS hash_present FROM app_user LIMIT 1;",
+    "expected": "allowed",
+    "token": "hash_present",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "backup-sequence-state",
+    "role": "campussafe_backup",
+    "sql": "SELECT last_value FROM role_role_id_seq;",
+    "expected": "allowed",
+    "token": "last_value",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-insert-role",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nINSERT INTO role DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-update-role",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nUPDATE role SET description=description WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-delete-role",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nDELETE FROM role WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-insert-app_user",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nINSERT INTO app_user DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-update-app_user",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nUPDATE app_user SET full_name=full_name WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-delete-app_user",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nDELETE FROM app_user WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-insert-hazard_category",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nINSERT INTO hazard_category DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-update-hazard_category",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nUPDATE hazard_category SET description=description WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-delete-hazard_category",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nDELETE FROM hazard_category WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-insert-campus_location",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nINSERT INTO campus_location DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-update-campus_location",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nUPDATE campus_location SET building=building WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-delete-campus_location",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nDELETE FROM campus_location WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-insert-hazard_report",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nINSERT INTO hazard_report DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-update-hazard_report",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nUPDATE hazard_report SET description=description WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-delete-hazard_report",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nDELETE FROM hazard_report WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-insert-assignment",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nINSERT INTO assignment DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-update-assignment",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nUPDATE assignment SET assignment_status=assignment_status WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-delete-assignment",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nDELETE FROM assignment WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-insert-report_status_history",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nINSERT INTO report_status_history DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-update-report_status_history",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nUPDATE report_status_history SET notes=notes WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-delete-report_status_history",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nDELETE FROM report_status_history WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-insert-maintenance_action",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nINSERT INTO maintenance_action DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-update-maintenance_action",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nUPDATE maintenance_action SET notes=notes WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-delete-maintenance_action",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nDELETE FROM maintenance_action WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-insert-attachment",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nINSERT INTO attachment DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-update-attachment",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nUPDATE attachment SET file_name=file_name WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-delete-attachment",
+    "role": "campussafe_report",
+    "sql": "BEGIN;\nDELETE FROM attachment WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-nextval",
+    "role": "campussafe_report",
+    "sql": "SELECT nextval('hazard_report_report_id_seq');",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-setval",
+    "role": "campussafe_report",
+    "sql": "SELECT setval('hazard_report_report_id_seq',1);",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-create",
+    "role": "campussafe_report",
+    "sql": "BEGIN; CREATE TABLE public.e4_forbidden(id integer); ROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_report-deny-owner",
+    "role": "campussafe_report",
+    "sql": "SET ROLE campussafe_owner_grp;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-insert-role",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nINSERT INTO role DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-update-role",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nUPDATE role SET description=description WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-delete-role",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nDELETE FROM role WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-insert-app_user",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nINSERT INTO app_user DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-update-app_user",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nUPDATE app_user SET full_name=full_name WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-delete-app_user",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nDELETE FROM app_user WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-insert-hazard_category",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nINSERT INTO hazard_category DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-update-hazard_category",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nUPDATE hazard_category SET description=description WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-delete-hazard_category",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nDELETE FROM hazard_category WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-insert-campus_location",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nINSERT INTO campus_location DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-update-campus_location",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nUPDATE campus_location SET building=building WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-delete-campus_location",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nDELETE FROM campus_location WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-insert-hazard_report",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nINSERT INTO hazard_report DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-update-hazard_report",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nUPDATE hazard_report SET description=description WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-delete-hazard_report",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nDELETE FROM hazard_report WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-insert-assignment",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nINSERT INTO assignment DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-update-assignment",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nUPDATE assignment SET assignment_status=assignment_status WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-delete-assignment",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nDELETE FROM assignment WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-insert-report_status_history",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nINSERT INTO report_status_history DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-update-report_status_history",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nUPDATE report_status_history SET notes=notes WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-delete-report_status_history",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nDELETE FROM report_status_history WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-insert-maintenance_action",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nINSERT INTO maintenance_action DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-update-maintenance_action",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nUPDATE maintenance_action SET notes=notes WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-delete-maintenance_action",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nDELETE FROM maintenance_action WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-insert-attachment",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nINSERT INTO attachment DEFAULT VALUES;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-update-attachment",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nUPDATE attachment SET file_name=file_name WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-delete-attachment",
+    "role": "campussafe_backup",
+    "sql": "BEGIN;\nDELETE FROM attachment WHERE false;\nROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-nextval",
+    "role": "campussafe_backup",
+    "sql": "SELECT nextval('hazard_report_report_id_seq');",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-setval",
+    "role": "campussafe_backup",
+    "sql": "SELECT setval('hazard_report_report_id_seq',1);",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-create",
+    "role": "campussafe_backup",
+    "sql": "BEGIN; CREATE TABLE public.e4_forbidden(id integer); ROLLBACK;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "campussafe_backup-deny-owner",
+    "role": "campussafe_backup",
+    "sql": "SET ROLE campussafe_owner_grp;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "dba-maintenance",
+    "role": "campussafe_dba",
+    "sql": "BEGIN;\nSET ROLE campussafe_owner_grp;\nINSERT INTO role(role_name) VALUES ('E4 DBA role') RETURNING role_id;\nALTER TABLE role ADD COLUMN e4_probe text;\nCREATE TABLE public.e4_ddl_probe(id integer);\nDROP TABLE public.e4_ddl_probe;\nROLLBACK;\nSELECT to_regclass('public.e4_ddl_probe') IS NULL AS probe_removed;\nSELECT count(*) AS leftover_roles FROM role WHERE role_name='E4 DBA role';",
+    "expected": "allowed",
+    "token": "ALTER TABLE",
+    "db": "grp07_campussafedb",
+    "exit_code": 0,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createdb-campussafe_app",
+    "role": "campussafe_app",
+    "sql": "CREATE DATABASE campussafe_e4_forbidden;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createrole-campussafe_app",
+    "role": "campussafe_app",
+    "sql": "CREATE ROLE campussafe_e4_forbidden NOLOGIN;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_app-campussafe_unrelateddb",
+    "role": "campussafe_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "campussafe_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_app-grp00_habalgodb",
+    "role": "campussafe_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "grp00_habalgodb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_app-habalgo_unrelateddb",
+    "role": "campussafe_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "habalgo_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_app-grp_brewposdb",
+    "role": "campussafe_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "grp_brewposdb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_app-brewpos_unrelateddb",
+    "role": "campussafe_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "brewpos_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_app-postgres",
+    "role": "campussafe_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "postgres",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_app-template1",
+    "role": "campussafe_app",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "template1",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createdb-campussafe_report",
+    "role": "campussafe_report",
+    "sql": "CREATE DATABASE campussafe_e4_forbidden;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createrole-campussafe_report",
+    "role": "campussafe_report",
+    "sql": "CREATE ROLE campussafe_e4_forbidden NOLOGIN;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_report-campussafe_unrelateddb",
+    "role": "campussafe_report",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "campussafe_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_report-grp00_habalgodb",
+    "role": "campussafe_report",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "grp00_habalgodb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_report-habalgo_unrelateddb",
+    "role": "campussafe_report",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "habalgo_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_report-grp_brewposdb",
+    "role": "campussafe_report",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "grp_brewposdb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_report-brewpos_unrelateddb",
+    "role": "campussafe_report",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "brewpos_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_report-postgres",
+    "role": "campussafe_report",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "postgres",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_report-template1",
+    "role": "campussafe_report",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "template1",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createdb-campussafe_backup",
+    "role": "campussafe_backup",
+    "sql": "CREATE DATABASE campussafe_e4_forbidden;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createrole-campussafe_backup",
+    "role": "campussafe_backup",
+    "sql": "CREATE ROLE campussafe_e4_forbidden NOLOGIN;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_backup-campussafe_unrelateddb",
+    "role": "campussafe_backup",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "campussafe_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_backup-grp00_habalgodb",
+    "role": "campussafe_backup",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "grp00_habalgodb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_backup-habalgo_unrelateddb",
+    "role": "campussafe_backup",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "habalgo_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_backup-grp_brewposdb",
+    "role": "campussafe_backup",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "grp_brewposdb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_backup-brewpos_unrelateddb",
+    "role": "campussafe_backup",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "brewpos_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_backup-postgres",
+    "role": "campussafe_backup",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "postgres",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_backup-template1",
+    "role": "campussafe_backup",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "template1",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createdb-campussafe_dba",
+    "role": "campussafe_dba",
+    "sql": "CREATE DATABASE campussafe_e4_forbidden;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "deny-createrole-campussafe_dba",
+    "role": "campussafe_dba",
+    "sql": "CREATE ROLE campussafe_e4_forbidden NOLOGIN;",
+    "expected": "denied",
+    "token": "42501",
+    "db": "grp07_campussafedb",
+    "exit_code": 3,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_dba-campussafe_unrelateddb",
+    "role": "campussafe_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "campussafe_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_dba-grp00_habalgodb",
+    "role": "campussafe_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "grp00_habalgodb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_dba-habalgo_unrelateddb",
+    "role": "campussafe_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "habalgo_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_dba-grp_brewposdb",
+    "role": "campussafe_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "grp_brewposdb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_dba-brewpos_unrelateddb",
+    "role": "campussafe_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "brewpos_unrelateddb",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_dba-postgres",
+    "role": "campussafe_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "postgres",
+    "exit_code": 2,
+    "status": "PASS"
+  },
+  {
+    "id": "isolation-campussafe_dba-template1",
+    "role": "campussafe_dba",
+    "sql": "SELECT current_database();",
+    "expected": "denied",
+    "token": "User does not have CONNECT privilege.",
+    "db": "template1",
+    "exit_code": 2,
+    "status": "PASS"
+  }
+]

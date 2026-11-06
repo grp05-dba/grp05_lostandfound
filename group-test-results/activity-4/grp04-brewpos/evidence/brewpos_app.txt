@@ -1,0 +1,216 @@
+### identity-brewpos_app | database=grp_brewposdb | expected=allowed | PASS
+SELECT session_user, current_user, current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ brewpos_app  | brewpos_app  | grp_brewposdb
+(1 row)
+
+
+### read-brewpos_app | database=grp_brewposdb | expected=allowed | PASS
+SELECT (SELECT count(*) FROM staff) AS staff, (SELECT count(*) FROM menu_category) AS categories, (SELECT count(*) FROM menu_item) AS items, (SELECT count(*) FROM order_ticket) AS orders, (SELECT count(*) FROM order_line_item) AS lines;
+ staff | categories | items | orders | lines 
+-------+------------+-------+--------+-------
+     2 |          3 |    11 |      5 |     9
+(1 row)
+
+
+### runtime-catalog-write | database=grp_brewposdb | expected=allowed | PASS
+BEGIN;
+BEGIN
+INSERT INTO menu_category(category_name) VALUES ('E4 temporary category') RETURNING category_id \gset
+INSERT 0 1
+UPDATE menu_category SET category_name='E4 renamed category' WHERE category_id=:category_id RETURNING category_name;
+    category_name    
+---------------------
+ E4 renamed category
+(1 row)
+
+UPDATE 1
+INSERT INTO menu_item(category_id,item_name,price) VALUES (:category_id,'E4 temporary item',10) RETURNING item_id \gset
+INSERT 0 1
+UPDATE menu_item SET price=12.50,is_active=false WHERE item_id=:item_id RETURNING price,is_active;
+ price | is_active 
+-------+-----------
+ 12.50 | f
+(1 row)
+
+UPDATE 1
+ROLLBACK;
+ROLLBACK
+SELECT count(*) AS leftover_categories FROM menu_category WHERE category_name LIKE 'E4%';
+ leftover_categories 
+---------------------
+                   0
+(1 row)
+
+SELECT count(*) AS leftover_items FROM menu_item WHERE item_name LIKE 'E4%';
+ leftover_items 
+----------------
+              0
+(1 row)
+
+
+### runtime-category-delete | database=grp_brewposdb | expected=allowed | PASS
+BEGIN; INSERT INTO menu_category(category_name) VALUES ('E4 delete probe') RETURNING category_id \gset
+BEGIN
+INSERT 0 1
+DELETE FROM menu_category WHERE category_id=:category_id RETURNING category_name; ROLLBACK;
+  category_name  
+-----------------
+ E4 delete probe
+(1 row)
+
+DELETE 1
+ROLLBACK
+
+### runtime-checkout | database=grp_brewposdb | expected=allowed | PASS
+BEGIN;
+BEGIN
+INSERT INTO order_ticket(staff_id,payment_method) SELECT min(staff_id),'CASH' FROM staff RETURNING order_id \gset
+INSERT 0 1
+INSERT INTO order_line_item(order_id,item_id,quantity,sold_price) SELECT :order_id,item_id,2,price FROM menu_item WHERE is_active AND item_name='Americano' ORDER BY item_id LIMIT 1;
+INSERT 0 1
+SELECT order_id,SUM(quantity*sold_price) AS total FROM order_line_item WHERE order_id=:order_id GROUP BY order_id;
+ order_id | total  
+----------+--------
+        8 | 180.00
+(1 row)
+
+ROLLBACK;
+ROLLBACK
+SELECT (SELECT count(*) FROM staff) AS staff, (SELECT count(*) FROM menu_category) AS categories, (SELECT count(*) FROM menu_item) AS items, (SELECT count(*) FROM order_ticket) AS orders, (SELECT count(*) FROM order_line_item) AS lines;
+ staff | categories | items | orders | lines 
+-------+------------+-------+--------+-------
+     2 |          3 |    11 |      5 |     9
+(1 row)
+
+
+### runtime-deny-staff-insert | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO staff(full_name,role) VALUES ('E4 probe','CASHIER');
+ERROR:  42501: permission denied for table staff
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-staff-update | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE staff SET full_name=full_name WHERE staff_id=1;
+ERROR:  42501: permission denied for table staff
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-staff-delete | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM staff WHERE staff_id=1;
+ERROR:  42501: permission denied for table staff
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-item-delete | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM menu_item WHERE false;
+ERROR:  42501: permission denied for table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-order-update | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE order_ticket SET payment_method=payment_method WHERE order_id=1;
+ERROR:  42501: permission denied for table order_ticket
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-order-delete | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM order_ticket WHERE false;
+ERROR:  42501: permission denied for table order_ticket
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-line-update | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE order_line_item SET sold_price=sold_price WHERE order_id=1;
+ERROR:  42501: permission denied for table order_line_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-line-delete | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM order_line_item WHERE false;
+ERROR:  42501: permission denied for table order_line_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-truncate | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+TRUNCATE order_line_item;
+ERROR:  42501: permission denied for table order_line_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-create-table | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+CREATE TABLE public.e4_forbidden(id integer);
+ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.e4_forbidden(id integer);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-create-schema | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+CREATE SCHEMA e4_forbidden;
+ERROR:  42501: permission denied for database grp_brewposdb
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-alter-table | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+ALTER TABLE staff ADD COLUMN e4_forbidden integer;
+ERROR:  42501: must be owner of table staff
+LOCATION:  aclcheck_error, aclchk.c:2933
+
+### runtime-deny-staff-sequence | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+SELECT nextval('staff_staff_id_seq');
+ERROR:  42501: permission denied for sequence staff_staff_id_seq
+LOCATION:  nextval_internal, sequence.c:655
+
+### runtime-deny-sequence-reset | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+SELECT setval('order_ticket_order_id_seq',1);
+ERROR:  42501: permission denied for sequence order_ticket_order_id_seq
+LOCATION:  do_setval, sequence.c:964
+
+### runtime-deny-owner-escalation | database=grp_brewposdb | expected=denied | PASS
+BEGIN;
+BEGIN
+SET ROLE brewpos_owner_grp;
+ERROR:  42501: permission denied to set role "brewpos_owner_grp"
+LOCATION:  call_string_check_hook, guc.c:6945
+
+### deny-createdb-brewpos_app | database=grp_brewposdb | expected=denied | PASS
+CREATE DATABASE e4_forbidden_database;
+ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+### deny-createrole-brewpos_app | database=grp_brewposdb | expected=denied | PASS
+CREATE ROLE e4_forbidden_role NOLOGIN;
+ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+### isolation-brewpos_app-brewpos_unrelateddb | database=brewpos_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "brewpos_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-brewpos_app-postgres | database=postgres | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-brewpos_app-template1 | database=template1 | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.

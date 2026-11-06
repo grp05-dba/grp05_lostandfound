@@ -1,0 +1,232 @@
+### identity-habalgo_auditor | database=grp00_habalgodb | expected=allowed | PASS
+SELECT session_user,current_user,current_database();
+  session_user   |  current_user   | current_database 
+-----------------+-----------------+------------------
+ habalgo_auditor | habalgo_auditor | grp00_habalgodb
+(1 row)
+
+
+### read-habalgo_auditor | database=grp00_habalgodb | expected=allowed | PASS
+SELECT (SELECT count(*) FROM habalgo.customer) AS customer, (SELECT count(*) FROM habalgo.driver) AS driver, (SELECT count(*) FROM habalgo.vehicle) AS vehicle, (SELECT count(*) FROM habalgo.driver_vehicle) AS driver_vehicle, (SELECT count(*) FROM habalgo.location) AS location, (SELECT count(*) FROM habalgo.booking) AS booking, (SELECT count(*) FROM habalgo.payment) AS payment, (SELECT count(*) FROM habalgo.rating_feedback) AS rating_feedback;
+ customer | driver | vehicle | driver_vehicle | location | booking | payment | rating_feedback 
+----------+--------+---------+----------------+----------+---------+---------+-----------------
+        0 |     10 |       0 |              0 |        0 |       0 |       0 |               0
+(1 row)
+
+
+### auditor-deny-insert-customer | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO habalgo.customer DEFAULT VALUES;
+ERROR:  42501: permission denied for table customer
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-customer | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE habalgo.customer SET name=name WHERE false;
+ERROR:  42501: permission denied for table customer
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-customer | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM habalgo.customer WHERE false;
+ERROR:  42501: permission denied for table customer
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-insert-driver | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO habalgo.driver DEFAULT VALUES;
+ERROR:  42501: permission denied for table driver
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-driver | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE habalgo.driver SET name=name WHERE false;
+ERROR:  42501: permission denied for table driver
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-driver | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM habalgo.driver WHERE false;
+ERROR:  42501: permission denied for table driver
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-insert-vehicle | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO habalgo.vehicle DEFAULT VALUES;
+ERROR:  42501: permission denied for table vehicle
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-vehicle | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE habalgo.vehicle SET model=model WHERE false;
+ERROR:  42501: permission denied for table vehicle
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-vehicle | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM habalgo.vehicle WHERE false;
+ERROR:  42501: permission denied for table vehicle
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-insert-driver_vehicle | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO habalgo.driver_vehicle DEFAULT VALUES;
+ERROR:  42501: permission denied for table driver_vehicle
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-driver_vehicle | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE habalgo.driver_vehicle SET assigned_from=assigned_from WHERE false;
+ERROR:  42501: permission denied for table driver_vehicle
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-driver_vehicle | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM habalgo.driver_vehicle WHERE false;
+ERROR:  42501: permission denied for table driver_vehicle
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-insert-location | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO habalgo.location DEFAULT VALUES;
+ERROR:  42501: permission denied for table location
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-location | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE habalgo.location SET address=address WHERE false;
+ERROR:  42501: permission denied for table location
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-location | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM habalgo.location WHERE false;
+ERROR:  42501: permission denied for table location
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-insert-booking | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO habalgo.booking DEFAULT VALUES;
+ERROR:  42501: permission denied for table booking
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-booking | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE habalgo.booking SET booking_status=booking_status WHERE false;
+ERROR:  42501: permission denied for table booking
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-booking | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM habalgo.booking WHERE false;
+ERROR:  42501: permission denied for table booking
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-insert-payment | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO habalgo.payment DEFAULT VALUES;
+ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-payment | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE habalgo.payment SET amount=amount WHERE false;
+ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-payment | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM habalgo.payment WHERE false;
+ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-insert-rating_feedback | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO habalgo.rating_feedback DEFAULT VALUES;
+ERROR:  42501: permission denied for table rating_feedback
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-update-rating_feedback | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE habalgo.rating_feedback SET rating=rating WHERE false;
+ERROR:  42501: permission denied for table rating_feedback
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-delete-rating_feedback | database=grp00_habalgodb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM habalgo.rating_feedback WHERE false;
+ERROR:  42501: permission denied for table rating_feedback
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-sequence | database=grp00_habalgodb | expected=denied | PASS
+SELECT nextval('habalgo.customer_customer_id_seq');
+ERROR:  42501: permission denied for sequence customer_customer_id_seq
+LOCATION:  nextval_internal, sequence.c:655
+
+### auditor-deny-create | database=grp00_habalgodb | expected=denied | PASS
+BEGIN; CREATE TABLE habalgo.e4_forbidden(id integer); ROLLBACK;
+BEGIN
+ERROR:  42501: permission denied for schema habalgo
+LINE 1: CREATE TABLE habalgo.e4_forbidden(id integer);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-owner | database=grp00_habalgodb | expected=denied | PASS
+SET ROLE habalgo_owner_grp;
+ERROR:  42501: permission denied to set role "habalgo_owner_grp"
+LOCATION:  call_string_check_hook, guc.c:6945
+
+### deny-createdb-habalgo_auditor | database=grp00_habalgodb | expected=denied | PASS
+CREATE DATABASE habalgo_e4_forbidden;
+ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+### deny-createrole-habalgo_auditor | database=grp00_habalgodb | expected=denied | PASS
+CREATE ROLE habalgo_e4_forbidden NOLOGIN;
+ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+### isolation-habalgo_auditor-habalgo_unrelateddb | database=habalgo_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "habalgo_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-habalgo_auditor-grp_brewposdb | database=grp_brewposdb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp_brewposdb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-habalgo_auditor-brewpos_unrelateddb | database=brewpos_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "brewpos_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-habalgo_auditor-postgres | database=postgres | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-habalgo_auditor-template1 | database=template1 | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.

@@ -1,0 +1,19 @@
+### brewpos_app denied access to HabalGo
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp00_habalgodb"
+DETAIL:  User does not have CONNECT privilege.
+
+### brewpos_auditor denied access to HabalGo
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp00_habalgodb"
+DETAIL:  User does not have CONNECT privilege.
+
+### brewpos_dba denied access to HabalGo
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp00_habalgodb"
+DETAIL:  User does not have CONNECT privilege.
+
+### Existing Group 4 runtime retains its own database access
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ brewpos_app  | brewpos_app  | grp_brewposdb
+(1 row)
+

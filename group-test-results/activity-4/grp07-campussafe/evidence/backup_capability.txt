@@ -1,0 +1,134 @@
+Backup capability test: actual pg_dump -Fc as campussafe_backup.
+Exit code: 0
+All 9 TABLE DATA entries present; sequence SET entries included below.
+The sensitive dump remains only in local scratch storage and is not submitted.
+No data values, password hashes or credentials appear in this metadata evidence.
+
+;
+; Archive created at 2026-11-06 18:35:02
+;     dbname: grp07_campussafedb
+;     TOC Entries: 119
+;     Compression: gzip
+;     Dump Version: 1.16-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 18.6
+;     Dumped by pg_dump version: 18.6
+;
+;
+; Selected TOC Entries:
+;
+5; 2615 2200 SCHEMA - public campussafe_owner_grp
+5150; 0 0 ACL - SCHEMA public campussafe_owner_grp
+222; 1259 16716 TABLE public app_user campussafe_owner_grp
+5151; 0 0 ACL public TABLE app_user campussafe_owner_grp
+221; 1259 16715 SEQUENCE public app_user_user_id_seq campussafe_owner_grp
+5152; 0 0 SEQUENCE OWNED BY public app_user_user_id_seq campussafe_owner_grp
+5153; 0 0 ACL public SEQUENCE app_user_user_id_seq campussafe_owner_grp
+230; 1259 16816 TABLE public assignment campussafe_owner_grp
+5154; 0 0 ACL public TABLE assignment campussafe_owner_grp
+229; 1259 16815 SEQUENCE public assignment_assignment_id_seq campussafe_owner_grp
+5155; 0 0 SEQUENCE OWNED BY public assignment_assignment_id_seq campussafe_owner_grp
+5156; 0 0 ACL public SEQUENCE assignment_assignment_id_seq campussafe_owner_grp
+236; 1259 16902 TABLE public attachment campussafe_owner_grp
+5157; 0 0 ACL public TABLE attachment campussafe_owner_grp
+235; 1259 16901 SEQUENCE public attachment_attachment_id_seq campussafe_owner_grp
+5158; 0 0 SEQUENCE OWNED BY public attachment_attachment_id_seq campussafe_owner_grp
+5159; 0 0 ACL public SEQUENCE attachment_attachment_id_seq campussafe_owner_grp
+226; 1259 16760 TABLE public campus_location campussafe_owner_grp
+5160; 0 0 ACL public TABLE campus_location campussafe_owner_grp
+225; 1259 16759 SEQUENCE public campus_location_location_id_seq campussafe_owner_grp
+5161; 0 0 SEQUENCE OWNED BY public campus_location_location_id_seq campussafe_owner_grp
+5162; 0 0 ACL public SEQUENCE campus_location_location_id_seq campussafe_owner_grp
+224; 1259 16745 TABLE public hazard_category campussafe_owner_grp
+5163; 0 0 ACL public TABLE hazard_category campussafe_owner_grp
+223; 1259 16744 SEQUENCE public hazard_category_category_id_seq campussafe_owner_grp
+5164; 0 0 SEQUENCE OWNED BY public hazard_category_category_id_seq campussafe_owner_grp
+5165; 0 0 ACL public SEQUENCE hazard_category_category_id_seq campussafe_owner_grp
+228; 1259 16774 TABLE public hazard_report campussafe_owner_grp
+5166; 0 0 ACL public TABLE hazard_report campussafe_owner_grp
+227; 1259 16773 SEQUENCE public hazard_report_report_id_seq campussafe_owner_grp
+5167; 0 0 SEQUENCE OWNED BY public hazard_report_report_id_seq campussafe_owner_grp
+5168; 0 0 ACL public SEQUENCE hazard_report_report_id_seq campussafe_owner_grp
+234; 1259 16875 TABLE public maintenance_action campussafe_owner_grp
+5169; 0 0 ACL public TABLE maintenance_action campussafe_owner_grp
+233; 1259 16874 SEQUENCE public maintenance_action_action_id_seq campussafe_owner_grp
+5170; 0 0 SEQUENCE OWNED BY public maintenance_action_action_id_seq campussafe_owner_grp
+5171; 0 0 ACL public SEQUENCE maintenance_action_action_id_seq campussafe_owner_grp
+232; 1259 16849 TABLE public report_status_history campussafe_owner_grp
+5172; 0 0 ACL public TABLE report_status_history campussafe_owner_grp
+231; 1259 16848 SEQUENCE public report_status_history_history_id_seq campussafe_owner_grp
+5173; 0 0 SEQUENCE OWNED BY public report_status_history_history_id_seq campussafe_owner_grp
+5174; 0 0 ACL public SEQUENCE report_status_history_history_id_seq campussafe_owner_grp
+220; 1259 16703 TABLE public role campussafe_owner_grp
+5175; 0 0 ACL public TABLE role campussafe_owner_grp
+219; 1259 16702 SEQUENCE public role_role_id_seq campussafe_owner_grp
+5176; 0 0 SEQUENCE OWNED BY public role_role_id_seq campussafe_owner_grp
+5177; 0 0 ACL public SEQUENCE role_role_id_seq campussafe_owner_grp
+4898; 2604 16719 DEFAULT public app_user user_id campussafe_owner_grp
+4908; 2604 16819 DEFAULT public assignment assignment_id campussafe_owner_grp
+4916; 2604 16905 DEFAULT public attachment attachment_id campussafe_owner_grp
+4903; 2604 16763 DEFAULT public campus_location location_id campussafe_owner_grp
+4901; 2604 16748 DEFAULT public hazard_category category_id campussafe_owner_grp
+4905; 2604 16777 DEFAULT public hazard_report report_id campussafe_owner_grp
+4913; 2604 16878 DEFAULT public maintenance_action action_id campussafe_owner_grp
+4911; 2604 16852 DEFAULT public report_status_history history_id campussafe_owner_grp
+4897; 2604 16706 DEFAULT public role role_id campussafe_owner_grp
+5127; 0 16716 TABLE DATA public app_user campussafe_owner_grp
+5135; 0 16816 TABLE DATA public assignment campussafe_owner_grp
+5141; 0 16902 TABLE DATA public attachment campussafe_owner_grp
+5131; 0 16760 TABLE DATA public campus_location campussafe_owner_grp
+5129; 0 16745 TABLE DATA public hazard_category campussafe_owner_grp
+5133; 0 16774 TABLE DATA public hazard_report campussafe_owner_grp
+5139; 0 16875 TABLE DATA public maintenance_action campussafe_owner_grp
+5137; 0 16849 TABLE DATA public report_status_history campussafe_owner_grp
+5125; 0 16703 TABLE DATA public role campussafe_owner_grp
+5178; 0 0 SEQUENCE SET public app_user_user_id_seq campussafe_owner_grp
+5179; 0 0 SEQUENCE SET public assignment_assignment_id_seq campussafe_owner_grp
+5180; 0 0 SEQUENCE SET public attachment_attachment_id_seq campussafe_owner_grp
+5181; 0 0 SEQUENCE SET public campus_location_location_id_seq campussafe_owner_grp
+5182; 0 0 SEQUENCE SET public hazard_category_category_id_seq campussafe_owner_grp
+5183; 0 0 SEQUENCE SET public hazard_report_report_id_seq campussafe_owner_grp
+5184; 0 0 SEQUENCE SET public maintenance_action_action_id_seq campussafe_owner_grp
+5185; 0 0 SEQUENCE SET public report_status_history_history_id_seq campussafe_owner_grp
+5186; 0 0 SEQUENCE SET public role_role_id_seq campussafe_owner_grp
+4930; 2606 16736 CONSTRAINT public app_user app_user_email_key campussafe_owner_grp
+4932; 2606 16734 CONSTRAINT public app_user app_user_pkey campussafe_owner_grp
+4934; 2606 16738 CONSTRAINT public app_user app_user_username_key campussafe_owner_grp
+4949; 2606 16830 CONSTRAINT public assignment assignment_pkey campussafe_owner_grp
+4951; 2606 16832 CONSTRAINT public assignment assignment_report_id_maintenance_user_id_key campussafe_owner_grp
+4961; 2606 16916 CONSTRAINT public attachment attachment_pkey campussafe_owner_grp
+4940; 2606 16772 CONSTRAINT public campus_location campus_location_pkey campussafe_owner_grp
+4936; 2606 16758 CONSTRAINT public hazard_category hazard_category_category_name_key campussafe_owner_grp
+4938; 2606 16756 CONSTRAINT public hazard_category hazard_category_pkey campussafe_owner_grp
+4942; 2606 16794 CONSTRAINT public hazard_report hazard_report_pkey campussafe_owner_grp
+4959; 2606 16890 CONSTRAINT public maintenance_action maintenance_action_pkey campussafe_owner_grp
+4956; 2606 16863 CONSTRAINT public report_status_history report_status_history_pkey campussafe_owner_grp
+4926; 2606 16712 CONSTRAINT public role role_pkey campussafe_owner_grp
+4928; 2606 16714 CONSTRAINT public role role_role_name_key campussafe_owner_grp
+4957; 1259 16935 INDEX public idx_action_report campussafe_owner_grp
+4952; 1259 16933 INDEX public idx_assign_maint campussafe_owner_grp
+4953; 1259 16932 INDEX public idx_assign_report campussafe_owner_grp
+4962; 1259 16936 INDEX public idx_attach_report campussafe_owner_grp
+4954; 1259 16934 INDEX public idx_history_report campussafe_owner_grp
+4943; 1259 16929 INDEX public idx_report_category campussafe_owner_grp
+4944; 1259 16928 INDEX public idx_report_location campussafe_owner_grp
+4945; 1259 16927 INDEX public idx_report_reporter campussafe_owner_grp
+4946; 1259 16930 INDEX public idx_report_status campussafe_owner_grp
+4947; 1259 16931 INDEX public idx_report_submitted campussafe_owner_grp
+4963; 2606 16739 FK CONSTRAINT public app_user app_user_role_id_fkey campussafe_owner_grp
+4968; 2606 16843 FK CONSTRAINT public assignment assignment_assigned_by_user_id_fkey campussafe_owner_grp
+4969; 2606 16838 FK CONSTRAINT public assignment assignment_maintenance_user_id_fkey campussafe_owner_grp
+4970; 2606 16833 FK CONSTRAINT public assignment assignment_report_id_fkey campussafe_owner_grp
+4975; 2606 16917 FK CONSTRAINT public attachment attachment_report_id_fkey campussafe_owner_grp
+4976; 2606 16922 FK CONSTRAINT public attachment attachment_uploaded_by_user_id_fkey campussafe_owner_grp
+4964; 2606 16805 FK CONSTRAINT public hazard_report hazard_report_category_id_fkey campussafe_owner_grp
+4965; 2606 16800 FK CONSTRAINT public hazard_report hazard_report_location_id_fkey campussafe_owner_grp
+4966; 2606 16795 FK CONSTRAINT public hazard_report hazard_report_reporter_user_id_fkey campussafe_owner_grp
+4967; 2606 16810 FK CONSTRAINT public hazard_report hazard_report_verified_by_user_id_fkey campussafe_owner_grp
+4973; 2606 16896 FK CONSTRAINT public maintenance_action maintenance_action_maintenance_user_id_fkey campussafe_owner_grp
+4974; 2606 16891 FK CONSTRAINT public maintenance_action maintenance_action_report_id_fkey campussafe_owner_grp
+4971; 2606 16869 FK CONSTRAINT public report_status_history report_status_history_changed_by_user_id_fkey campussafe_owner_grp
+4972; 2606 16864 FK CONSTRAINT public report_status_history report_status_history_report_id_fkey campussafe_owner_grp
+2092; 826 16995 DEFAULT ACL - DEFAULT PRIVILEGES FOR FUNCTIONS campussafe_owner_grp

@@ -1,0 +1,10 @@
+CLI PDO diagnostic using the same ignored local .env and unmodified Database.php as the HTTP server. No passwords printed.
+{
+    "php": "8.2.12",
+    "pdo_pgsql": true,
+    "identity": {
+        "session_user": "campussafe_app",
+        "current_user": "campussafe_app",
+        "current_database": "grp07_campussafedb"
+    }
+}

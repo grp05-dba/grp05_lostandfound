@@ -1,0 +1,64 @@
+CampusSafe HTTP workflow and authorization checks - 6 November 2026 (Asia/Manila)
+Unmodified tracked PHP source; loopback server 18083; ignored local .env uses campussafe_app.
+Demo logins were used privately; passwords, hashes, CSRF/session tokens, cookies and HTML bodies are intentionally omitted.
+Only synthetic records/files were created, inspected for authorization probes, and removed.
+Expected controls and unresolved authorization failures are distinguished below.
+These are direct HTTP checks, not interactive browser testing.
+
+Guest: GET /reports/new.php -> HTTP 302 Location=/login.php
+demo_student: GET /login.php -> HTTP 200
+demo_student: POST /login.php -> HTTP 302 Location=/
+demo_student: GET / -> HTTP 200
+demo_student: authenticated through the real login form; credentials/cookies omitted.
+demo_admin: GET /login.php -> HTTP 200
+demo_admin: POST /login.php -> HTTP 302 Location=/
+demo_admin: GET / -> HTTP 200
+demo_admin: authenticated through the real login form; credentials/cookies omitted.
+demo_maint1: GET /login.php -> HTTP 200
+demo_maint1: POST /login.php -> HTTP 302 Location=/
+demo_maint1: GET / -> HTTP 200
+demo_maint1: authenticated through the real login form; credentials/cookies omitted.
+demo_maint2: GET /login.php -> HTTP 200
+demo_maint2: POST /login.php -> HTTP 302 Location=/
+demo_maint2: GET / -> HTTP 200
+demo_maint2: authenticated through the real login form; credentials/cookies omitted.
+demo_auditor: GET /login.php -> HTTP 200
+demo_auditor: POST /login.php -> HTTP 302 Location=/
+demo_auditor: GET / -> HTTP 200
+demo_auditor: authenticated through the real login form; credentials/cookies omitted.
+Student: GET /admin/users.php -> HTTP 403
+Auditor: GET /admin/verify.php -> HTTP 403
+Auditor: GET /admin/stats.php -> HTTP 200
+Student: GET /reports/view.php?id=2 -> HTTP 302 Location=/reports/list.php
+Student no-CSRF: POST /reports/new.php -> HTTP 403
+Student: GET /reports/new.php -> HTTP 200
+Student: POST /reports/new.php -> HTTP 302 Location=/reports/view.php?id=20
+Guest synthetic-attachment probe: GET /attachment.php?id=7 -> HTTP 200
+UNRESOLVED: guest received actual PNG bytes of the synthetic attachment without authentication.
+Administrator: GET /admin/verify.php?id=20 -> HTTP 200
+Administrator: POST /admin/verify.php -> HTTP 302 Location=/admin/assign.php?id=20
+Administrator: GET /admin/assign.php?id=20 -> HTTP 200
+Administrator: POST /admin/assign.php -> HTTP 302 Location=/reports/view.php?id=20
+Unassigned technician: GET /maintenance/update.php?id=20 -> HTTP 302 Location=/maintenance/index.php
+Unassigned technician: GET /maintenance/index.php -> HTTP 200
+Unassigned technician probe: POST /maintenance/index.php -> HTTP 302 Location=/maintenance/index.php
+UNRESOLVED: unassigned technician changed report status via work-queue POST; assignment retained technician 2, latest history actor was technician 3. {"assigned_to": 2, "assignment_status": "Assigned", "latest_changed_by": 3}
+Assigned technician: GET /maintenance/update.php?id=20 -> HTTP 200
+Assigned technician: POST /maintenance/update.php?id=20 -> HTTP 302 Location=/reports/view.php?id=20
+Administrator: GET /reports/view.php?id=20 -> HTTP 200
+Administrator: POST /reports/view.php?id=20 -> HTTP 302 Location=/reports/view.php?id=20
+Synthetic lifecycle completed through actual controllers: {"status": "Closed", "reporter": 4, "resolved_at_present": true, "history_count": 6}
+Auditor write probe: GET /reports/new.php -> HTTP 200
+Auditor write probe: POST /reports/new.php -> HTTP 302 Location=/reports/view.php?id=21
+UNRESOLVED: web Auditor submitted a new report and history row; PostgreSQL read-only login is a separate identity. {"status": "Submitted", "reporter": 6, "resolved_at_present": false, "history_count": 1}
+Provisioning cleanup of only marked synthetic reports (dependent rows cascade):
+DELETE FROM hazard_report WHERE description LIKE 'E4 CampusSafe HTTP%';
+DELETE 2
+SELECT (SELECT count(*) FROM public.role) AS role, (SELECT count(*) FROM public.app_user) AS app_user, (SELECT count(*) FROM public.hazard_category) AS hazard_category, (SELECT count(*) FROM public.campus_location) AS campus_location, (SELECT count(*) FROM public.hazard_report) AS hazard_report, (SELECT count(*) FROM public.assignment) AS assignment, (SELECT count(*) FROM public.report_status_history) AS report_status_history, (SELECT count(*) FROM public.maintenance_action) AS maintenance_action, (SELECT count(*) FROM public.attachment) AS attachment;
+ role | app_user | hazard_category | campus_location | hazard_report | assignment | report_status_history | maintenance_action | attachment 
+------+----------+-----------------+-----------------+---------------+------------+-----------------------+--------------------+------------
+    5 |        6 |               6 |              10 |            16 |         12 |                    60 |                  9 |          5
+(1 row)
+
+
+Removed 2 local synthetic upload copies; no recursive file deletion.

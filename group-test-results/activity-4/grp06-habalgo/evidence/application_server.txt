@@ -1,0 +1,151 @@
+[Fri Nov  6 18:18:27 2026] PHP 8.2.12 Development Server (http://127.0.0.1:18082) started
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58229 Accepted
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58229 [200]: GET /
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58229 Closing
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58230 Accepted
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58230 [200]: GET /api.php?t=dashboard
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58230 Closing
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58238 Accepted
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58238 [200]: GET /api.php?t=options
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58238 Closing
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58240 Accepted
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58240 [200]: GET /api.php?t=customers
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58240 Closing
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58242 Accepted
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58242 [200]: GET /api.php?t=vehicles
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58242 Closing
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58244 Accepted
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58244 [200]: GET /api.php?t=bookings
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58244 Closing
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58246 Accepted
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58246 [200]: GET /api.php?t=payments
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58246 Closing
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58248 Accepted
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58248 [200]: GET /api.php?t=ratings
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58248 Closing
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58250 Accepted
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58250 [404]: GET /api.php?t=nonexistent
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58250 Closing
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58252 Accepted
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58252 [200]: POST /api.php?t=customers
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58252 Closing
+[Fri Nov  6 18:20:01 2026] 127.0.0.1:58254 Accepted
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58254 [200]: POST /api.php?t=vehicles
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58254 Closing
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58264 Accepted
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58264 [200]: POST /api.php?t=bookings
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58264 Closing
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58268 Accepted
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58268 [200]: GET /api.php?t=bookings
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58268 Closing
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58278 Accepted
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58278 [400]: POST /api.php?t=ratings
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58278 Closing
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58280 Accepted
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58280 [200]: PUT /api.php?t=bookings&id=3
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58280 Closing
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58282 Accepted
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58282 [200]: POST /api.php?t=payments
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58282 Closing
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58284 Accepted
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58284 [200]: POST /api.php?t=ratings
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58284 Closing
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58286 Accepted
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58286 [200]: PUT /api.php?t=customers&id=4
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58286 Closing
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58288 Accepted
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58288 [200]: PUT /api.php?t=vehicles&id=3
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58288 Closing
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58290 Accepted
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58290 [200]: PUT /api.php?t=payments&id=2
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58290 Closing
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58292 Accepted
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58292 [400]: PUT /api.php?t=ratings&id=3
+[Fri Nov  6 18:20:02 2026] 127.0.0.1:58292 Closing
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64199 Accepted
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64199 [200]: GET /
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64199 Closing
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64200 Accepted
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64200 [200]: GET /api.php?t=dashboard
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64200 Closing
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64202 Accepted
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64202 [200]: GET /api.php?t=options
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64202 Closing
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64205 Accepted
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64205 [200]: GET /api.php?t=customers
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64205 Closing
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64207 Accepted
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64207 [200]: GET /api.php?t=vehicles
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64207 Closing
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64209 Accepted
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64209 [200]: GET /api.php?t=bookings
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64209 Closing
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64211 Accepted
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64211 [200]: GET /api.php?t=payments
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64211 Closing
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64213 Accepted
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64213 [200]: GET /api.php?t=ratings
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64213 Closing
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64215 Accepted
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64215 [404]: GET /api.php?t=nonexistent
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64215 Closing
+[Fri Nov  6 18:20:24 2026] 127.0.0.1:64217 Accepted
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64217 [200]: POST /api.php?t=customers
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64217 Closing
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64219 Accepted
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64219 [200]: POST /api.php?t=vehicles
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64219 Closing
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64224 Accepted
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64224 [200]: POST /api.php?t=bookings
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64224 Closing
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64239 Accepted
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64239 [200]: GET /api.php?t=bookings
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64239 Closing
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64241 Accepted
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64241 [400]: POST /api.php?t=ratings
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64241 Closing
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64243 Accepted
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64243 [200]: PUT /api.php?t=bookings&id=4
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64243 Closing
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64245 Accepted
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64245 [200]: POST /api.php?t=payments
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64245 Closing
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64247 Accepted
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64247 [200]: POST /api.php?t=ratings
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64247 Closing
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64249 Accepted
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64249 [200]: PUT /api.php?t=customers&id=5
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64249 Closing
+[Fri Nov  6 18:20:25 2026] 127.0.0.1:64251 Accepted
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64251 [200]: PUT /api.php?t=vehicles&id=4
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64251 Closing
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64259 Accepted
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64259 [200]: PUT /api.php?t=payments&id=3
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64259 Closing
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64261 Accepted
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64261 [200]: PUT /api.php?t=ratings&id=4
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64261 Closing
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64263 Accepted
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64263 [200]: GET /api.php?t=dashboard
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64263 Closing
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64273 Accepted
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64273 [200]: DELETE /api.php?t=ratings&id=4
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64273 Closing
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64275 Accepted
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64275 [200]: DELETE /api.php?t=payments&id=3
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64275 Closing
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64277 Accepted
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64277 [200]: DELETE /api.php?t=bookings&id=4
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64277 Closing
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64279 Accepted
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64279 [200]: DELETE /api.php?t=vehicles&id=4
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64279 Closing
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64281 Accepted
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64281 [200]: DELETE /api.php?t=customers&id=5
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64281 Closing
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64286 Accepted
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64286 [200]: GET /api.php?t=bookings
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64286 Closing
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64296 Accepted
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64296 [200]: GET /api.php?t=customers
+[Fri Nov  6 18:20:26 2026] 127.0.0.1:64296 Closing

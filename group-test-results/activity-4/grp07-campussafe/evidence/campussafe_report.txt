@@ -1,0 +1,276 @@
+### identity-campussafe_report | database=grp07_campussafedb | expected=allowed | PASS
+SELECT session_user,current_user,current_database();
+   session_user    |   current_user    |  current_database  
+-------------------+-------------------+--------------------
+ campussafe_report | campussafe_report | grp07_campussafedb
+(1 row)
+
+
+### read-campussafe_report | database=grp07_campussafedb | expected=allowed | PASS
+SELECT (SELECT count(*) FROM role) AS role, (SELECT count(*) FROM hazard_category) AS hazard_category, (SELECT count(*) FROM campus_location) AS campus_location, (SELECT count(*) FROM hazard_report) AS hazard_report, (SELECT count(*) FROM assignment) AS assignment, (SELECT count(*) FROM report_status_history) AS report_status_history, (SELECT count(*) FROM maintenance_action) AS maintenance_action, (SELECT count(*) FROM attachment) AS attachment;
+ role | hazard_category | campus_location | hazard_report | assignment | report_status_history | maintenance_action | attachment 
+------+-----------------+-----------------+---------------+------------+-----------------------+--------------------+------------
+    5 |               6 |              10 |            16 |         12 |                    60 |                  9 |          5
+(1 row)
+
+
+### auditor-deny-users | database=grp07_campussafedb | expected=denied | PASS
+SELECT user_id FROM app_user LIMIT 0;
+ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### auditor-deny-hashes | database=grp07_campussafedb | expected=denied | PASS
+SELECT password_hash FROM app_user LIMIT 0;
+ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-insert-role | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO role DEFAULT VALUES;
+ERROR:  42501: permission denied for table role
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-update-role | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE role SET description=description WHERE false;
+ERROR:  42501: permission denied for table role
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-delete-role | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM role WHERE false;
+ERROR:  42501: permission denied for table role
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-insert-app_user | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO app_user DEFAULT VALUES;
+ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-update-app_user | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE app_user SET full_name=full_name WHERE false;
+ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-delete-app_user | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM app_user WHERE false;
+ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-insert-hazard_category | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO hazard_category DEFAULT VALUES;
+ERROR:  42501: permission denied for table hazard_category
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-update-hazard_category | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE hazard_category SET description=description WHERE false;
+ERROR:  42501: permission denied for table hazard_category
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-delete-hazard_category | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM hazard_category WHERE false;
+ERROR:  42501: permission denied for table hazard_category
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-insert-campus_location | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO campus_location DEFAULT VALUES;
+ERROR:  42501: permission denied for table campus_location
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-update-campus_location | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE campus_location SET building=building WHERE false;
+ERROR:  42501: permission denied for table campus_location
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-delete-campus_location | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM campus_location WHERE false;
+ERROR:  42501: permission denied for table campus_location
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-insert-hazard_report | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO hazard_report DEFAULT VALUES;
+ERROR:  42501: permission denied for table hazard_report
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-update-hazard_report | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE hazard_report SET description=description WHERE false;
+ERROR:  42501: permission denied for table hazard_report
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-delete-hazard_report | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM hazard_report WHERE false;
+ERROR:  42501: permission denied for table hazard_report
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-insert-assignment | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO assignment DEFAULT VALUES;
+ERROR:  42501: permission denied for table assignment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-update-assignment | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE assignment SET assignment_status=assignment_status WHERE false;
+ERROR:  42501: permission denied for table assignment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-delete-assignment | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM assignment WHERE false;
+ERROR:  42501: permission denied for table assignment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-insert-report_status_history | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO report_status_history DEFAULT VALUES;
+ERROR:  42501: permission denied for table report_status_history
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-update-report_status_history | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE report_status_history SET notes=notes WHERE false;
+ERROR:  42501: permission denied for table report_status_history
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-delete-report_status_history | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM report_status_history WHERE false;
+ERROR:  42501: permission denied for table report_status_history
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-insert-maintenance_action | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO maintenance_action DEFAULT VALUES;
+ERROR:  42501: permission denied for table maintenance_action
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-update-maintenance_action | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE maintenance_action SET notes=notes WHERE false;
+ERROR:  42501: permission denied for table maintenance_action
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-delete-maintenance_action | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM maintenance_action WHERE false;
+ERROR:  42501: permission denied for table maintenance_action
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-insert-attachment | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO attachment DEFAULT VALUES;
+ERROR:  42501: permission denied for table attachment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-update-attachment | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE attachment SET file_name=file_name WHERE false;
+ERROR:  42501: permission denied for table attachment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-delete-attachment | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM attachment WHERE false;
+ERROR:  42501: permission denied for table attachment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-nextval | database=grp07_campussafedb | expected=denied | PASS
+SELECT nextval('hazard_report_report_id_seq');
+ERROR:  42501: permission denied for sequence hazard_report_report_id_seq
+LOCATION:  nextval_internal, sequence.c:655
+
+### campussafe_report-deny-setval | database=grp07_campussafedb | expected=denied | PASS
+SELECT setval('hazard_report_report_id_seq',1);
+ERROR:  42501: permission denied for sequence hazard_report_report_id_seq
+LOCATION:  do_setval, sequence.c:964
+
+### campussafe_report-deny-create | database=grp07_campussafedb | expected=denied | PASS
+BEGIN; CREATE TABLE public.e4_forbidden(id integer); ROLLBACK;
+BEGIN
+ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.e4_forbidden(id integer);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### campussafe_report-deny-owner | database=grp07_campussafedb | expected=denied | PASS
+SET ROLE campussafe_owner_grp;
+ERROR:  42501: permission denied to set role "campussafe_owner_grp"
+LOCATION:  call_string_check_hook, guc.c:6945
+
+### deny-createdb-campussafe_report | database=grp07_campussafedb | expected=denied | PASS
+CREATE DATABASE campussafe_e4_forbidden;
+ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+### deny-createrole-campussafe_report | database=grp07_campussafedb | expected=denied | PASS
+CREATE ROLE campussafe_e4_forbidden NOLOGIN;
+ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+### isolation-campussafe_report-campussafe_unrelateddb | database=campussafe_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "campussafe_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_report-grp00_habalgodb | database=grp00_habalgodb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp00_habalgodb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_report-habalgo_unrelateddb | database=habalgo_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "habalgo_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_report-grp_brewposdb | database=grp_brewposdb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp_brewposdb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_report-brewpos_unrelateddb | database=brewpos_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "brewpos_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_report-postgres | database=postgres | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_report-template1 | database=template1 | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.

@@ -1,0 +1,16 @@
+SELECT (SELECT count(*) FROM public.role) AS role, (SELECT count(*) FROM public.app_user) AS app_user, (SELECT count(*) FROM public.hazard_category) AS hazard_category, (SELECT count(*) FROM public.campus_location) AS campus_location, (SELECT count(*) FROM public.hazard_report) AS hazard_report, (SELECT count(*) FROM public.assignment) AS assignment, (SELECT count(*) FROM public.report_status_history) AS report_status_history, (SELECT count(*) FROM public.maintenance_action) AS maintenance_action, (SELECT count(*) FROM public.attachment) AS attachment; SELECT count(*) AS synthetic_reports_left FROM hazard_report WHERE description LIKE 'E4 CampusSafe HTTP%'; SELECT count(*) AS future_probe_objects_left FROM pg_class WHERE relnamespace='public'::regnamespace AND relname LIKE 'e4_%';
+ role | app_user | hazard_category | campus_location | hazard_report | assignment | report_status_history | maintenance_action | attachment 
+------+----------+-----------------+-----------------+---------------+------------+-----------------------+--------------------+------------
+    5 |        6 |               6 |              10 |            16 |         12 |                    60 |                  9 |          5
+(1 row)
+
+ synthetic_reports_left 
+------------------------
+                      0
+(1 row)
+
+ future_probe_objects_left 
+---------------------------
+                         0
+(1 row)
+

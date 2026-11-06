@@ -1,0 +1,10 @@
+PHP CLI diagnostic using the same process environment and unmodified config.php as the HTTP server. No passwords printed.
+{
+    "php": "8.2.12",
+    "pdo_pgsql": true,
+    "identity": {
+        "session_user": "habalgo_app",
+        "current_user": "habalgo_app",
+        "current_database": "grp00_habalgodb"
+    }
+}

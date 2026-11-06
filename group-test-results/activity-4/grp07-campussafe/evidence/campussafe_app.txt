@@ -1,0 +1,251 @@
+### identity-campussafe_app | database=grp07_campussafedb | expected=allowed | PASS
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  |  current_database  
+----------------+----------------+--------------------
+ campussafe_app | campussafe_app | grp07_campussafedb
+(1 row)
+
+
+### read-campussafe_app | database=grp07_campussafedb | expected=allowed | PASS
+SELECT (SELECT count(*) FROM public.role) AS role, (SELECT count(*) FROM public.app_user) AS app_user, (SELECT count(*) FROM public.hazard_category) AS hazard_category, (SELECT count(*) FROM public.campus_location) AS campus_location, (SELECT count(*) FROM public.hazard_report) AS hazard_report, (SELECT count(*) FROM public.assignment) AS assignment, (SELECT count(*) FROM public.report_status_history) AS report_status_history, (SELECT count(*) FROM public.maintenance_action) AS maintenance_action, (SELECT count(*) FROM public.attachment) AS attachment;
+ role | app_user | hazard_category | campus_location | hazard_report | assignment | report_status_history | maintenance_action | attachment 
+------+----------+-----------------+-----------------+---------------+------------+-----------------------+--------------------+------------
+    5 |        6 |               6 |              10 |            16 |         12 |                    60 |                  9 |          5
+(1 row)
+
+
+### runtime-workflow | database=grp07_campussafedb | expected=allowed | PASS
+BEGIN;
+BEGIN
+INSERT INTO app_user(role_id,full_name,email,username,password_hash) VALUES (1,'E4 test user','e4-test@example.invalid','e4_test_user','[test-only]') RETURNING user_id \gset
+INSERT 0 1
+INSERT INTO hazard_category(category_name) VALUES ('E4 test category') RETURNING category_id \gset
+INSERT 0 1
+INSERT INTO campus_location(building,room_area) VALUES ('E4 test building','E4 test room') RETURNING location_id \gset
+INSERT 0 1
+INSERT INTO hazard_report(reporter_user_id,location_id,category_id,description) VALUES (:user_id,:location_id,:category_id,'E4 transactional hazard probe') RETURNING report_id \gset
+INSERT 0 1
+INSERT INTO report_status_history(report_id,changed_by_user_id,status) VALUES (:report_id,:user_id,'Submitted');
+INSERT 0 1
+UPDATE app_user SET account_status='inactive' WHERE user_id=:user_id;
+UPDATE 1
+UPDATE hazard_category SET is_active=false WHERE category_id=:category_id;
+UPDATE 1
+UPDATE campus_location SET is_active=false WHERE location_id=:location_id;
+UPDATE 1
+UPDATE hazard_report SET status='Verified',priority='High',verified_by_user_id=1,verified_at=now() WHERE report_id=:report_id;
+UPDATE 1
+INSERT INTO assignment(report_id,maintenance_user_id,assigned_by_user_id) VALUES (:report_id,2,1) RETURNING assignment_id \gset
+INSERT 0 1
+UPDATE assignment SET assignment_status='In Progress' WHERE assignment_id=:assignment_id;
+UPDATE 1
+INSERT INTO maintenance_action(report_id,maintenance_user_id,action_details) VALUES (:report_id,2,'E4 test action');
+INSERT 0 1
+INSERT INTO attachment(report_id,uploaded_by_user_id,file_name,file_path_or_url) VALUES (:report_id,:user_id,'e4-test.png','uploads/e4-test.png') RETURNING attachment_id \gset
+INSERT 0 1
+DELETE FROM attachment WHERE attachment_id=:attachment_id;
+DELETE 1
+SELECT h.status,h.priority,a.assignment_status FROM hazard_report h JOIN assignment a USING(report_id) WHERE h.report_id=:report_id;
+  status  | priority | assignment_status 
+----------+----------+-------------------
+ Verified | High     | In Progress
+(1 row)
+
+ROLLBACK;
+ROLLBACK
+SELECT (SELECT count(*) FROM public.role) AS role, (SELECT count(*) FROM public.app_user) AS app_user, (SELECT count(*) FROM public.hazard_category) AS hazard_category, (SELECT count(*) FROM public.campus_location) AS campus_location, (SELECT count(*) FROM public.hazard_report) AS hazard_report, (SELECT count(*) FROM public.assignment) AS assignment, (SELECT count(*) FROM public.report_status_history) AS report_status_history, (SELECT count(*) FROM public.maintenance_action) AS maintenance_action, (SELECT count(*) FROM public.attachment) AS attachment;
+ role | app_user | hazard_category | campus_location | hazard_report | assignment | report_status_history | maintenance_action | attachment 
+------+----------+-----------------+-----------------+---------------+------------+-----------------------+--------------------+------------
+    5 |        6 |               6 |              10 |            16 |         12 |                    60 |                  9 |          5
+(1 row)
+
+
+### runtime-deny-role-insert | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+INSERT INTO role(role_name) VALUES ('E4 forbidden');
+ERROR:  42501: permission denied for table role
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-role-update | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE role SET description=description WHERE role_id=1;
+ERROR:  42501: permission denied for table role
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-role-delete | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM role WHERE false;
+ERROR:  42501: permission denied for table role
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-user-delete | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM app_user WHERE false;
+ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-category-delete | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM hazard_category WHERE false;
+ERROR:  42501: permission denied for table hazard_category
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-location-delete | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM campus_location WHERE false;
+ERROR:  42501: permission denied for table campus_location
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-report-delete | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM hazard_report WHERE false;
+ERROR:  42501: permission denied for table hazard_report
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-assignment-delete | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM assignment WHERE false;
+ERROR:  42501: permission denied for table assignment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-history-update | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE report_status_history SET notes=notes WHERE false;
+ERROR:  42501: permission denied for table report_status_history
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-history-delete | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM report_status_history WHERE false;
+ERROR:  42501: permission denied for table report_status_history
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-action-update | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE maintenance_action SET notes=notes WHERE false;
+ERROR:  42501: permission denied for table maintenance_action
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-action-delete | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+DELETE FROM maintenance_action WHERE false;
+ERROR:  42501: permission denied for table maintenance_action
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-attachment-update | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+UPDATE attachment SET file_name=file_name WHERE false;
+ERROR:  42501: permission denied for table attachment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-truncate | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+TRUNCATE report_status_history;
+ERROR:  42501: permission denied for table report_status_history
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-create-table | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+CREATE TABLE public.e4_forbidden(id integer);
+ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.e4_forbidden(id integer);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-create-schema | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+CREATE SCHEMA e4_forbidden;
+ERROR:  42501: permission denied for database grp07_campussafedb
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+### runtime-deny-create-temp | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+CREATE TEMP TABLE e4_forbidden(id integer);
+ERROR:  42501: permission denied to create temporary tables in database "grp07_campussafedb"
+LINE 1: CREATE TEMP TABLE e4_forbidden(id integer);
+                          ^
+LOCATION:  InitTempTableNamespace, namespace.c:4416
+
+### runtime-deny-alter-table | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+ALTER TABLE role ADD COLUMN e4_forbidden integer;
+ERROR:  42501: must be owner of table role
+LOCATION:  aclcheck_error, aclchk.c:2933
+
+### runtime-deny-role-sequence | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+SELECT nextval('role_role_id_seq');
+ERROR:  42501: permission denied for sequence role_role_id_seq
+LOCATION:  nextval_internal, sequence.c:655
+
+### runtime-deny-sequence-reset | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+SELECT setval('hazard_report_report_id_seq',1);
+ERROR:  42501: permission denied for sequence hazard_report_report_id_seq
+LOCATION:  do_setval, sequence.c:964
+
+### runtime-deny-owner-escalation | database=grp07_campussafedb | expected=denied | PASS
+BEGIN;
+BEGIN
+SET ROLE campussafe_owner_grp;
+ERROR:  42501: permission denied to set role "campussafe_owner_grp"
+LOCATION:  call_string_check_hook, guc.c:6945
+
+### deny-createdb-campussafe_app | database=grp07_campussafedb | expected=denied | PASS
+CREATE DATABASE campussafe_e4_forbidden;
+ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+### deny-createrole-campussafe_app | database=grp07_campussafedb | expected=denied | PASS
+CREATE ROLE campussafe_e4_forbidden NOLOGIN;
+ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+### isolation-campussafe_app-campussafe_unrelateddb | database=campussafe_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "campussafe_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_app-grp00_habalgodb | database=grp00_habalgodb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp00_habalgodb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_app-habalgo_unrelateddb | database=habalgo_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "habalgo_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_app-grp_brewposdb | database=grp_brewposdb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "grp_brewposdb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_app-brewpos_unrelateddb | database=brewpos_unrelateddb | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "brewpos_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_app-postgres | database=postgres | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+### isolation-campussafe_app-template1 | database=template1 | expected=denied | PASS
+psql: error: connection to server at "127.0.0.1", port 55432 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
