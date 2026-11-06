@@ -1,0 +1,34 @@
+-- Existing local BrewPOS database; run directly as brewpos_app.
+-- Runtime is the only BrewPOS login found. Inspect within existing grants; no superuser fallback.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),version();
+          captured_at          | session_user | current_user | current_database |                                        version
+-------------------------------+--------------+--------------+------------------+---------------------------------------------------------------------------------------
+ 2026-11-06 18:11:38.319038+08 | brewpos_app  | brewpos_app  | grp_brewposdb    | PostgreSQL 18.6 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 16.2.1 20260810, 64-bit
+(1 row)
+
+SELECT relname,n_live_tup,n_dead_tup,n_mod_since_analyze,last_vacuum,last_analyze,vacuum_count,analyze_count FROM pg_stat_user_tables ORDER BY relname;
+     relname     | n_live_tup | n_dead_tup | n_mod_since_analyze | last_vacuum |         last_analyze          | vacuum_count | analyze_count
+-----------------+------------+------------+---------------------+-------------+-------------------------------+--------------+---------------
+ menu_category   |          6 |          0 |                   3 |             | 2026-11-05 22:48:07.07524+08  |            0 |             2
+ menu_item       |         22 |          0 |                  11 |             | 2026-11-05 22:48:07.07574+08  |            0 |             2
+ order_line_item |         18 |          0 |                   9 |             | 2026-11-05 22:48:07.076667+08 |            0 |             2
+ order_ticket    |         10 |          0 |                   5 |             | 2026-11-05 22:48:07.076125+08 |            0 |             2
+ staff           |          4 |          0 |                   2 |             | 2026-11-05 22:48:07.074836+08 |            0 |             3
+(5 rows)
+
+SELECT 'menu_category' AS table_name,count(*) AS rows FROM public.menu_category
+UNION ALL SELECT 'menu_item' AS table_name,count(*) AS rows FROM public.menu_item
+UNION ALL SELECT 'order_line_item' AS table_name,count(*) AS rows FROM public.order_line_item
+UNION ALL SELECT 'order_ticket' AS table_name,count(*) AS rows FROM public.order_ticket
+UNION ALL SELECT 'staff' AS table_name,count(*) AS rows FROM public.staff ORDER BY table_name;
+   table_name    | rows
+-----------------+------
+ menu_category   |    3
+ menu_item       |   11
+ order_line_item |    9
+ order_ticket    |    5
+ staff           |    2
+(5 rows)

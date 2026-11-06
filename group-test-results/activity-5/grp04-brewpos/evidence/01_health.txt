@@ -1,0 +1,211 @@
+-- Existing local BrewPOS database; run directly as brewpos_app.
+-- Runtime is the only BrewPOS login found. Inspect within existing grants; no superuser fallback.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),version();
+          captured_at          | session_user | current_user | current_database |                                        version
+-------------------------------+--------------+--------------+------------------+---------------------------------------------------------------------------------------
+ 2026-11-06 18:11:34.348064+08 | brewpos_app  | brewpos_app  | grp_brewposdb    | PostgreSQL 18.6 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 16.2.1 20260810, 64-bit
+(1 row)
+
+SELECT pg_size_pretty(pg_database_size(current_database())) AS database_size,pg_database_size(current_database()) AS database_bytes;
+ database_size | database_bytes
+---------------+----------------
+ 8070 kB       |        8263359
+(1 row)
+
+SELECT c.relkind,count(*) AS object_count FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' GROUP BY c.relkind ORDER BY c.relkind;
+ relkind | object_count
+---------+--------------
+ S       |            4
+ i       |            9
+ r       |            5
+(3 rows)
+
+SELECT tablename,tableowner FROM pg_tables WHERE schemaname='public' ORDER BY tablename;
+    tablename    | tableowner
+-----------------+------------
+ menu_category   | postgres
+ menu_item       | postgres
+ order_line_item | postgres
+ order_ticket    | postgres
+ staff           | postgres
+(5 rows)
+
+SELECT 'menu_category' AS table_name,count(*) AS rows FROM public.menu_category
+UNION ALL SELECT 'menu_item' AS table_name,count(*) AS rows FROM public.menu_item
+UNION ALL SELECT 'order_line_item' AS table_name,count(*) AS rows FROM public.order_line_item
+UNION ALL SELECT 'order_ticket' AS table_name,count(*) AS rows FROM public.order_ticket
+UNION ALL SELECT 'staff' AS table_name,count(*) AS rows FROM public.staff ORDER BY table_name;
+   table_name    | rows
+-----------------+------
+ menu_category   |    3
+ menu_item       |   11
+ order_line_item |    9
+ order_ticket    |    5
+ staff           |    2
+(5 rows)
+
+SELECT datname,numbackends,xact_commit,xact_rollback,deadlocks,conflicts,sessions,sessions_abandoned,sessions_fatal,sessions_killed,stats_reset FROM pg_stat_database WHERE datname=current_database();
+    datname    | numbackends | xact_commit | xact_rollback | deadlocks | conflicts | sessions | sessions_abandoned | sessions_fatal | sessions_killed | stats_reset
+---------------+-------------+-------------+---------------+-----------+-----------+----------+--------------------+----------------+-----------------+-------------
+ grp_brewposdb |           1 |        2520 |             3 |         0 |         0 |       45 |                  0 |              0 |               1 |
+(1 row)
+
+-- Other users' SQL is omitted for redaction and may also be hidden by server privileges.
+SELECT pid,usename,application_name,state,wait_event_type,wait_event,query_start,
+ CASE WHEN state='active' THEN clock_timestamp()-query_start END AS active_duration,
+ CASE WHEN usename=current_user THEN query ELSE '[other-account SQL omitted; visibility may be restricted]' END AS query
+FROM pg_stat_activity WHERE datname=current_database() ORDER BY query_start NULLS LAST;
+  pid  |   usename   | application_name | state  | wait_event_type | wait_event |          query_start          | active_duration |                                                          query
+-------+-------------+------------------+--------+-----------------+------------+-------------------------------+-----------------+--------------------------------------------------------------------------------------------------------------------------
+ 50461 | brewpos_app | psql             | active |                 |            | 2026-11-06 18:11:34.366101+08 | 00:00:00.002774 | SELECT pid,usename,application_name,state,wait_event_type,wait_event,query_start,                                       +
+       |             |                  |        |                 |            |                               |                 |  CASE WHEN state='active' THEN clock_timestamp()-query_start END AS active_duration,                                    +
+       |             |                  |        |                 |            |                               |                 |  CASE WHEN usename=current_user THEN query ELSE '[other-account SQL omitted; visibility may be restricted]' END AS query+
+       |             |                  |        |                 |            |                               |                 | FROM pg_stat_activity WHERE datname=current_database() ORDER BY query_start NULLS LAST;
+(1 row)
+
+SELECT pid,usename,state,pg_blocking_pids(pid) AS blocking_pids FROM pg_stat_activity WHERE datname=current_database();
+  pid  |   usename   | state  | blocking_pids
+-------+-------------+--------+---------------
+ 50461 | brewpos_app | active | {}
+(1 row)
+
+WITH expected(rolname) AS (VALUES ('brewpos_app'),('brewpos_auditor'),('brewpos_admin'),('app_runtime_grp'),('app_readonly_grp'),('app_admin_grp'))
+SELECT e.rolname,r.oid IS NOT NULL AS present,r.rolcanlogin,r.rolsuper,r.rolcreatedb,r.rolcreaterole,r.rolinherit,r.rolbypassrls,r.rolreplication
+FROM expected e LEFT JOIN pg_roles r ON r.rolname=e.rolname ORDER BY e.rolname;
+     rolname      | present | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolinherit | rolbypassrls | rolreplication
+------------------+---------+-------------+----------+-------------+---------------+------------+--------------+----------------
+ app_admin_grp    | f       |             |          |             |               |            |              |
+ app_readonly_grp | f       |             |          |             |               |            |              |
+ app_runtime_grp  | f       |             |          |             |               |            |              |
+ brewpos_admin    | f       |             |          |             |               |            |              |
+ brewpos_app      | t       | t           | f        | f           | f             | f          | f            | f
+ brewpos_auditor  | f       |             |          |             |               |            |              |
+(6 rows)
+
+SELECT member.rolname AS login,parent.rolname AS group_role,m.admin_option,m.inherit_option,m.set_option
+FROM pg_auth_members m JOIN pg_roles member ON member.oid=m.member JOIN pg_roles parent ON parent.oid=m.roleid
+WHERE member.rolname IN ('brewpos_app','brewpos_auditor','brewpos_admin','app_runtime_grp','app_readonly_grp','app_admin_grp') ORDER BY login,group_role;
+ login | group_role | admin_option | inherit_option | set_option
+-------+------------+--------------+----------------+------------
+(0 rows)
+
+SELECT datname,pg_get_userbyid(datdba) AS owner,datacl FROM pg_database WHERE datname IN (current_database(),'postgres') ORDER BY datname;
+    datname    |  owner   |                           datacl
+---------------+----------+-------------------------------------------------------------
+ grp_brewposdb | postgres | {=Tc/postgres,postgres=CTc/postgres,brewpos_app=c/postgres}
+ postgres      | postgres |
+(2 rows)
+
+SELECT nspname,nspacl FROM pg_namespace WHERE nspname='public';
+ nspname |                                            nspacl
+---------+-----------------------------------------------------------------------------------------------
+ public  | {pg_database_owner=UC/pg_database_owner,=U/pg_database_owner,brewpos_app=U/pg_database_owner}
+(1 row)
+
+SELECT c.relname,p.privilege,has_table_privilege(current_user,c.oid,p.privilege) AS allowed,c.relacl
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+CROSS JOIN (VALUES ('SELECT'),('INSERT'),('UPDATE'),('DELETE'),('TRUNCATE'),('MAINTAIN')) p(privilege)
+WHERE n.nspname='public' AND c.relkind='r' ORDER BY c.relname,p.privilege;
+     relname     | privilege | allowed |                         relacl
+-----------------+-----------+---------+--------------------------------------------------------
+ menu_category   | DELETE    | t       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ menu_category   | INSERT    | t       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ menu_category   | MAINTAIN  | f       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ menu_category   | SELECT    | t       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ menu_category   | TRUNCATE  | f       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ menu_category   | UPDATE    | t       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ menu_item       | DELETE    | t       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ menu_item       | INSERT    | t       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ menu_item       | MAINTAIN  | f       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ menu_item       | SELECT    | t       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ menu_item       | TRUNCATE  | f       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ menu_item       | UPDATE    | t       | {postgres=arwdDxtm/postgres,brewpos_app=arwd/postgres}
+ order_line_item | DELETE    | f       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ order_line_item | INSERT    | t       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ order_line_item | MAINTAIN  | f       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ order_line_item | SELECT    | t       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ order_line_item | TRUNCATE  | f       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ order_line_item | UPDATE    | f       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ order_ticket    | DELETE    | f       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ order_ticket    | INSERT    | t       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ order_ticket    | MAINTAIN  | f       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ order_ticket    | SELECT    | t       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ order_ticket    | TRUNCATE  | f       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ order_ticket    | UPDATE    | f       | {postgres=arwdDxtm/postgres,brewpos_app=ar/postgres}
+ staff           | DELETE    | f       | {postgres=arwdDxtm/postgres,brewpos_app=r/postgres}
+ staff           | INSERT    | f       | {postgres=arwdDxtm/postgres,brewpos_app=r/postgres}
+ staff           | MAINTAIN  | f       | {postgres=arwdDxtm/postgres,brewpos_app=r/postgres}
+ staff           | SELECT    | t       | {postgres=arwdDxtm/postgres,brewpos_app=r/postgres}
+ staff           | TRUNCATE  | f       | {postgres=arwdDxtm/postgres,brewpos_app=r/postgres}
+ staff           | UPDATE    | f       | {postgres=arwdDxtm/postgres,brewpos_app=r/postgres}
+(30 rows)
+
+SELECT c.relname,has_sequence_privilege(current_user,c.oid,'USAGE') AS usage,has_sequence_privilege(current_user,c.oid,'SELECT') AS select,has_sequence_privilege(current_user,c.oid,'UPDATE') AS update
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='S' ORDER BY c.relname;
+            relname            | usage | select | update
+-------------------------------+-------+--------+--------
+ menu_category_category_id_seq | t     | t      | f
+ menu_item_item_id_seq         | t     | t      | f
+ order_ticket_order_id_seq     | t     | t      | f
+ staff_staff_id_seq            | t     | t      | f
+(4 rows)
+
+SELECT has_database_privilege(current_user,'postgres','CONNECT') AS runtime_connect_to_unrelated_postgres;
+ runtime_connect_to_unrelated_postgres
+---------------------------------------
+ t
+(1 row)
+
+SELECT relname,n_live_tup,n_dead_tup,n_mod_since_analyze,last_vacuum,last_autovacuum,last_analyze,last_autoanalyze,vacuum_count,analyze_count FROM pg_stat_user_tables ORDER BY relname;
+     relname     | n_live_tup | n_dead_tup | n_mod_since_analyze | last_vacuum | last_autovacuum |         last_analyze          | last_autoanalyze | vacuum_count | analyze_count
+-----------------+------------+------------+---------------------+-------------+-----------------+-------------------------------+------------------+--------------+---------------
+ menu_category   |          6 |          0 |                   3 |             |                 | 2026-11-05 22:48:07.07524+08  |                  |            0 |             2
+ menu_item       |         22 |          0 |                  11 |             |                 | 2026-11-05 22:48:07.07574+08  |                  |            0 |             2
+ order_line_item |         18 |          0 |                   9 |             |                 | 2026-11-05 22:48:07.076667+08 |                  |            0 |             2
+ order_ticket    |         10 |          0 |                   5 |             |                 | 2026-11-05 22:48:07.076125+08 |                  |            0 |             2
+ staff           |          4 |          0 |                   2 |             |                 | 2026-11-05 22:48:07.074836+08 |                  |            0 |             3
+(5 rows)
+
+SELECT schemaname,tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' ORDER BY tablename,indexname;
+ schemaname |    tablename    |          indexname          |                                                indexdef
+------------+-----------------+-----------------------------+---------------------------------------------------------------------------------------------------------
+ public     | menu_category   | menu_category_pkey          | CREATE UNIQUE INDEX menu_category_pkey ON public.menu_category USING btree (category_id)
+ public     | menu_category   | uq_menu_category_name       | CREATE UNIQUE INDEX uq_menu_category_name ON public.menu_category USING btree (category_name)
+ public     | menu_item       | menu_item_pkey              | CREATE UNIQUE INDEX menu_item_pkey ON public.menu_item USING btree (item_id)
+ public     | menu_item       | uq_menu_item_category_name  | CREATE UNIQUE INDEX uq_menu_item_category_name ON public.menu_item USING btree (category_id, item_name)
+ public     | order_line_item | idx_order_line_item_item_id | CREATE INDEX idx_order_line_item_item_id ON public.order_line_item USING btree (item_id)
+ public     | order_line_item | pk_order_line_item          | CREATE UNIQUE INDEX pk_order_line_item ON public.order_line_item USING btree (order_id, item_id)
+ public     | order_ticket    | idx_order_ticket_timestamp  | CREATE INDEX idx_order_ticket_timestamp ON public.order_ticket USING btree (order_timestamp)
+ public     | order_ticket    | order_ticket_pkey           | CREATE UNIQUE INDEX order_ticket_pkey ON public.order_ticket USING btree (order_id)
+ public     | staff           | staff_pkey                  | CREATE UNIQUE INDEX staff_pkey ON public.staff USING btree (staff_id)
+(9 rows)
+
+SELECT c.relname,c.reltuples,c.relpages,c.reloptions,age(c.relfrozenxid) AS xid_age,pg_size_pretty(pg_total_relation_size(c.oid)) AS total_size
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r' ORDER BY c.relname;
+     relname     | reltuples | relpages | reloptions | xid_age | total_size
+-----------------+-----------+----------+------------+---------+------------
+ menu_category   |         3 |        1 |            |      70 | 40 kB
+ menu_item       |        11 |        1 |            |      70 | 40 kB
+ order_line_item |         9 |        1 |            |      70 | 40 kB
+ order_ticket    |         5 |        1 |            |      70 | 40 kB
+ staff           |         2 |        1 |            |      70 | 24 kB
+(5 rows)
+
+SELECT name,setting,unit FROM pg_settings WHERE name IN ('autovacuum','track_activities','track_counts') ORDER BY name;
+       name       | setting | unit
+------------------+---------+------
+ autovacuum       | on      |
+ track_activities | on      |
+ track_counts     | on      |
+(3 rows)
+
+SELECT unnest(setconfig) AS runtime_database_setting FROM pg_db_role_setting WHERE setrole=(SELECT oid FROM pg_roles WHERE rolname=current_user) AND setdatabase=(SELECT oid FROM pg_database WHERE datname=current_database());
+ runtime_database_setting
+--------------------------
+ search_path=public
+ statement_timeout=30s
+ lock_timeout=10s
+(3 rows)

@@ -1,0 +1,18 @@
+Repository: https://github.com/Nycri/brewpos
+Branch: main
+Reviewed commit: f2af982d7cd2709ebcb0e0f0fd00af27bc4286d4
+Path: src/main/java/com/brewpos/repository/OrderLineItemRepository.java
+Git blob SHA: a6f170b767fc54ed4c5f1bbb58c017871688e766
+Retrieved: 2026-11-06 using connected GitHub read tools.
+Query is JPQL. sql/04_query_plan.sql translates it to the supplied schema's table/column names.
+No literal Hibernate-generated SQL capture is claimed.
+
+    @Query("select sum(l.quantity * l.soldPrice), count(distinct t.orderId) "
+            + "from OrderLineItem l join l.order t "
+            + "where t.orderTimestamp >= :from and t.orderTimestamp < :to")
+    List<Object[]> dailyTotals(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+Caller: src/main/java/com/brewpos/service/SalesReportService.java
+The dailySales method calls lineRepository.dailyTotals(start(d), end(d)).
+start(d) = d.atStartOfDay(); end(d) = d.plusDays(1).atStartOfDay().
+This preserves a half-open local-cafe-time timestamp range.

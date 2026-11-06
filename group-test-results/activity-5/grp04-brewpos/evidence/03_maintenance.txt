@@ -1,0 +1,40 @@
+-- Restricted demonstration, not a claim of successful maintenance.
+-- Only brewpos_app exists; no authorized maintenance login/group was found.
+-- ANALYZE would refresh planner statistics; ordinary VACUUM would reclaim dead tuple space.
+-- The catalog shows MAINTAIN=false and postgres ownership, so expect permission skips.
+-- Do not grant privileges, SET ROLE or reconnect as a superuser to make these work.
+-- One small real table is sufficient to demonstrate the limitation; do not repeat on all tables.
+-- VACUUM must be standalone; never run this with --single-transaction.
+\set ON_ERROR_STOP off
+\set VERBOSITY verbose
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database();
+          captured_at          | session_user | current_user | current_database
+-------------------------------+--------------+--------------+------------------
+ 2026-11-06 18:11:36.482791+08 | brewpos_app  | brewpos_app  | grp_brewposdb
+(1 row)
+
+SET lock_timeout='3s';
+SET
+SET statement_timeout='30s';
+SET
+SELECT c.relname,pg_get_userbyid(c.relowner) AS owner,has_table_privilege(current_user,c.oid,'MAINTAIN') AS can_maintain
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r' ORDER BY c.relname;
+     relname     |  owner   | can_maintain
+-----------------+----------+--------------
+ menu_category   | postgres | f
+ menu_item       | postgres | f
+ order_line_item | postgres | f
+ order_ticket    | postgres | f
+ staff           | postgres | f
+(5 rows)
+
+ANALYZE VERBOSE public.menu_item;
+psql:activity-5/grp04-brewpos/sql/03_maintenance.sql:16: WARNING:  01000: permission denied to analyze "menu_item", skipping it
+LOCATION:  vacuum_is_permitted_for_relation, vacuum.c:771
+ANALYZE
+VACUUM (VERBOSE, ANALYZE) public.menu_item;
+psql:activity-5/grp04-brewpos/sql/03_maintenance.sql:17: WARNING:  01000: permission denied to vacuum "menu_item", skipping it
+LOCATION:  vacuum_is_permitted_for_relation, vacuum.c:758
+VACUUM

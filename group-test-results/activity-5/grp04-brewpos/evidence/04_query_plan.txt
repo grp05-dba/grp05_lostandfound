@@ -1,0 +1,81 @@
+-- SQL translation of OrderLineItemRepository.dailyTotals JPQL, not captured Hibernate SQL.
+-- SalesReportService supplies the same half-open local-day timestamp range.
+-- Source commit f2af982d7cd2709ebcb0e0f0fd00af27bc4286d4; run as brewpos_app.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database();
+          captured_at          | session_user | current_user | current_database
+-------------------------------+--------------+--------------+------------------
+ 2026-11-06 18:11:37.232448+08 | brewpos_app  | brewpos_app  | grp_brewposdb
+(1 row)
+
+BEGIN READ ONLY;
+BEGIN
+SET LOCAL statement_timeout='30s';
+SET
+SELECT coalesce(min(order_timestamp)::date,current_date) AS report_date FROM public.order_ticket
+\gset
+\echo Selected existing order day (or today if empty): :report_date
+Selected existing order day (or today if empty): 2026-11-04
+EXPLAIN
+SELECT sum(l.quantity * l.sold_price), count(DISTINCT t.order_id)
+FROM public.order_line_item l JOIN public.order_ticket t ON t.order_id=l.order_id
+WHERE t.order_timestamp >= :'report_date'::date::timestamp
+  AND t.order_timestamp < (:'report_date'::date + 1)::timestamp;
+                                                                                       QUERY PLAN
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=2.26..2.27 rows=1 width=40)
+   ->  Sort  (cost=2.23..2.24 rows=2 width=13)
+         Sort Key: t.order_id
+         ->  Hash Join  (cost=1.09..2.22 rows=2 width=13)
+               Hash Cond: (l.order_id = t.order_id)
+               ->  Seq Scan on order_line_item l  (cost=0.00..1.09 rows=9 width=13)
+               ->  Hash  (cost=1.07..1.07 rows=1 width=4)
+                     ->  Seq Scan on order_ticket t  (cost=0.00..1.07 rows=1 width=4)
+                           Filter: ((order_timestamp >= '2026-11-04 00:00:00'::timestamp without time zone) AND (order_timestamp < '2026-11-05 00:00:00'::timestamp without time zone))
+(9 rows)
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT sum(l.quantity * l.sold_price), count(DISTINCT t.order_id)
+FROM public.order_line_item l JOIN public.order_ticket t ON t.order_id=l.order_id
+WHERE t.order_timestamp >= :'report_date'::date::timestamp
+  AND t.order_timestamp < (:'report_date'::date + 1)::timestamp;
+                                                                                       QUERY PLAN
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=2.26..2.27 rows=1 width=40) (actual time=0.092..0.093 rows=1.00 loops=1)
+   Buffers: shared hit=5
+   ->  Sort  (cost=2.23..2.24 rows=2 width=13) (actual time=0.079..0.081 rows=4.00 loops=1)
+         Sort Key: t.order_id
+         Sort Method: quicksort  Memory: 25kB
+         Buffers: shared hit=5
+         ->  Hash Join  (cost=1.09..2.22 rows=2 width=13) (actual time=0.050..0.052 rows=4.00 loops=1)
+               Hash Cond: (l.order_id = t.order_id)
+               Buffers: shared hit=2
+               ->  Seq Scan on order_line_item l  (cost=0.00..1.09 rows=9 width=13) (actual time=0.009..0.010 rows=9.00 loops=1)
+                     Buffers: shared hit=1
+               ->  Hash  (cost=1.07..1.07 rows=1 width=4) (actual time=0.020..0.020 rows=2.00 loops=1)
+                     Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                     Buffers: shared hit=1
+                     ->  Seq Scan on order_ticket t  (cost=0.00..1.07 rows=1 width=4) (actual time=0.007..0.008 rows=2.00 loops=1)
+                           Filter: ((order_timestamp >= '2026-11-04 00:00:00'::timestamp without time zone) AND (order_timestamp < '2026-11-05 00:00:00'::timestamp without time zone))
+                           Rows Removed by Filter: 3
+                           Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=14
+ Planning Time: 0.177 ms
+ Execution Time: 0.123 ms
+(22 rows)
+
+-- The aggregate itself is safe to record and validates report semantics.
+SELECT sum(l.quantity * l.sold_price), count(DISTINCT t.order_id)
+FROM public.order_line_item l JOIN public.order_ticket t ON t.order_id=l.order_id
+WHERE t.order_timestamp >= :'report_date'::date::timestamp
+  AND t.order_timestamp < (:'report_date'::date + 1)::timestamp;
+  sum   | count
+--------+-------
+ 440.00 |     2
+(1 row)
+
+ROLLBACK;
+ROLLBACK

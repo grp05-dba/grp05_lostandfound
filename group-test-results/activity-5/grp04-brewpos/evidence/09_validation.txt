@@ -1,0 +1,11 @@
+Validated: 2026-11-06T18:16:03.617771+08:00
+Scope: evidence/documentation checks, not successful maintenance or application workflow tests.
+PASS | All local Markdown links resolve
+PASS | All five exact counts unchanged; 30 live rows retained
+PASS | Maintenance timestamps/counts unchanged on all five tables
+PASS | Both attempted maintenance operations explicitly skipped with warning SQLSTATE 01000
+PASS | Exactly two expected 42501 log-function denials
+PASS | No unexpected ERROR/FATAL/WARNING in health, query or verification
+PASS | Five documented login/group roles explicitly recorded as absent
+PASS | Safe report plan captured and aggregate result 440.00 / 2 retained
+PASS | Credential/hash pattern scan; captures also reviewed for sensitive values
