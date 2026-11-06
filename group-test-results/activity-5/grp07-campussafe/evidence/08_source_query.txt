@@ -1,0 +1,25 @@
+Repository: https://github.com/jeffersonorpesa2-ops/grp07-campussafe
+Reviewed main commit: 3684b97cfa8b8c6624d039eda461551ade774701
+Working tree: clean
+Source: src/models/Report.php; blob 47fde49a818e83ee039ae6c93dd65e8631e84848
+Report::getStatistics category-count query:
+// Category counts
+        $categoryCounts = $pdo->query("
+            SELECT c.category_name, COUNT(r.report_id) AS count
+            FROM hazard_category c
+            LEFT JOIN hazard_report r ON c.category_id = r.category_id
+            GROUP BY c.category_name
+            ORDER BY count DESC
+        ")->fetchAll();
+Caller: public/admin/stats.php; Auth::requireRole([Administrator, Auditor]); Report::getStatistics().
+Documented DBA source: docs/user-roles.md
+| **Database Owner / DBA** | Schema deployments, migrations, index optimization, `VACUUM` / `ANALYZE`, recovery restoration. | Object owner of schema tables and sequences. Not a PostgreSQL superuser. | `campussafe_owner` | Complete table ownership privileges (`ALL ON ALL TABLES IN SCHEMA public`). |
+Setup source blobs:
+database/01_schema.sql: 8b1da817e3ead934dc2d7f00e6fff4e28a237ede
+database/02_seed.sql: 0964618c2ba1c59e9cd9c61de954a5b8b747a7ae
+database/03_roles_and_privileges.sql: e05de1a0e5ea2e1aba035648970aae719d08a531
+docs/user-roles.md: 37bf89a7b68cd2c65319eff208c78b05d45ad6be
+Local adaptations: schema DROP resets removed; seed TRUNCATE removed in temporary seed copy;
+PASSWORD clauses removed; group names prefixed campussafe_ to avoid HabalGo role collision;
+documented campussafe_owner provisioned with project ownership and aligned owner defaults.
+Raw seed data, password/hash values and original credential-bearing role file are not copied into this package.

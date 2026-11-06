@@ -1,0 +1,58 @@
+-- Implements the documented Database Owner / DBA identity in docs/user-roles.md.
+-- Fresh local setup only: the supplied installer does not provision this account.
+-- No password literal or cluster provisioning attribute. Ownership is project-scoped.
+\set ON_ERROR_STOP on
+CREATE ROLE campussafe_owner LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+ALTER DATABASE grp07_campussafedb OWNER TO campussafe_owner;
+ALTER DATABASE
+ALTER TABLE public.role OWNER TO campussafe_owner;
+ALTER TABLE
+ALTER TABLE public.app_user OWNER TO campussafe_owner;
+ALTER TABLE
+ALTER TABLE public.hazard_category OWNER TO campussafe_owner;
+ALTER TABLE
+ALTER TABLE public.campus_location OWNER TO campussafe_owner;
+ALTER TABLE
+ALTER TABLE public.hazard_report OWNER TO campussafe_owner;
+ALTER TABLE
+ALTER TABLE public.assignment OWNER TO campussafe_owner;
+ALTER TABLE
+ALTER TABLE public.report_status_history OWNER TO campussafe_owner;
+ALTER TABLE
+ALTER TABLE public.maintenance_action OWNER TO campussafe_owner;
+ALTER TABLE
+ALTER TABLE public.attachment OWNER TO campussafe_owner;
+ALTER TABLE
+-- Table ownership also controls its owned SERIAL sequence. Verify all owners afterward.
+-- Keep migration defaults aligned with the documented owner instead of only postgres.
+ALTER DEFAULT PRIVILEGES FOR ROLE campussafe_owner IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO campussafe_runtime_grp;
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES FOR ROLE campussafe_owner IN SCHEMA public GRANT USAGE, SELECT ON SEQUENCES TO campussafe_runtime_grp;
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES FOR ROLE campussafe_owner IN SCHEMA public GRANT SELECT ON TABLES TO campussafe_backup_grp;
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES FOR ROLE campussafe_owner IN SCHEMA public GRANT SELECT ON SEQUENCES TO campussafe_backup_grp;
+ALTER DEFAULT PRIVILEGES
+SELECT c.relname,c.relkind,pg_get_userbyid(c.relowner) AS owner FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind IN ('r','S') ORDER BY c.relkind,c.relname;
+               relname                | relkind |      owner
+--------------------------------------+---------+------------------
+ app_user_user_id_seq                 | S       | campussafe_owner
+ assignment_assignment_id_seq         | S       | campussafe_owner
+ attachment_attachment_id_seq         | S       | campussafe_owner
+ campus_location_location_id_seq      | S       | campussafe_owner
+ hazard_category_category_id_seq      | S       | campussafe_owner
+ hazard_report_report_id_seq          | S       | campussafe_owner
+ maintenance_action_action_id_seq     | S       | campussafe_owner
+ report_status_history_history_id_seq | S       | campussafe_owner
+ role_role_id_seq                     | S       | campussafe_owner
+ app_user                             | r       | campussafe_owner
+ assignment                           | r       | campussafe_owner
+ attachment                           | r       | campussafe_owner
+ campus_location                      | r       | campussafe_owner
+ hazard_category                      | r       | campussafe_owner
+ hazard_report                        | r       | campussafe_owner
+ maintenance_action                   | r       | campussafe_owner
+ report_status_history                | r       | campussafe_owner
+ role                                 | r       | campussafe_owner
+(18 rows)

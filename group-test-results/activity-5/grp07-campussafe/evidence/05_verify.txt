@@ -1,0 +1,42 @@
+-- Run directly as campussafe_report. Approved metadata and aggregate counts only.
+-- app_user and role are intentionally excluded from auditor counts.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),version();
+          captured_at          |   session_user    |   current_user    |  current_database  |                                        version
+-------------------------------+-------------------+-------------------+--------------------+---------------------------------------------------------------------------------------
+ 2026-11-06 19:08:07.570947+08 | campussafe_report | campussafe_report | grp07_campussafedb | PostgreSQL 18.6 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 16.2.1 20260810, 64-bit
+(1 row)
+
+SELECT relname,n_live_tup,n_dead_tup,n_mod_since_analyze,last_vacuum,last_analyze,vacuum_count,analyze_count FROM pg_stat_user_tables ORDER BY relname;
+        relname        | n_live_tup | n_dead_tup | n_mod_since_analyze |          last_vacuum          |         last_analyze          | vacuum_count | analyze_count
+-----------------------+------------+------------+---------------------+-------------------------------+-------------------------------+--------------+---------------
+ app_user              |          6 |          0 |                   0 | 2026-11-06 19:08:05.834573+08 | 2026-11-06 19:08:05.835578+08 |            1 |             2
+ assignment            |         12 |          0 |                   0 | 2026-11-06 19:08:05.837391+08 | 2026-11-06 19:08:05.838001+08 |            1 |             2
+ attachment            |          5 |          0 |                   0 | 2026-11-06 19:08:05.839621+08 | 2026-11-06 19:08:05.840724+08 |            1 |             2
+ campus_location       |         10 |          0 |                   0 | 2026-11-06 19:08:05.842248+08 | 2026-11-06 19:08:05.843463+08 |            1 |             2
+ hazard_category       |          6 |          0 |                   0 | 2026-11-06 19:08:05.845083+08 | 2026-11-06 19:08:05.845951+08 |            1 |             2
+ hazard_report         |         16 |          0 |                   0 | 2026-11-06 19:08:05.847751+08 | 2026-11-06 19:08:05.849368+08 |            1 |             2
+ maintenance_action    |          9 |          0 |                   0 | 2026-11-06 19:08:05.851561+08 | 2026-11-06 19:08:05.852574+08 |            1 |             2
+ report_status_history |         60 |          0 |                   0 | 2026-11-06 19:08:05.854593+08 | 2026-11-06 19:08:05.856082+08 |            1 |             2
+ role                  |          5 |          0 |                   0 | 2026-11-06 19:08:05.857734+08 | 2026-11-06 19:08:05.858654+08 |            1 |             2
+(9 rows)
+
+SELECT 'assignment' AS table_name,count(*) AS rows FROM public.assignment
+UNION ALL SELECT 'attachment' AS table_name,count(*) AS rows FROM public.attachment
+UNION ALL SELECT 'campus_location' AS table_name,count(*) AS rows FROM public.campus_location
+UNION ALL SELECT 'hazard_category' AS table_name,count(*) AS rows FROM public.hazard_category
+UNION ALL SELECT 'hazard_report' AS table_name,count(*) AS rows FROM public.hazard_report
+UNION ALL SELECT 'maintenance_action' AS table_name,count(*) AS rows FROM public.maintenance_action
+UNION ALL SELECT 'report_status_history' AS table_name,count(*) AS rows FROM public.report_status_history ORDER BY table_name;
+      table_name       | rows
+-----------------------+------
+ assignment            |   12
+ attachment            |    5
+ campus_location       |   10
+ hazard_category       |    6
+ hazard_report         |   16
+ maintenance_action    |    9
+ report_status_history |   60
+(7 rows)

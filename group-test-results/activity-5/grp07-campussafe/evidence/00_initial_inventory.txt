@@ -1,0 +1,14 @@
+          captured_at
+-------------------------------
+ 2026-11-06 19:05:09.390036+08
+(1 row)
+
+ datname | owner
+---------+-------
+(0 rows)
+
+     rolname      | rolcanlogin | rolsuper
+------------------+-------------+----------
+ app_runtime_grp  | f           | f
+ app_readonly_grp | f           | f
+(2 rows)

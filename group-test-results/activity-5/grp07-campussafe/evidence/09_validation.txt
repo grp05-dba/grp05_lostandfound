@@ -1,0 +1,14 @@
+Validated: 2026-11-06T19:14:11.175333+08:00
+Scope: setup/SQL/evidence/documentation checks, not PHP UI, full access-control, backup or load testing.
+PASS | All local Markdown links resolve
+PASS | All 9 exact table counts preserved through role-appropriate accounts; 129 seed rows retained
+PASS | 9 explicit ANALYZE and 9 ordinary VACUUM completions
+PASS | All tables have current manual timestamps, vacuum count 1, analyze count 2, zero dead/modification estimates
+PASS | No unexpected PostgreSQL ERROR/FATAL/WARNING diagnostics in setup, health, runtime counts, maintenance, query or verification (echoed SQL comments excluded)
+PASS | Exactly two expected log-function SQLSTATE 42501 denials
+PASS | Category query estimated/actual output six groups, actual join 16, measured 0.185 ms
+PASS | All four CampusSafe account membership checks exclude HabalGo groups
+PASS | Local role SQL matches supplied plan after password removal, group renaming and comment/whitespace normalization
+PASS | Local schema DDL matches source after DROP reset removal and comment/whitespace normalization
+PASS | Schema setup created nine tables and ten explicit indexes
+PASS | Credential/hash scan and manual review: no passwords, hashes, raw seed or personal result values retained

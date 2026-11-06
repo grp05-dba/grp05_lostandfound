@@ -1,0 +1,43 @@
+INSERT 0 5
+ setval
+--------
+      5
+(1 row)
+
+INSERT 0 6
+ setval
+--------
+      6
+(1 row)
+
+INSERT 0 6
+ setval
+--------
+      6
+(1 row)
+
+INSERT 0 10
+ setval
+--------
+     10
+(1 row)
+
+INSERT 0 16
+ setval
+--------
+     16
+(1 row)
+
+INSERT 0 12
+ setval
+--------
+     12
+(1 row)
+
+INSERT 0 60
+INSERT 0 9
+INSERT 0 5
+ setval
+--------
+      5
+(1 row)

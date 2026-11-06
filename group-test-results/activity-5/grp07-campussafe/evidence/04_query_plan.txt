@@ -1,0 +1,70 @@
+-- Exact Report::getStatistics category-count SELECT, used by public/admin/stats.php.
+-- Source commit 3684b97cfa8b8c6624d039eda461551ade774701. Safe read; no personal values output.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database();
+          captured_at          |  session_user  |  current_user  |  current_database
+-------------------------------+----------------+----------------+--------------------
+ 2026-11-06 19:08:06.681707+08 | campussafe_app | campussafe_app | grp07_campussafedb
+(1 row)
+
+BEGIN READ ONLY;
+BEGIN
+SET LOCAL search_path=public,pg_catalog;
+SET
+SET LOCAL statement_timeout='30s';
+SET
+EXPLAIN
+SELECT c.category_name, COUNT(r.report_id) AS count
+FROM hazard_category c
+LEFT JOIN hazard_report r ON c.category_id = r.category_id
+GROUP BY c.category_name
+ORDER BY count DESC;
+                                        QUERY PLAN
+------------------------------------------------------------------------------------------
+ Sort  (cost=2.59..2.60 rows=6 width=19)
+   Sort Key: (count(r.report_id)) DESC
+   ->  HashAggregate  (cost=2.45..2.51 rows=6 width=19)
+         Group Key: c.category_name
+         ->  Hash Right Join  (cost=1.14..2.37 rows=16 width=15)
+               Hash Cond: (r.category_id = c.category_id)
+               ->  Seq Scan on hazard_report r  (cost=0.00..1.16 rows=16 width=8)
+               ->  Hash  (cost=1.06..1.06 rows=6 width=15)
+                     ->  Seq Scan on hazard_category c  (cost=0.00..1.06 rows=6 width=15)
+(9 rows)
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT c.category_name, COUNT(r.report_id) AS count
+FROM hazard_category c
+LEFT JOIN hazard_report r ON c.category_id = r.category_id
+GROUP BY c.category_name
+ORDER BY count DESC;
+                                                              QUERY PLAN
+---------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=2.59..2.60 rows=6 width=19) (actual time=0.127..0.129 rows=6.00 loops=1)
+   Sort Key: (count(r.report_id)) DESC
+   Sort Method: quicksort  Memory: 25kB
+   Buffers: shared hit=5
+   ->  HashAggregate  (cost=2.45..2.51 rows=6 width=19) (actual time=0.086..0.090 rows=6.00 loops=1)
+         Group Key: c.category_name
+         Batches: 1  Memory Usage: 32kB
+         Buffers: shared hit=2
+         ->  Hash Right Join  (cost=1.14..2.37 rows=16 width=15) (actual time=0.056..0.072 rows=16.00 loops=1)
+               Hash Cond: (r.category_id = c.category_id)
+               Buffers: shared hit=2
+               ->  Seq Scan on hazard_report r  (cost=0.00..1.16 rows=16 width=8) (actual time=0.009..0.011 rows=16.00 loops=1)
+                     Buffers: shared hit=1
+               ->  Hash  (cost=1.06..1.06 rows=6 width=15) (actual time=0.025..0.025 rows=6.00 loops=1)
+                     Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                     Buffers: shared hit=1
+                     ->  Seq Scan on hazard_category c  (cost=0.00..1.06 rows=6 width=15) (actual time=0.014..0.016 rows=6.00 loops=1)
+                           Buffers: shared hit=1
+ Planning:
+   Buffers: shared hit=4
+ Planning Time: 0.189 ms
+ Execution Time: 0.185 ms
+(22 rows)
+
+ROLLBACK;
+ROLLBACK

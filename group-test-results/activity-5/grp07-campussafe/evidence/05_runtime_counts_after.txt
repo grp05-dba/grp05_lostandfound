@@ -1,0 +1,17 @@
+-- Direct campussafe_app; aggregate-only reads of auditor-excluded tables.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database();
+         captured_at          |  session_user  |  current_user  |  current_database
+------------------------------+----------------+----------------+--------------------
+ 2026-11-06 19:08:08.48588+08 | campussafe_app | campussafe_app | grp07_campussafedb
+(1 row)
+
+SELECT 'app_user' AS table_name,count(user_id) AS rows FROM public.app_user
+UNION ALL SELECT 'role',count(role_id) FROM public.role ORDER BY table_name;
+ table_name | rows
+------------+------
+ app_user   |    6
+ role       |    5
+(2 rows)
