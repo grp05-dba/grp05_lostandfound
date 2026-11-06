@@ -1,0 +1,113 @@
+Captured UTC: 2026-11-06T13:24:08.152393+00:00
+
+E15 Direct SCRAM login and identity
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_dba   | parkit_dba   | grp_parkitdb
+(1 row)
+
+SELECT session_user = current_user AS identity_matches;
+ identity_matches 
+------------------
+ t
+(1 row)
+
+
+E16 Database creation denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_dba   | parkit_dba   | grp_parkitdb
+(1 row)
+
+CREATE DATABASE parkit_forbidden_probe;
+ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:977
+
+E17 Role creation denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_dba   | parkit_dba   | grp_parkitdb
+(1 row)
+
+CREATE ROLE parkit_forbidden_role;
+ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:316
+
+E18 Unrelated/default database CONNECT denied
+Expected: denied CONNECT privilege diagnostic (psql omits startup SQLSTATE)
+psql: error: connection to server at "127.0.0.1", port 55442 failed: FATAL:  permission denied for database "parkit_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+E19 Unrelated/default database CONNECT denied
+Expected: denied CONNECT privilege diagnostic (psql omits startup SQLSTATE)
+psql: error: connection to server at "127.0.0.1", port 55442 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+E20 Unrelated/default database CONNECT denied
+Expected: denied CONNECT privilege diagnostic (psql omits startup SQLSTATE)
+psql: error: connection to server at "127.0.0.1", port 55442 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+E21 Cannot inherit provisioning superuser
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_dba   | parkit_dba   | grp_parkitdb
+(1 row)
+
+SET ROLE postgres;
+ERROR:  42501: permission denied to set role "postgres"
+LOCATION:  call_string_check_hook, guc.c:6936
+
+E87 DBA owns/migrates project objects and provisions zone data
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_dba   | parkit_dba   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+SET ROLE parkit_owner_grp;
+SET
+CREATE TABLE public.act4_owner_probe(id integer);
+CREATE TABLE
+ALTER TABLE public.act4_owner_probe ADD COLUMN note text;
+ALTER TABLE
+INSERT INTO public.parking_zone(zone_name,max_capacity) VALUES('ACT4-DBA',5) RETURNING zone_id;
+ zone_id 
+---------
+       3
+(1 row)
+
+INSERT 0 1
+SELECT session_user,current_user;
+ session_user |   current_user   
+--------------+------------------
+ parkit_dba   | parkit_owner_grp
+(1 row)
+
+DROP TABLE public.act4_owner_probe;
+DROP TABLE
+ROLLBACK;
+ROLLBACK
+
+E88 DBA can maintain project table
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_dba   | parkit_dba   | grp_parkitdb
+(1 row)
+
+ANALYZE public.vehicle;
+ANALYZE

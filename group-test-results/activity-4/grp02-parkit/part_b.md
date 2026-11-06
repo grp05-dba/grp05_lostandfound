@@ -1,172 +1,48 @@
+# Part B - Identify Users, Group Roles, and Privileges
 
-# Part B – Identify Users, Group Roles, and Privileges
+## 1. Access-control plan
 
-## 1. Objective
+This plan is based on Group 02's current `main` at `0c01b3e87cf3d623f5f8c4936e3fe7fe56daeeb3`, its `user-role.md`, and the PHP statements actually executed by its features. It was selected before provisioning the new test database. [Parts C and D](part_cd.md) implement it; [Part E](part_e.md) records actual verification.
 
-This part identifies the different types of database access required by the Park It application.
+| Login / account | NOLOGIN group | Application role served | Responsibility and required privileges |
+|---|---|---|---|
+| `parkit_app` | `parkit_runtime_grp` | Shared PHP service for Admin and Staff sessions | CONNECT, schema USAGE, exact table/column grants below, USAGE on three insert sequences |
+| `parkit_auditor` | `parkit_readonly_grp` | External database inspection; no corresponding web role | Read four operational tables and safe staff columns; no writes, password hashes or sequences |
+| `parkit_dba` | `parkit_owner_grp` | Trusted project database administrator | Database/schema/table/sequence ownership through its group; seed users/zones, maintain objects and run migrations |
+| Local `postgres` provisioner | None | No application role | Initialize this dedicated lab, create cluster-wide roles/databases and assign credentials |
 
-Based on the application's existing functionality and database operations, appropriate PostgreSQL group roles and login accounts will be planned.
+All six project roles lack SUPERUSER, CREATEDB, CREATEROLE, REPLICATION and BYPASSRLS. Each login inherits just its designated group without ADMIN OPTION. The owner group is intentionally powerful within this project; the DBA is trusted to alter/drop project objects but cannot provision cluster roles or databases. It must never serve ordinary PHP requests.
 
-The access-control design follows the principle of least privilege. Each role should receive only the permissions required to perform its intended responsibilities.
+## 2. Table and column matrix
 
-## 2. Distinction Between Application Roles and PostgreSQL Roles
+| Table | Runtime SELECT | INSERT | UPDATE columns | DELETE | Auditor |
+|---|---|---|---|---|---|
+| `parking_zone` | Yes | No | `current_active_count` | No | SELECT |
+| `vehicle` | Yes | Yes | `license_plate`, `vehicle_type` | Yes | SELECT |
+| `staff_user` | Yes, including hash for authentication | No | None | No | SELECT (`user_id`, `username`, `role`) only |
+| `transaction` | Yes | Yes | `exit_time`, `status`, `is_lost_ticket` | No | SELECT |
+| `payment` | Yes | Yes | `payment_method` | No | SELECT |
 
-Park It has two application-level roles:
+The code's vehicle-deletion endpoint needs DELETE, while foreign keys protect vehicles referenced by history. Payment-method correction needs UPDATE on that column; amount, timestamp, ID and transaction linkage remain protected against UPDATE. Column grants also prevent runtime changes to capacity, staff roles/hashes, original entry times and transaction vehicle/zone links. INSERT still permits caller-supplied values; these grants do not enforce every business rule or make history immutable.
 
-- Administrator
-- Staff
+The upstream role guide omits vehicle DELETE and payment-method UPDATE even though the endpoints use them. This evaluation adds only those feature-required privileges, rather than granting blanket UPDATE to every table. Seed-only staff/zone writes belong to the DBA, not the runtime.
 
-These roles are stored in the `staff_user` table and are used by the PHP application for user authentication and session management.
+## 3. Sequences, schemas and future objects
 
-However, both application users currently access PostgreSQL through the same database connection configured in `config/database.php`.
+| Sequence | Runtime | Auditor | Purpose |
+|---|---|---|---|
+| `vehicle_vehicle_id_seq` | USAGE | None | Vehicle registration |
+| `transaction_transaction_id_seq` | USAGE | None | Parking entry |
+| `payment_payment_id_seq` | USAGE | None | Payment insertion |
+| `parking_zone_zone_id_seq` | None | None | DBA-only zone setup |
+| `staff_user_user_id_seq` | None | None | DBA-only staff setup |
 
-Therefore, PostgreSQL does not automatically distinguish an application administrator from an application staff member.
+USAGE allows `nextval`/`currval`; sequence SELECT and UPDATE (`setval`) are unnecessary. The owner controls all five sequences. CONNECT does not grant object access, and schema USAGE does not grant table access.
 
-Separate PostgreSQL accounts are intended for database-level responsibilities, rather than automatically mirroring every application user.
+PUBLIC project database/schema/table/sequence privileges are revoked. Runtime/auditor have no database CREATE/TEMPORARY, schema CREATE, TRUNCATE, REFERENCES, TRIGGER, MAINTAIN or grant authority. An unrelated lab database, `postgres`, and `template1` have PUBLIC CONNECT revoked in this isolated cluster. These cluster-wide targets require an impact review before similar changes on a shared server.
 
-## 3. Identified Database Access Requirements
+Future tables/sequences receive no automatic service grants. Migrations use `SET ROLE parkit_owner_grp` and explicit reviewed object grants. PUBLIC execution of future owner-created and DBA-created functions is revoked globally for those creators; a schema-specific revoke alone would not remove the global default. Future-object tests verify this policy.
 
-The following database access categories are considered for Park It.
+## 4. Application role boundary
 
-### 3.1 Database Administrator
-
-**Purpose:** Provision, configure, and maintain the PostgreSQL database.
-
-Responsibilities include:
-
-- Creating and configuring the project database.
-- Creating and managing PostgreSQL roles.
-- Assigning and revoking privileges.
-- Managing database objects when necessary.
-- Performing database maintenance.
-
-The administrative account should be separate from the account used by the application.
-
-Elevated privileges should only be assigned when justified by the administrative task.
-
-### 3.2 Application Runtime
-
-**Purpose:** Allow the PHP application to perform its normal database operations.
-
-The application runtime account is responsible for:
-
-- Authenticating application users.
-- Registering vehicles.
-- Creating parking transactions.
-- Updating parking occupancy.
-- Processing payments.
-- Recording vehicle exits.
-- Retrieving dashboard and monitoring information.
-- Retrieving payment and transaction history.
-
-This account should have the required access to the operational tables without receiving PostgreSQL superuser privileges.
-
-### 3.3 Read-Only User / Auditor
-
-**Purpose:** Allow authorized users to inspect database records without modifying them.
-
-Potential responsibilities include:
-
-- Viewing registered vehicles.
-- Inspecting parking transactions.
-- Reviewing payment records.
-- Checking parking-zone information.
-- Performing database reporting and verification.
-
-This account should receive SELECT privileges only on the approved tables.
-
-A separate read-only application feature is not currently established in the reviewed project. This role is therefore intended for database inspection and testing, unless additional application requirements are identified.
-
-## 4. Proposed PostgreSQL Group Roles
-
-The following group roles are proposed:
-
-| Group role | Intended responsibility |
-|---|---|
-| `park_it_runtime_grp` | Provides the privileges required by the PHP application's normal database operations. |
-| `park_it_readonly_grp` | Provides read-only access to approved database tables. |
-| `park_it_admin_grp` | Provides administrative privileges for authorized database management tasks. |
-
-Group roles will be created with `NOLOGIN`. Individual login accounts will be assigned to the appropriate group roles.
-
-## 5. Proposed Login Accounts
-
-| Login role | Assigned group role | Purpose |
-|---|---|---|
-| `park_it_app` | `park_it_runtime_grp` | Database account used by the PHP application. |
-| `park_it_auditor` | `park_it_readonly_grp` | Account used for read-only inspection and verification. |
-| `park_it_dba` | `park_it_admin_grp` | Account used for authorized database administration. |
-
-These are proposed database account names. Actual passwords will be configured locally and will not be included in the repository or documentation.
-
-## 6. Proposed Table Privileges
-
-The application runtime requires access to the following database objects:
-
-| Table | SELECT | INSERT | UPDATE | DELETE |
-|---|---|---|---|---|
-| `parking_zone` | Yes | Setup only | Yes | No |
-| `vehicle` | Yes | Yes | Yes | Yes |
-| `staff_user` | Yes | Setup only | No | No |
-| `transaction` | Yes | Yes | Yes | No |
-| `payment` | Yes | Yes | Yes | No |
-
-### Privilege considerations
-
-- `parking_zone`: The application retrieves parking information and updates current occupancy. Initial zone creation is performed by the setup process.
-- `vehicle`: The application registers, retrieves, updates, and deletes vehicle records when permitted by the application's business rules.
-- `staff_user`: The application retrieves user records during authentication. Initial user creation is handled by the setup process.
-- `transaction`: The application creates parking transactions and updates their status, exit time, and lost-ticket information.
-- `payment`: The application records payments, retrieves payment history, and allows payment-method corrections.
-
-The application does not provide normal deletion operations for completed transactions or payment records. These records should be preserved for audit purposes.
-
-Column-level UPDATE privileges may be used where appropriate to further restrict changes to sensitive records.
-
-## 7. Sequence Privileges
-
-The application uses PostgreSQL sequences to generate primary-key values.
-
-The runtime role must receive the necessary sequence privileges for the sequences used by its permitted INSERT operations.
-
-The following sequences must be reviewed:
-
-- `parking_zone_zone_id_seq`
-- `vehicle_vehicle_id_seq`
-- `staff_user_user_id_seq`
-- `transaction_transaction_id_seq`
-- `payment_payment_id_seq`
-
-Sequences used only during initial database setup may be restricted to the account responsible for provisioning.
-
-## 8. Database and Schema Privileges
-
-The proposed role structure must also account for privileges beyond individual tables.
-
-### Database-level access
-
-- Grant CONNECT to the database only to accounts that require access.
-- Avoid granting unnecessary access to unrelated databases.
-
-### Schema-level access
-
-- Grant USAGE on the `public` schema to roles that need to access its objects.
-- Do not assume schema access automatically grants table or sequence access.
-
-### Object-level access
-
-- Grant table privileges according to each role's responsibilities.
-- Grant sequence privileges where generated identifiers are required.
-- Review default privileges for objects created in the future.
-
-## 9. Access-Control Design Summary
-
-| Account | Database access | Intended permissions |
-|---|---|---|
-| `park_it_app` | Application runtime | Required SELECT, INSERT, UPDATE, and DELETE operations |
-| `park_it_auditor` | Read-only inspection | SELECT on approved tables |
-| `park_it_dba` | Database administration | Administrative privileges appropriate to the task |
-
-The administrative account will not be used by the application for ordinary operations.
-
-The runtime account will be used by the PHP application's database connection after the access-control implementation is completed.
+The seed stores `Admin` and `Staff`; `isAdmin()` normalizes case. The role guide describes administrator-only vehicle registration/maintenance, but the reviewed endpoints use `requireLogin()` without calling `isAdmin()`. Both users share `parkit_app`; PostgreSQL cannot distinguish their web sessions. The implemented database roles restrict the service itself. Enforcing the stated human-user policy still requires PHP authorization checks on each restricted action.

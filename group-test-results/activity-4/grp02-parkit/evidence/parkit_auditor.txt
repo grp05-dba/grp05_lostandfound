@@ -1,0 +1,581 @@
+Captured UTC: 2026-11-06T13:24:08.152393+00:00
+
+E08 Direct SCRAM login and identity
+Expected: allowed
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT session_user = current_user AS identity_matches;
+ identity_matches 
+------------------
+ t
+(1 row)
+
+
+E09 Database creation denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+CREATE DATABASE parkit_forbidden_probe;
+ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:977
+
+E10 Role creation denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+CREATE ROLE parkit_forbidden_role;
+ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:316
+
+E11 Unrelated/default database CONNECT denied
+Expected: denied CONNECT privilege diagnostic (psql omits startup SQLSTATE)
+psql: error: connection to server at "127.0.0.1", port 55442 failed: FATAL:  permission denied for database "parkit_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+E12 Unrelated/default database CONNECT denied
+Expected: denied CONNECT privilege diagnostic (psql omits startup SQLSTATE)
+psql: error: connection to server at "127.0.0.1", port 55442 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+E13 Unrelated/default database CONNECT denied
+Expected: denied CONNECT privilege diagnostic (psql omits startup SQLSTATE)
+psql: error: connection to server at "127.0.0.1", port 55442 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+E14 Cannot inherit provisioning superuser
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SET ROLE postgres;
+ERROR:  42501: permission denied to set role "postgres"
+LOCATION:  call_string_check_hook, guc.c:6936
+
+E23 Auditor reads parking_zone
+Expected: allowed
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT count(*) FROM public."parking_zone";
+ count 
+-------
+     1
+(1 row)
+
+
+E25 Auditor reads vehicle
+Expected: allowed
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT count(*) FROM public."vehicle";
+ count 
+-------
+     0
+(1 row)
+
+
+E27 Auditor reads transaction
+Expected: allowed
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT count(*) FROM public."transaction";
+ count 
+-------
+     0
+(1 row)
+
+
+E29 Auditor reads payment
+Expected: allowed
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT count(*) FROM public."payment";
+ count 
+-------
+     0
+(1 row)
+
+
+E31 Auditor approved staff columns
+Expected: allowed
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT user_id,username,role FROM public.staff_user;
+ user_id | username | role  
+---------+----------+-------
+       1 | admin    | Admin
+       2 | staff    | Staff
+(2 rows)
+
+
+E32 Auditor staff hash denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT password_hash FROM public.staff_user;
+ERROR:  42501: permission denied for table staff_user
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E33 Auditor SELECT star staff denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT * FROM public.staff_user;
+ERROR:  42501: permission denied for table staff_user
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E60 schema CREATE denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+CREATE TABLE public.act4_forbidden(id integer);
+ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.act4_forbidden(id integer);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E61 database CREATE denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+CREATE SCHEMA act4_forbidden;
+ERROR:  42501: permission denied for database grp_parkitdb
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E62 TEMPORARY denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+CREATE TEMP TABLE act4_forbidden(id integer);
+ERROR:  42501: permission denied to create temporary tables in database "grp_parkitdb"
+LINE 1: CREATE TEMP TABLE act4_forbidden(id integer);
+                          ^
+LOCATION:  InitTempTableNamespace, namespace.c:4413
+
+E63 TRUNCATE denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+TRUNCATE public.vehicle;
+ERROR:  42501: permission denied for table vehicle
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E64 ALTER denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+ALTER TABLE public.vehicle ADD COLUMN act4_forbidden integer;
+ERROR:  42501: must be owner of table vehicle
+LOCATION:  aclcheck_error, aclchk.c:2931
+
+E65 owner membership escalation denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+GRANT parkit_owner_grp TO parkit_auditor;
+ERROR:  42501: permission denied to grant role "parkit_owner_grp"
+DETAIL:  Only roles with the ADMIN option on role "parkit_owner_grp" may grant this role.
+LOCATION:  check_role_membership_authorization, user.c:2158
+
+E66 staff sequence denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+SELECT nextval('public.staff_user_user_id_seq');
+ERROR:  42501: permission denied for sequence staff_user_user_id_seq
+LOCATION:  nextval_internal, sequence.c:652
+
+E67 zone sequence denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+SELECT nextval('public.parking_zone_zone_id_seq');
+ERROR:  42501: permission denied for sequence parking_zone_zone_id_seq
+LOCATION:  nextval_internal, sequence.c:652
+
+E68 setval denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+SELECT setval('public.vehicle_vehicle_id_seq',999);
+ERROR:  42501: permission denied for sequence vehicle_vehicle_id_seq
+LOCATION:  do_setval, sequence.c:961
+
+E69 Auditor INSERT parking_zone denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+INSERT INTO public."parking_zone" DEFAULT VALUES;
+ERROR:  42501: permission denied for table parking_zone
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E70 Auditor UPDATE parking_zone denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public."parking_zone" SET current_active_count=current_active_count;
+ERROR:  42501: permission denied for table parking_zone
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E71 Auditor DELETE parking_zone denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+DELETE FROM public."parking_zone";
+ERROR:  42501: permission denied for table parking_zone
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E72 Auditor INSERT vehicle denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+INSERT INTO public."vehicle" DEFAULT VALUES;
+ERROR:  42501: permission denied for table vehicle
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E73 Auditor UPDATE vehicle denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public."vehicle" SET vehicle_type=vehicle_type;
+ERROR:  42501: permission denied for table vehicle
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E74 Auditor DELETE vehicle denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+DELETE FROM public."vehicle";
+ERROR:  42501: permission denied for table vehicle
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E75 Auditor INSERT staff_user denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+INSERT INTO public."staff_user" DEFAULT VALUES;
+ERROR:  42501: permission denied for table staff_user
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E76 Auditor UPDATE staff_user denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public."staff_user" SET role=role;
+ERROR:  42501: permission denied for table staff_user
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E77 Auditor DELETE staff_user denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+DELETE FROM public."staff_user";
+ERROR:  42501: permission denied for table staff_user
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E78 Auditor INSERT transaction denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+INSERT INTO public."transaction" DEFAULT VALUES;
+ERROR:  42501: permission denied for table transaction
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E79 Auditor UPDATE transaction denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public."transaction" SET status=status;
+ERROR:  42501: permission denied for table transaction
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E80 Auditor DELETE transaction denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+DELETE FROM public."transaction";
+ERROR:  42501: permission denied for table transaction
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E81 Auditor INSERT payment denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+INSERT INTO public."payment" DEFAULT VALUES;
+ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E82 Auditor UPDATE payment denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public."payment" SET payment_method=payment_method;
+ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E83 Auditor DELETE payment denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+DELETE FROM public."payment";
+ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E84 Auditor operational sequence denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT nextval('public.vehicle_vehicle_id_seq');
+ERROR:  42501: permission denied for sequence vehicle_vehicle_id_seq
+LOCATION:  nextval_internal, sequence.c:652
+
+E85 Auditor operational sequence denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT nextval('public.transaction_transaction_id_seq');
+ERROR:  42501: permission denied for sequence transaction_transaction_id_seq
+LOCATION:  nextval_internal, sequence.c:652
+
+E86 Auditor operational sequence denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT nextval('public.payment_payment_id_seq');
+ERROR:  42501: permission denied for sequence payment_payment_id_seq
+LOCATION:  nextval_internal, sequence.c:652
+
+E92 Future table has no automatic grants
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT * FROM public.act4_future_probe;
+ERROR:  42501: permission denied for table act4_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E93 Future sequence has no automatic grants
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT nextval('public.act4_future_probe_id_seq');
+ERROR:  42501: permission denied for sequence act4_future_probe_id_seq
+LOCATION:  nextval_internal, sequence.c:652
+
+E94 Future function PUBLIC execute revoked
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+  session_user  |  current_user  | current_database 
+----------------+----------------+------------------
+ parkit_auditor | parkit_auditor | grp_parkitdb
+(1 row)
+
+SELECT public.act4_future_function();
+ERROR:  42501: permission denied for function act4_future_function
+LOCATION:  aclcheck_error, aclchk.c:2793

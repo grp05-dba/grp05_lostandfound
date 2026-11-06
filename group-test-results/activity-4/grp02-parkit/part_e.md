@@ -1,270 +1,178 @@
-# Part E – Test and Verify Access Control
+# Part E - Test and Verify Access Control
 
-## 1. Execution details
+## 1. Execution and result
 
-These tests were **executed in psql on 6 November 2026** against local PostgreSQL 18.6 and `grp_parkitdb`. They replace the previous illustrative results. See [Part C and Part D](part_cd.md) for the privilege plan.
+The checks below were **executed on 6 November 2026** against local PostgreSQL **18.6**, `grp_parkitdb`, at `127.0.0.1:55442`. Each case opened a new direct SCRAM-authenticated connection as its named login. Successful connections recorded `session_user`, `current_user` and `current_database`; no administrator impersonation was used for runtime/auditor tests.
 
-Each login connected directly, without administrator impersonation:
+**96 of 96 cases matched the stated expectations.** This includes two deliberately successful business-rule probes (E95–E96), which demonstrate unresolved integrity gaps. It does not mean every application security requirement is satisfied: Staff vehicle registration/editing also succeeded during HTTP testing despite the upstream Admin-only policy.
 
-```sh
-psql -X -w -U park_it_app -d grp_parkitdb
-psql -X -w -U park_it_auditor -d grp_parkitdb
-psql -X -w -U park_it_dba -d grp_parkitdb
-```
+[The test runner](run_verification.py) contains every executed statement, expected outcome and assertion. [Structured results](evidence/results.json) preserve the complete SQL, process exit status and stdout/stderr for each numbered case. The account-specific output files below provide readable transcripts. Long multi-statement cases are abbreviated in the table; their complete SQL is in the structured result with the same ID.
 
-`SELECT session_user, current_user, current_database();` confirmed each requested account as both session and current user, with database `grp_parkitdb`. Connections used the local Unix socket on port 5432 without passwords in commands or evidence. Remote connections and password authentication were not tested.
+Permission denials use SQLSTATE `42501`; the protected-vehicle test expects foreign-key SQLSTATE `23503`. Startup CONNECT errors do not display SQLSTATE in psql, so those cases verify the explicit “User does not have CONNECT privilege” diagnostic and a nonzero exit status. Successful SQL probes explicitly roll back changes; failed sessions disconnect and roll back. Temporary future objects are removed after testing. Sequence increments can persist without row changes.
 
-Evidence below contains executed statements and actual output excerpts. Expected errors were allowed to continue so that later tests could run. A zero psql process exit status was not interpreted as proof that every statement succeeded. All permission errors below reported SQLSTATE `42501`.
+## 2. Individual verification results
 
-## 2. Results
+| Test | Account | Statement or operation | Expected | Actual result / evidence |
+|---|---|---|---|---|
+| E01 | `parkit_app` | `SELECT session_user = current_user AS identity_matches;` | Allowed | Succeeded; exit 0; [output](evidence/parkit_app.txt) |
+| E02 | `parkit_app` | `CREATE DATABASE parkit_forbidden_probe;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E03 | `parkit_app` | `CREATE ROLE parkit_forbidden_role;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E04 | `parkit_app` | `SELECT current_database();` | CONNECT denied | Denied: no CONNECT privilege; [output](evidence/parkit_app.txt) |
+| E05 | `parkit_app` | `SELECT current_database();` | CONNECT denied | Denied: no CONNECT privilege; [output](evidence/parkit_app.txt) |
+| E06 | `parkit_app` | `SELECT current_database();` | CONNECT denied | Denied: no CONNECT privilege; [output](evidence/parkit_app.txt) |
+| E07 | `parkit_app` | `SET ROLE postgres;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E08 | `parkit_auditor` | `SELECT session_user = current_user AS identity_matches;` | Allowed | Succeeded; exit 0; [output](evidence/parkit_auditor.txt) |
+| E09 | `parkit_auditor` | `CREATE DATABASE parkit_forbidden_probe;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E10 | `parkit_auditor` | `CREATE ROLE parkit_forbidden_role;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E11 | `parkit_auditor` | `SELECT current_database();` | CONNECT denied | Denied: no CONNECT privilege; [output](evidence/parkit_auditor.txt) |
+| E12 | `parkit_auditor` | `SELECT current_database();` | CONNECT denied | Denied: no CONNECT privilege; [output](evidence/parkit_auditor.txt) |
+| E13 | `parkit_auditor` | `SELECT current_database();` | CONNECT denied | Denied: no CONNECT privilege; [output](evidence/parkit_auditor.txt) |
+| E14 | `parkit_auditor` | `SET ROLE postgres;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E15 | `parkit_dba` | `SELECT session_user = current_user AS identity_matches;` | Allowed | Succeeded; exit 0; [output](evidence/parkit_dba.txt) |
+| E16 | `parkit_dba` | `CREATE DATABASE parkit_forbidden_probe;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_dba.txt) |
+| E17 | `parkit_dba` | `CREATE ROLE parkit_forbidden_role;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_dba.txt) |
+| E18 | `parkit_dba` | `SELECT current_database();` | CONNECT denied | Denied: no CONNECT privilege; [output](evidence/parkit_dba.txt) |
+| E19 | `parkit_dba` | `SELECT current_database();` | CONNECT denied | Denied: no CONNECT privilege; [output](evidence/parkit_dba.txt) |
+| E20 | `parkit_dba` | `SELECT current_database();` | CONNECT denied | Denied: no CONNECT privilege; [output](evidence/parkit_dba.txt) |
+| E21 | `parkit_dba` | `SET ROLE postgres;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_dba.txt) |
+| E22 | `parkit_app` | `SELECT count(*) FROM public."parking_zone";` | Allowed | Succeeded; exit 0; [output](evidence/parkit_app.txt) |
+| E23 | `parkit_auditor` | `SELECT count(*) FROM public."parking_zone";` | Allowed | Succeeded; exit 0; [output](evidence/parkit_auditor.txt) |
+| E24 | `parkit_app` | `SELECT count(*) FROM public."vehicle";` | Allowed | Succeeded; exit 0; [output](evidence/parkit_app.txt) |
+| E25 | `parkit_auditor` | `SELECT count(*) FROM public."vehicle";` | Allowed | Succeeded; exit 0; [output](evidence/parkit_auditor.txt) |
+| E26 | `parkit_app` | `SELECT count(*) FROM public."transaction";` | Allowed | Succeeded; exit 0; [output](evidence/parkit_app.txt) |
+| E27 | `parkit_auditor` | `SELECT count(*) FROM public."transaction";` | Allowed | Succeeded; exit 0; [output](evidence/parkit_auditor.txt) |
+| E28 | `parkit_app` | `SELECT count(*) FROM public."payment";` | Allowed | Succeeded; exit 0; [output](evidence/parkit_app.txt) |
+| E29 | `parkit_auditor` | `SELECT count(*) FROM public."payment";` | Allowed | Succeeded; exit 0; [output](evidence/parkit_auditor.txt) |
+| E30 | `parkit_app` | `SELECT user_id,username,role,(length(password_hash)>0) AS hash_present FROM public.staff_user;` | Allowed | Succeeded; exit 0; [output](evidence/parkit_app.txt) |
+| E31 | `parkit_auditor` | `SELECT user_id,username,role FROM public.staff_user;` | Allowed | Succeeded; exit 0; [output](evidence/parkit_auditor.txt) |
+| E32 | `parkit_auditor` | `SELECT password_hash FROM public.staff_user;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E33 | `parkit_auditor` | `SELECT * FROM public.staff_user;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E34 | `parkit_app` | `Runtime complete parking lifecycle, generated IDs and narrow updates; complete SQL in results.json E34` | Allowed | Succeeded; exit 0; [output](evidence/parkit_app.txt) |
+| E35 | `parkit_app` | `Runtime edits and deletes unreferenced vehicle; complete SQL in results.json E35` | Allowed | Succeeded; exit 0; [output](evidence/parkit_app.txt) |
+| E36 | `parkit_app` | `Foreign key protects referenced vehicle; complete SQL in results.json E36` | Denied 23503 | Rejected 23503; [output](evidence/parkit_app.txt) |
+| E37 | `parkit_app` | `BEGIN; UPDATE public.parking_zone SET max_capacity=100; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E38 | `parkit_app` | `BEGIN; UPDATE public.vehicle SET vehicle_id=vehicle_id; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E39 | `parkit_app` | `BEGIN; UPDATE public."transaction" SET entry_time=entry_time; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E40 | `parkit_app` | `BEGIN; UPDATE public."transaction" SET vehicle_id=vehicle_id; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E41 | `parkit_app` | `BEGIN; UPDATE public.payment SET amount=amount; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E42 | `parkit_app` | `BEGIN; UPDATE public.payment SET payment_time=payment_time; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E43 | `parkit_app` | `BEGIN; UPDATE public.payment SET transaction_id=transaction_id; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E44 | `parkit_app` | `BEGIN; UPDATE public.staff_user SET role=role; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E45 | `parkit_app` | `BEGIN; INSERT INTO public.parking_zone(zone_name,max_capacity) VALUES('ACT4-NO',1); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E46 | `parkit_app` | `BEGIN; INSERT INTO public.staff_user(username,password_hash,role) VALUES('ACT4-NO','noncredential-probe','Staff'); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E47 | `parkit_app` | `BEGIN; DELETE FROM public.staff_user; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E48 | `parkit_app` | `BEGIN; DELETE FROM public.parking_zone; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E49 | `parkit_app` | `BEGIN; DELETE FROM public."transaction"; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E50 | `parkit_app` | `BEGIN; DELETE FROM public.payment; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E51 | `parkit_app` | `BEGIN; CREATE TABLE public.act4_forbidden(id integer); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E52 | `parkit_app` | `BEGIN; CREATE SCHEMA act4_forbidden; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E53 | `parkit_app` | `BEGIN; CREATE TEMP TABLE act4_forbidden(id integer); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E54 | `parkit_app` | `BEGIN; TRUNCATE public.vehicle; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E55 | `parkit_app` | `BEGIN; ALTER TABLE public.vehicle ADD COLUMN act4_forbidden integer; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E56 | `parkit_app` | `BEGIN; GRANT parkit_owner_grp TO parkit_app; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E57 | `parkit_app` | `BEGIN; SELECT nextval('public.staff_user_user_id_seq'); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E58 | `parkit_app` | `BEGIN; SELECT nextval('public.parking_zone_zone_id_seq'); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E59 | `parkit_app` | `BEGIN; SELECT setval('public.vehicle_vehicle_id_seq',999); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E60 | `parkit_auditor` | `BEGIN; CREATE TABLE public.act4_forbidden(id integer); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E61 | `parkit_auditor` | `BEGIN; CREATE SCHEMA act4_forbidden; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E62 | `parkit_auditor` | `BEGIN; CREATE TEMP TABLE act4_forbidden(id integer); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E63 | `parkit_auditor` | `BEGIN; TRUNCATE public.vehicle; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E64 | `parkit_auditor` | `BEGIN; ALTER TABLE public.vehicle ADD COLUMN act4_forbidden integer; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E65 | `parkit_auditor` | `BEGIN; GRANT parkit_owner_grp TO parkit_auditor; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E66 | `parkit_auditor` | `BEGIN; SELECT nextval('public.staff_user_user_id_seq'); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E67 | `parkit_auditor` | `BEGIN; SELECT nextval('public.parking_zone_zone_id_seq'); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E68 | `parkit_auditor` | `BEGIN; SELECT setval('public.vehicle_vehicle_id_seq',999); ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E69 | `parkit_auditor` | `BEGIN; INSERT INTO public."parking_zone" DEFAULT VALUES; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E70 | `parkit_auditor` | `BEGIN; UPDATE public."parking_zone" SET current_active_count=current_active_count; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E71 | `parkit_auditor` | `BEGIN; DELETE FROM public."parking_zone"; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E72 | `parkit_auditor` | `BEGIN; INSERT INTO public."vehicle" DEFAULT VALUES; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E73 | `parkit_auditor` | `BEGIN; UPDATE public."vehicle" SET vehicle_type=vehicle_type; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E74 | `parkit_auditor` | `BEGIN; DELETE FROM public."vehicle"; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E75 | `parkit_auditor` | `BEGIN; INSERT INTO public."staff_user" DEFAULT VALUES; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E76 | `parkit_auditor` | `BEGIN; UPDATE public."staff_user" SET role=role; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E77 | `parkit_auditor` | `BEGIN; DELETE FROM public."staff_user"; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E78 | `parkit_auditor` | `BEGIN; INSERT INTO public."transaction" DEFAULT VALUES; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E79 | `parkit_auditor` | `BEGIN; UPDATE public."transaction" SET status=status; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E80 | `parkit_auditor` | `BEGIN; DELETE FROM public."transaction"; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E81 | `parkit_auditor` | `BEGIN; INSERT INTO public."payment" DEFAULT VALUES; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E82 | `parkit_auditor` | `BEGIN; UPDATE public."payment" SET payment_method=payment_method; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E83 | `parkit_auditor` | `BEGIN; DELETE FROM public."payment"; ROLLBACK;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E84 | `parkit_auditor` | `SELECT nextval('public.vehicle_vehicle_id_seq');` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E85 | `parkit_auditor` | `SELECT nextval('public.transaction_transaction_id_seq');` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E86 | `parkit_auditor` | `SELECT nextval('public.payment_payment_id_seq');` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E87 | `parkit_dba` | `DBA owns/migrates project objects and provisions zone data; complete SQL in results.json E87` | Allowed | Succeeded; exit 0; [output](evidence/parkit_dba.txt) |
+| E88 | `parkit_dba` | `ANALYZE public.vehicle;` | Allowed | Succeeded; exit 0; [output](evidence/parkit_dba.txt) |
+| E89 | `parkit_app` | `SELECT * FROM public.act4_future_probe;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E90 | `parkit_app` | `SELECT nextval('public.act4_future_probe_id_seq');` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E91 | `parkit_app` | `SELECT public.act4_future_function();` | Denied 42501 | Rejected 42501; [output](evidence/parkit_app.txt) |
+| E92 | `parkit_auditor` | `SELECT * FROM public.act4_future_probe;` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E93 | `parkit_auditor` | `SELECT nextval('public.act4_future_probe_id_seq');` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E94 | `parkit_auditor` | `SELECT public.act4_future_function();` | Denied 42501 | Rejected 42501; [output](evidence/parkit_auditor.txt) |
+| E95 | `parkit_app` | `Business rule gap: duplicate active entries permitted by schema; complete SQL in results.json E95` | Allowed | Succeeded; exit 0; [output](evidence/parkit_app.txt) |
+| E96 | `parkit_app` | `BEGIN; UPDATE public.parking_zone SET current_active_count=-1 RETURNING current_active_count; ROLLBACK;` | Allowed | Succeeded; exit 0; [output](evidence/parkit_app.txt) |
 
-| Test | Account | SQL statement or operation | Expected | Actual result / evidence | Status |
-|---|---|---|---|---|---|
-| E01 | `park_it_app` | Vehicle SELECT and operational table counts (§3) | Allowed | SELECT succeeded; all counts 0 | PASS |
-| E02 | `park_it_app` | Actual vehicle INSERT with default generated ID (§3) | Allowed | `INSERT 0 1`, ID 1; rolled back; remaining test rows 0 | PASS |
-| E03 | `park_it_app` | UPDATE vehicle, zone, transaction and payment; DELETE vehicle, all `WHERE false` (§3) | Allowed | Four `UPDATE 0` results; `DELETE 0` | PASS for privilege checks |
-| E04 | `park_it_app` | `DELETE FROM public.payment WHERE false;` | Denied | `permission denied for table payment` | PASS |
-| E05 | `park_it_app` | `UPDATE public.staff_user SET username=username WHERE false;` | Denied | `permission denied for table staff_user` | PASS |
-| E06 | `park_it_app` | `CREATE DATABASE park_it_part_e_probe_20261106;` | Denied | `permission denied to create database` | PASS |
-| E07 | `park_it_app` | `CREATE ROLE park_it_part_e_probe_20261106 NOLOGIN;` | Denied | `permission denied to create role` | PASS |
-| E08 | `park_it_app` | `CREATE TABLE public.part_e_probe_20261106 (id integer);` | Denied | `permission denied for schema public` | PASS |
-| E09 | `park_it_auditor` | SELECT operational tables and approved staff columns (§4) | Allowed | All SELECT statements succeeded; operational counts 0 | PASS |
-| E10 | `park_it_auditor` | `SELECT password_hash FROM public.staff_user LIMIT 0;` | Denied | `permission denied for table staff_user` | PASS |
-| E11a | `park_it_auditor` | `UPDATE public.vehicle SET vehicle_type=vehicle_type WHERE false;` | Denied | `permission denied for table vehicle` | PASS |
-| E11b | `park_it_auditor` | Vehicle INSERT (§4) | Denied | `permission denied for table vehicle` | PASS |
-| E11c | `park_it_auditor` | `DELETE FROM public.vehicle WHERE false;` | Denied | `permission denied for table vehicle` | PASS |
-| E12 | `park_it_auditor` | `CREATE DATABASE park_it_part_e_auditor_probe_20261106;` | Denied | `permission denied to create database` | PASS |
-| E13 | `park_it_dba` | Staff SELECT, vehicle INSERT, zone UPDATE, payment DELETE, table creation (§5) | Allowed | SELECT succeeded; `INSERT 0 1`, ID 2; `UPDATE 0`, `DELETE 0`, `CREATE TABLE`; rolled back | PASS for tested operations |
-| E14a | `park_it_dba` | `CREATE DATABASE park_it_part_e_dba_probe_20261106;` | Denied under configured attributes | `permission denied to create database` | PASS |
-| E14b | `park_it_dba` | `CREATE ROLE park_it_part_e_dba_probe_20261106 NOLOGIN;` | Denied under configured attributes | `permission denied to create role` | PASS |
-| E15a | `park_it_app` | Connect to unrelated `postgres` database (§6) | Denied | Connection succeeded | **FAIL – unresolved** |
-| E15b | `park_it_auditor` | Connect to unrelated `postgres` database (§6) | Denied | Connection succeeded | **FAIL – unresolved** |
-| E15c | `park_it_dba` | Connect to unrelated `postgres` database (§6) | Denied for project-scoped administration | Connection succeeded | **FAIL – unresolved** |
+## 3. Representative actual output
 
-## 3. Runtime statements and captured evidence
-
-Connected as `park_it_app` to `grp_parkitdb`:
-
-```sql
-SELECT vehicle_id, license_plate, vehicle_type FROM public.vehicle LIMIT 0;
-BEGIN;
-INSERT INTO public.vehicle (license_plate, vehicle_type)
-VALUES ('E4-' || pg_backend_pid(), 'Part E verification')
-RETURNING vehicle_id, license_plate, vehicle_type;
-ROLLBACK;
-SELECT count(*) AS remaining_test_rows FROM public.vehicle
-WHERE license_plate = 'E4-' || pg_backend_pid();
-
-BEGIN;
-UPDATE public.vehicle SET vehicle_type=vehicle_type WHERE false;
-UPDATE public.parking_zone SET current_active_count=current_active_count WHERE false;
-UPDATE public."transaction" SET status=status WHERE false;
-UPDATE public.payment SET payment_method=payment_method WHERE false;
-DELETE FROM public.vehicle WHERE false;
-ROLLBACK;
-```
-
-The SELECT succeeded with the requested column headers and `(0 rows)`. Captured INSERT evidence:
+The runtime lifecycle case (E34) creates a disposable vehicle, entry and payment, locks the rows used by the PHP workflow, updates the exit and occupancy, and corrects only the payment method. It returns:
 
 ```text
- vehicle_id | license_plate |    vehicle_type
-------------+---------------+---------------------
-          1 | E4-20188      | Part E verification
+  status   | amount | payment_method
+-----------+--------+----------------
+ Completed |  50.00 | GCash
 (1 row)
 
-INSERT 0 1
 ROLLBACK
- remaining_test_rows
----------------------
-                   0
-(1 row)
 ```
 
-The four UPDATE statements returned `UPDATE 0`; DELETE returned `DELETE 0`. The actual INSERT also exercised the default `vehicle_vehicle_id_seq` sequence.
-
-The E04, E05 and E08 statements in the results table each ran inside a separate `BEGIN` / `ROLLBACK`. E06 and E07 ran outside transactions so that their errors tested privileges rather than transaction-block restrictions. Captured errors, in order:
-
-```text
-ERROR:  42501: permission denied for table payment
-ERROR:  42501: permission denied for table staff_user
-ERROR:  42501: permission denied to create database
-ERROR:  42501: permission denied to create role
-DETAIL:  Only roles with the CREATEROLE attribute may create roles.
-ERROR:  42501: permission denied for schema public
-```
-
-This actual data-read query was also run separately under **all three logins**:
-
-```sql
-SELECT current_user,
-       (SELECT count(*) FROM public.vehicle) AS vehicles,
-       (SELECT count(*) FROM public.parking_zone) AS zones,
-       (SELECT count(*) FROM public."transaction") AS transactions,
-       (SELECT count(*) FROM public.payment) AS payments;
-```
-
-Combined evidence from the three separate one-row outputs:
-
-```text
-  current_user   | vehicles | zones | transactions | payments
------------------+----------+-------+--------------+----------
- park_it_app     |        0 |     0 |            0 |        0
- park_it_auditor |        0 |     0 |            0 |        0
- park_it_dba     |        0 |     0 |            0 |        0
-```
-
-## 4. Auditor statements and captured evidence
-
-Connected as `park_it_auditor`:
-
-```sql
-SELECT * FROM public.vehicle LIMIT 0;
-SELECT * FROM public.parking_zone LIMIT 0;
-SELECT * FROM public."transaction" LIMIT 0;
-SELECT * FROM public.payment LIMIT 0;
-SELECT user_id, username, role FROM public.staff_user LIMIT 0;
-SELECT password_hash FROM public.staff_user LIMIT 0;
-
-BEGIN;
-UPDATE public.vehicle SET vehicle_type=vehicle_type WHERE false;
-ROLLBACK;
-BEGIN;
-INSERT INTO public.vehicle (license_plate, vehicle_type)
-VALUES ('E4-' || pg_backend_pid(), 'Part E verification');
-ROLLBACK;
-BEGIN;
-DELETE FROM public.vehicle WHERE false;
-ROLLBACK;
-CREATE DATABASE park_it_part_e_auditor_probe_20261106;
-```
-
-The first five SELECT statements succeeded, returning requested column headers and `(0 rows)`. `LIMIT 0` still checks column permissions and avoids exposing staff records. The separate count query in §3 also performed actual operational-table reads.
-
-Captured errors for password-hash SELECT, UPDATE, INSERT, DELETE and CREATE DATABASE, respectively:
+The auditor can select staff identity columns but cannot select hashes or use `SELECT *`:
 
 ```text
 ERROR:  42501: permission denied for table staff_user
-ERROR:  42501: permission denied for table vehicle
-ERROR:  42501: permission denied for table vehicle
-ERROR:  42501: permission denied for table vehicle
-ERROR:  42501: permission denied to create database
 ```
 
-## 5. DBA statements and captured evidence
-
-Connected as `park_it_dba`:
-
-```sql
-BEGIN;
-SELECT user_id, username, role FROM public.staff_user LIMIT 0;
-INSERT INTO public.vehicle (license_plate, vehicle_type)
-VALUES ('E4-' || pg_backend_pid(), 'Part E DBA verification') RETURNING vehicle_id;
-UPDATE public.parking_zone SET current_active_count=current_active_count WHERE false;
-DELETE FROM public.payment WHERE false;
-CREATE TABLE public.part_e_dba_probe_20261106 (id integer);
-ROLLBACK;
-SELECT to_regclass('public.part_e_dba_probe_20261106') IS NULL AS probe_table_removed;
-SELECT count(*) AS remaining_test_rows FROM public.vehicle
-WHERE license_plate='E4-' || pg_backend_pid();
-CREATE DATABASE park_it_part_e_dba_probe_20261106;
-CREATE ROLE park_it_part_e_dba_probe_20261106 NOLOGIN;
-```
-
-Staff SELECT succeeded. Captured output excerpts:
+Runtime changes to protected payment columns, transaction linkage/entry time, capacity and staff roles are rejected. Permission checks occur even when a protected table is empty; these denial statements do not rely on rows being present. Positive write tests create actual rows within their rollback transaction. The referenced-vehicle test reaches the DELETE privilege successfully and is then rejected by its foreign key:
 
 ```text
- vehicle_id
-------------
-          2
-(1 row)
-
-INSERT 0 1
-UPDATE 0
-DELETE 0
-CREATE TABLE
-ROLLBACK
- probe_table_removed
----------------------
- t
-(1 row)
-
- remaining_test_rows
----------------------
-                   0
-(1 row)
-
-ERROR:  42501: permission denied to create database
-ERROR:  42501: permission denied to create role
-DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+ERROR:  23503: update or delete on table "vehicle" violates foreign key constraint "transaction_vehicle_id_fkey" on table "transaction"
 ```
 
-The DBA account can administer the tested existing objects and create objects in `public`. It is not a cluster administrator. Database-level `ALL PRIVILEGES` does not grant the `CREATEDB` or `CREATEROLE` attributes; provisioning database roles still requires an appropriately authorized account.
-
-## 6. Unrelated-database failure and investigation
-
-Actual separate connection attempts:
-
-```sh
-psql -X -w -U park_it_app -d postgres
-psql -X -w -U park_it_auditor -d postgres
-psql -X -w -U park_it_dba -d postgres
-```
-
-Each ran `SELECT session_user, current_user, current_database();`. All connections succeeded. Combined evidence from separate sessions:
+All three project logins are denied connections to each unrelated/default test target:
 
 ```text
-  session_user   |  current_user   | current_database
------------------+-----------------+------------------
- park_it_app     | park_it_app     | postgres
- park_it_auditor | park_it_auditor | postgres
- park_it_dba     | park_it_dba     | postgres
+FATAL:  permission denied for database "parkit_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
 ```
 
-Investigation queries executed under `park_it_app`:
+[Catalog evidence](evidence/catalog.txt) independently confirms role attributes, memberships, database/schema/object ownership, table/column ACLs, defaults, constraints, indexes and final row counts. DBA ownership gives project DDL/maintenance authority; it does not grant cluster SUPERUSER, CREATEDB or CREATEROLE.
 
-```sql
-SELECT rolname, rolcanlogin, rolsuper, rolcreatedb, rolcreaterole, rolinherit
-FROM pg_roles WHERE rolname LIKE 'park_it_%' ORDER BY rolname;
+## 4. Application-level validation
 
-SELECT member.rolname AS login, parent.rolname AS group_role
-FROM pg_auth_members m
-JOIN pg_roles member ON member.oid=m.member
-JOIN pg_roles parent ON parent.oid=m.roleid
-WHERE member.rolname LIKE 'park_it_%';
+[The HTTP validation transcript](evidence/application_validation.txt) records requests made by [validate_application.py](validate_application.py) against a private copy of the pinned source. Only connection configuration was adapted to private environment values. PHP connected as **`parkit_app`** with its private password. No UI/browser interaction, Apache/XAMPP setup or automated upstream test suite is claimed.
 
-SELECT datname, pg_get_userbyid(datdba) AS owner, datacl
-FROM pg_database WHERE datname IN ('grp_parkitdb','postgres');
-SELECT nspname, nspacl FROM pg_namespace WHERE nspname='public';
-SELECT tablename, tableowner FROM pg_tables WHERE schemaname='public';
+| Operation | Actual result |
+|---|---|
+| Staff login | Successful authentication and redirect to populated dashboard |
+| Staff vehicle registration | Vehicle and Active transaction persisted; occupancy became 1 — violates documented Admin-only policy |
+| Staff vehicle edit | License plate changed — same unresolved role-policy failure |
+| Monitoring page/API | HTTP 200; API returned valid JSON |
+| Vehicle payment/exit | Completed transaction, amount 50.00, Cash payment, occupancy returned to 0 |
+| Receipt/payment-method correction | Receipt retrieved; method changed to GCash using the narrow UPDATE grant |
+| Admin login/dashboard | Successful with the same restricted service login |
+| Cleanup | Named test payment/transaction/vehicle removed by DBA; seed records retained; PHP server stopped |
 
-SELECT grantee, table_name, privilege_type
-FROM information_schema.table_privileges
-WHERE table_schema='public'
-  AND grantee IN ('PUBLIC','park_it_app','park_it_runtime_grp')
-ORDER BY grantee, table_name, privilege_type;
+The HTTP tests prove the normal database workflow works without superuser privileges. They also show why database roles cannot distinguish Admin and Staff when both use the same PHP service account. Owners must enforce `isAdmin()` or equivalent authorization on the vehicle endpoints, and review other role-sensitive actions.
 
-SELECT datname, has_database_privilege(current_user, oid, 'CONNECT') AS can_connect
-FROM pg_database WHERE datallowconn ORDER BY datname;
-```
+## 5. Remaining findings, fixes and limits
 
-Findings:
+- **Fixed in the evaluated local setup:** superuser runtime connection, missing group/login separation, overly broad PUBLIC access, missing insert-sequence permissions, and grants that did not match feature SQL. Runtime UPDATE is restricted to needed columns, and auditor staff access excludes hashes. The original repository is unchanged.
+- **Unresolved application authorization:** Staff can register/edit vehicles despite the published policy. Captured HTTP evidence records this as a finding, not a passed policy check.
+- **Unresolved database integrity:** E95 inserts two Active transactions for one vehicle; E96 sets occupancy to -1. Both succeed and roll back. Recommend a reviewed unique active-entry rule and nonnegative capacity/occupancy CHECKs, alongside explicit state-transition validation. These schema changes were not applied because the source's table/column structure was preserved.
+- **History protection has limits:** denial of transaction/payment DELETE and protected-column UPDATE does not guarantee valid amounts, chronology, status or relationships on INSERT. Trusted DBA ownership is also intentionally powerful. Further business validation needs reviewed constraints, guarded routines or application controls.
+- **Lab scope:** this is an isolated local PostgreSQL/PHP test, with only disposable demo data. Network TLS, external hosts, concurrent-load behavior, production deployment and long-term credential management were not evaluated. Loopback SCRAM authentication was exercised. Initial default-socket connection failed because no default server was running; the separate cluster resolved that environment issue.
+- **Final state:** one 50-space zone at occupancy 0, two application users, zero vehicles, transactions and payments; no probe tables/functions remain. Sequence counters may contain gaps.
 
-- All six Park It roles have `rolsuper = f`, `rolcreatedb = f`, `rolcreaterole = f`, and `rolinherit = t`. Only the three account roles have `rolcanlogin = t`.
-- Each login has only its corresponding group membership: runtime, readonly or admin. No unexpected membership was returned for these roles.
-- The project database and all five existing tables are owned by `postgres`, not a tested account. Object ownership does not explain these connections.
-- `postgres.datacl` is NULL: default database privileges apply, including CONNECT for `PUBLIC`. This explains access without a direct login-specific grant.
-- `grp_parkitdb.datacl` is `{=Tc/postgres,postgres=CTc/postgres,park_it_admin_grp=CTc/postgres,park_it_runtime_grp=c/postgres,park_it_readonly_grp=c/postgres}`. The `=Tc` entry retains `PUBLIC` TEMPORARY and CONNECT privileges on the project database too.
-- The `public` schema retains `PUBLIC` USAGE, but not CREATE. The table-grant query returned only the planned runtime group grants; no direct `park_it_app` or `PUBLIC` table grants were returned by that query.
-- Runtime effective CONNECT was also true for `company_db`, `grp05_lostandfounddb`, `grp05_lostandfounddb_clone`, `grp_brewposdb` and `template1`, and false for `loan_system_demo`. These were catalog checks; actual unrelated-database connections were tested only against `postgres`. Connection access does not establish access to its tables.
+Feedback and recommended fixes are documented in these reports but were **not sent** to owners. Tracker edits, a consolidated submission PDF and commits remain separate submission steps; no such actions are claimed.
 
-**The unrelated-database restriction remains unresolved.** Shared database permissions were not changed during Part E. An administrator must review legitimate users of affected databases, preserve their explicit CONNECT grants, and revoke inappropriate `PUBLIC` CONNECT. Revoking only a direct login grant cannot remove access inherited through `PUBLIC`. The project database's PUBLIC defaults also need review. After remediation, rerun the actual connection tests for all three logins and check other applicable access paths before claiming completion.
+## 6. AI usage declaration
 
-## 7. Cleanup, limits and AI validation
-
-Both successful vehicle inserts were rolled back; cleanup queries found zero remaining test rows. The DBA test table was rolled back and verified absent. Denied CREATE statements created no database or role. PostgreSQL sequence increments are not rolled back: successful inserts consumed vehicle IDs 1 and 2. The sequence was not reset.
-
-`WHERE false` UPDATE/DELETE tests verify privileges without changing records; they do not test modifications to populated records or application business rules. `LIMIT 0` verifies requested column privileges. Actual INSERT and count queries supplement these checks. The four operational tables were empty. Transaction/payment INSERTs, their sequences, full application workflows, future-object permissions and a complete table/column permission matrix were not exercised and are not claimed as passing.
-
-AI assistance prepared and executed the psql tests and wrote this report. Validation used actual independent account connections, SQL results, SQLSTATE errors, catalog inspection and rollback checks. No actual passwords or password hashes are included.
-
-The tested table restrictions and role-attribute restrictions behaved as intended. Unrelated-database connections failed the expected restriction, so the overall access-control configuration must not yet be reported as fully verified or complete.
+OpenAI Codex assisted with reading the Activity 4 PDF and repository documents, tracing PHP database operations, preparing the access plan and SQL/scripts, executing local setup/tests and drafting these reports. Generated grants were checked against the source SQL and final PostgreSQL catalogs. Each restricted login was tested directly with both allowed and denied operations; psql outcomes were checked against expected error diagnostics. HTTP requests independently exercised the actual PHP workflow and confirmed its authorization limitation. Secrets, cookies, source configuration credentials, staff hashes and the seeder's credential-bearing output were excluded from submitted evidence.

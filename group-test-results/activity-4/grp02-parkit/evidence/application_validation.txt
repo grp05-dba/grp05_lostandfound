@@ -1,0 +1,21 @@
+GET auth/login.php: HTTP 200, final route auth/login.php
+POST auth/login.php: HTTP 200, final route dashboard.php
+Staff login succeeded; submitted credentials and session cookies omitted.
+POST modules/vehicles/index.php: HTTP 200, final route modules/vehicles/index.php
+STAFF POLICY GAP: Staff POST successfully registered a vehicle despite the documented Admin-only policy.
+Database after entry: one disposable vehicle with Active transaction; 1 occupied space.
+POST modules/vehicles/edit.php?id=10: HTTP 200, final route modules/vehicles/index.php
+STAFF POLICY GAP: Staff POST also successfully edited the vehicle.
+GET modules/monitoring/index.php: HTTP 200, final route modules/monitoring/index.php
+GET modules/monitoring/api_status.php: HTTP 200, final route modules/monitoring/api_status.php
+Monitoring API returned valid JSON.
+GET modules/payments/index.php?license_plate=ACT4-HTTP-EDIT: HTTP 200, final route modules/payments/index.php?license_plate=ACT4-HTTP-EDIT
+POST modules/payments/process.php: HTTP 200, final route modules/payments/history.php?receipt_id=4
+Database after payment: Completed|50.00|Cash; occupancy=0
+POST modules/payments/history.php: HTTP 200, final route modules/payments/history.php?receipt_id=4
+Payment-method correction persisted as GCash using the runtime column grant; receipt read succeeded.
+GET auth/logout.php: HTTP 200, final route auth/login.php
+POST auth/login.php: HTTP 200, final route dashboard.php
+Admin login and populated dashboard succeeded with the same restricted service account.
+GET auth/logout.php: HTTP 200, final route auth/login.php
+Disposable HTTP test records removed by DBA; seed records retained. PHP test server stopped.

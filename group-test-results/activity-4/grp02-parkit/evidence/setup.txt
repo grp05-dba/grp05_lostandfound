@@ -1,0 +1,159 @@
+\set ON_ERROR_STOP on
+-- Fresh isolated lab only; connect as the provisioning administrator to postgres.
+CREATE ROLE parkit_owner_grp NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE parkit_runtime_grp NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE parkit_readonly_grp NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE parkit_app LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE parkit_auditor LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+CREATE ROLE parkit_dba LOGIN INHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+CREATE ROLE
+GRANT parkit_runtime_grp TO parkit_app;
+GRANT ROLE
+GRANT parkit_readonly_grp TO parkit_auditor;
+GRANT ROLE
+GRANT parkit_owner_grp TO parkit_dba;
+GRANT ROLE
+CREATE DATABASE grp_parkitdb OWNER parkit_owner_grp;
+CREATE DATABASE
+CREATE DATABASE parkit_unrelateddb;
+CREATE DATABASE
+REVOKE ALL ON DATABASE grp_parkitdb FROM PUBLIC;
+REVOKE
+REVOKE ALL ON DATABASE parkit_unrelateddb FROM PUBLIC;
+REVOKE
+-- Only safe without further review in this new, dedicated lab cluster.
+REVOKE CONNECT, TEMPORARY ON DATABASE postgres FROM PUBLIC;
+REVOKE
+REVOKE CONNECT, TEMPORARY ON DATABASE template1 FROM PUBLIC;
+REVOKE
+GRANT CONNECT ON DATABASE grp_parkitdb TO parkit_runtime_grp, parkit_readonly_grp;
+GRANT
+-- Assign private passwords separately with psql \password; none are stored here.
+Private SCRAM credentials assigned to three project logins (values omitted).
+Imported upstream park-it/schema.sql unchanged:
+SET
+SET
+SET
+SET
+SET
+SET
+ set_config 
+------------
+ 
+(1 row)
+
+SET
+SET
+SET
+SET
+SET
+SET
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER SEQUENCE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER SEQUENCE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER SEQUENCE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER SEQUENCE
+ALTER SEQUENCE
+CREATE TABLE
+ALTER TABLE
+CREATE SEQUENCE
+ALTER SEQUENCE
+ALTER SEQUENCE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+\set ON_ERROR_STOP on
+-- Connect as provisioning administrator to grp_parkitdb after importing upstream schema.sql.
+-- The upstream plain dump explicitly assigns postgres ownership. Transfer each table;
+-- PostgreSQL also transfers its owned sequence. Do not globally REASSIGN postgres objects.
+ALTER SCHEMA public OWNER TO parkit_owner_grp;
+ALTER SCHEMA
+ALTER TABLE public.parking_zone OWNER TO parkit_owner_grp;
+ALTER TABLE
+ALTER TABLE public.vehicle OWNER TO parkit_owner_grp;
+ALTER TABLE
+ALTER TABLE public.staff_user OWNER TO parkit_owner_grp;
+ALTER TABLE
+ALTER TABLE public."transaction" OWNER TO parkit_owner_grp;
+ALTER TABLE
+ALTER TABLE public.payment OWNER TO parkit_owner_grp;
+ALTER TABLE
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC;
+REVOKE
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC;
+REVOKE
+GRANT USAGE ON SCHEMA public TO parkit_runtime_grp, parkit_readonly_grp;
+GRANT
+GRANT SELECT ON public.parking_zone, public.vehicle, public.staff_user,
+    public."transaction", public.payment TO parkit_runtime_grp;
+GRANT
+GRANT INSERT ON public.vehicle, public."transaction", public.payment TO parkit_runtime_grp;
+GRANT
+GRANT DELETE ON public.vehicle TO parkit_runtime_grp;
+GRANT
+GRANT UPDATE (license_plate, vehicle_type) ON public.vehicle TO parkit_runtime_grp;
+GRANT
+GRANT UPDATE (current_active_count) ON public.parking_zone TO parkit_runtime_grp;
+GRANT
+GRANT UPDATE (exit_time, status, is_lost_ticket) ON public."transaction" TO parkit_runtime_grp;
+GRANT
+GRANT UPDATE (payment_method) ON public.payment TO parkit_runtime_grp;
+GRANT
+GRANT USAGE ON SEQUENCE public.vehicle_vehicle_id_seq,
+    public.transaction_transaction_id_seq, public.payment_payment_id_seq TO parkit_runtime_grp;
+GRANT
+GRANT SELECT ON public.parking_zone, public.vehicle, public."transaction", public.payment TO parkit_readonly_grp;
+GRANT
+GRANT SELECT (user_id, username, role) ON public.staff_user TO parkit_readonly_grp;
+GRANT
+-- Future objects fail closed until explicit, reviewed grants are applied.
+ALTER DEFAULT PRIVILEGES FOR ROLE parkit_owner_grp IN SCHEMA public REVOKE ALL ON TABLES FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES FOR ROLE parkit_owner_grp IN SCHEMA public REVOKE ALL ON SEQUENCES FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES FOR ROLE parkit_owner_grp REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES FOR ROLE parkit_dba REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES
+ALTER ROLE parkit_app IN DATABASE grp_parkitdb SET search_path = public;
+ALTER ROLE
+ALTER ROLE parkit_app IN DATABASE grp_parkitdb SET statement_timeout = '30s';
+ALTER ROLE
+ALTER ROLE parkit_app IN DATABASE grp_parkitdb SET lock_timeout = '10s';
+ALTER ROLE
+Upstream config/seed.php executed via PHP CLI as parkit_dba: initialization success; raw HTML omitted because it prints demo credentials.

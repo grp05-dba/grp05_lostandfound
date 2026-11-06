@@ -1,0 +1,246 @@
+          captured_at          |                                        version                                        | current_database | session_user | current_user 
+-------------------------------+---------------------------------------------------------------------------------------+------------------+--------------+--------------
+ 2026-11-06 21:32:52.675221+08 | PostgreSQL 18.6 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 16.2.1 20260810, 64-bit | grp_parkitdb     | postgres     | postgres
+(1 row)
+
+       rolname       | rolcanlogin | rolinherit | rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolbypassrls 
+---------------------+-------------+------------+----------+-------------+---------------+----------------+--------------
+ parkit_app          | t           | t          | f        | f           | f             | f              | f
+ parkit_auditor      | t           | t          | f        | f           | f             | f              | f
+ parkit_dba          | t           | t          | f        | f           | f             | f              | f
+ parkit_owner_grp    | f           | t          | f        | f           | f             | f              | f
+ parkit_readonly_grp | f           | t          | f        | f           | f             | f              | f
+ parkit_runtime_grp  | f           | t          | f        | f           | f             | f              | f
+(6 rows)
+
+     group_role      |     login      | admin_option | inherit_option | set_option 
+---------------------+----------------+--------------+----------------+------------
+ parkit_runtime_grp  | parkit_app     | f            | t              | t
+ parkit_readonly_grp | parkit_auditor | f            | t              | t
+ parkit_owner_grp    | parkit_dba     | f            | t              | t
+(3 rows)
+
+      datname       |      owner       |                                                        datacl                                                        
+--------------------+------------------+----------------------------------------------------------------------------------------------------------------------
+ grp_parkitdb       | parkit_owner_grp | {parkit_owner_grp=CTc/parkit_owner_grp,parkit_runtime_grp=c/parkit_owner_grp,parkit_readonly_grp=c/parkit_owner_grp}
+ parkit_unrelateddb | postgres         | {postgres=CTc/postgres}
+ postgres           | postgres         | {postgres=CTc/postgres}
+ template0          | postgres         | {=c/postgres,postgres=CTc/postgres}
+ template1          | postgres         | {postgres=CTc/postgres}
+(5 rows)
+
+ nspname |      owner       |                                                       nspacl                                                        
+---------+------------------+---------------------------------------------------------------------------------------------------------------------
+ public  | parkit_owner_grp | {parkit_owner_grp=UC/parkit_owner_grp,parkit_runtime_grp=U/parkit_owner_grp,parkit_readonly_grp=U/parkit_owner_grp}
+(1 row)
+
+            relname             | relkind |      owner       |                                                           relacl                                                            
+--------------------------------+---------+------------------+-----------------------------------------------------------------------------------------------------------------------------
+ parking_zone_zone_id_seq       | S       | parkit_owner_grp | {parkit_owner_grp=rwU/parkit_owner_grp}
+ payment_payment_id_seq         | S       | parkit_owner_grp | {parkit_owner_grp=rwU/parkit_owner_grp,parkit_runtime_grp=U/parkit_owner_grp}
+ staff_user_user_id_seq         | S       | parkit_owner_grp | {parkit_owner_grp=rwU/parkit_owner_grp}
+ transaction_transaction_id_seq | S       | parkit_owner_grp | {parkit_owner_grp=rwU/parkit_owner_grp,parkit_runtime_grp=U/parkit_owner_grp}
+ vehicle_vehicle_id_seq         | S       | parkit_owner_grp | {parkit_owner_grp=rwU/parkit_owner_grp,parkit_runtime_grp=U/parkit_owner_grp}
+ parking_zone_pkey              | i       | parkit_owner_grp | 
+ parking_zone_zone_name_key     | i       | parkit_owner_grp | 
+ payment_pkey                   | i       | parkit_owner_grp | 
+ payment_transaction_id_key     | i       | parkit_owner_grp | 
+ staff_user_pkey                | i       | parkit_owner_grp | 
+ staff_user_username_key        | i       | parkit_owner_grp | 
+ transaction_pkey               | i       | parkit_owner_grp | 
+ vehicle_license_plate_key      | i       | parkit_owner_grp | 
+ vehicle_pkey                   | i       | parkit_owner_grp | 
+ parking_zone                   | r       | parkit_owner_grp | {parkit_owner_grp=arwdDxtm/parkit_owner_grp,parkit_runtime_grp=r/parkit_owner_grp,parkit_readonly_grp=r/parkit_owner_grp}
+ payment                        | r       | parkit_owner_grp | {parkit_owner_grp=arwdDxtm/parkit_owner_grp,parkit_runtime_grp=ar/parkit_owner_grp,parkit_readonly_grp=r/parkit_owner_grp}
+ staff_user                     | r       | parkit_owner_grp | {parkit_owner_grp=arwdDxtm/parkit_owner_grp,parkit_runtime_grp=r/parkit_owner_grp}
+ transaction                    | r       | parkit_owner_grp | {parkit_owner_grp=arwdDxtm/parkit_owner_grp,parkit_runtime_grp=ar/parkit_owner_grp,parkit_readonly_grp=r/parkit_owner_grp}
+ vehicle                        | r       | parkit_owner_grp | {parkit_owner_grp=arwdDxtm/parkit_owner_grp,parkit_runtime_grp=ard/parkit_owner_grp,parkit_readonly_grp=r/parkit_owner_grp}
+(19 rows)
+
+  table_name  |     column_name      | privilege_type |       grantee       
+--------------+----------------------+----------------+---------------------
+ parking_zone | current_active_count | SELECT         | parkit_readonly_grp
+ parking_zone | max_capacity         | SELECT         | parkit_readonly_grp
+ parking_zone | zone_id              | SELECT         | parkit_readonly_grp
+ parking_zone | zone_name            | SELECT         | parkit_readonly_grp
+ parking_zone | current_active_count | SELECT         | parkit_runtime_grp
+ parking_zone | max_capacity         | SELECT         | parkit_runtime_grp
+ parking_zone | zone_id              | SELECT         | parkit_runtime_grp
+ parking_zone | zone_name            | SELECT         | parkit_runtime_grp
+ parking_zone | current_active_count | UPDATE         | parkit_runtime_grp
+ payment      | amount               | SELECT         | parkit_readonly_grp
+ payment      | payment_id           | SELECT         | parkit_readonly_grp
+ payment      | payment_method       | SELECT         | parkit_readonly_grp
+ payment      | payment_time         | SELECT         | parkit_readonly_grp
+ payment      | transaction_id       | SELECT         | parkit_readonly_grp
+ payment      | amount               | INSERT         | parkit_runtime_grp
+ payment      | payment_id           | INSERT         | parkit_runtime_grp
+ payment      | payment_method       | INSERT         | parkit_runtime_grp
+ payment      | payment_time         | INSERT         | parkit_runtime_grp
+ payment      | transaction_id       | INSERT         | parkit_runtime_grp
+ payment      | amount               | SELECT         | parkit_runtime_grp
+ payment      | payment_id           | SELECT         | parkit_runtime_grp
+ payment      | payment_method       | SELECT         | parkit_runtime_grp
+ payment      | payment_time         | SELECT         | parkit_runtime_grp
+ payment      | transaction_id       | SELECT         | parkit_runtime_grp
+ payment      | payment_method       | UPDATE         | parkit_runtime_grp
+ staff_user   | role                 | SELECT         | parkit_readonly_grp
+ staff_user   | user_id              | SELECT         | parkit_readonly_grp
+ staff_user   | username             | SELECT         | parkit_readonly_grp
+ staff_user   | password_hash        | SELECT         | parkit_runtime_grp
+ staff_user   | role                 | SELECT         | parkit_runtime_grp
+ staff_user   | user_id              | SELECT         | parkit_runtime_grp
+ staff_user   | username             | SELECT         | parkit_runtime_grp
+ transaction  | entry_time           | SELECT         | parkit_readonly_grp
+ transaction  | exit_time            | SELECT         | parkit_readonly_grp
+ transaction  | is_lost_ticket       | SELECT         | parkit_readonly_grp
+ transaction  | status               | SELECT         | parkit_readonly_grp
+ transaction  | transaction_id       | SELECT         | parkit_readonly_grp
+ transaction  | vehicle_id           | SELECT         | parkit_readonly_grp
+ transaction  | zone_id              | SELECT         | parkit_readonly_grp
+ transaction  | entry_time           | INSERT         | parkit_runtime_grp
+ transaction  | exit_time            | INSERT         | parkit_runtime_grp
+ transaction  | is_lost_ticket       | INSERT         | parkit_runtime_grp
+ transaction  | status               | INSERT         | parkit_runtime_grp
+ transaction  | transaction_id       | INSERT         | parkit_runtime_grp
+ transaction  | vehicle_id           | INSERT         | parkit_runtime_grp
+ transaction  | zone_id              | INSERT         | parkit_runtime_grp
+ transaction  | entry_time           | SELECT         | parkit_runtime_grp
+ transaction  | exit_time            | SELECT         | parkit_runtime_grp
+ transaction  | is_lost_ticket       | SELECT         | parkit_runtime_grp
+ transaction  | status               | SELECT         | parkit_runtime_grp
+ transaction  | transaction_id       | SELECT         | parkit_runtime_grp
+ transaction  | vehicle_id           | SELECT         | parkit_runtime_grp
+ transaction  | zone_id              | SELECT         | parkit_runtime_grp
+ transaction  | exit_time            | UPDATE         | parkit_runtime_grp
+ transaction  | is_lost_ticket       | UPDATE         | parkit_runtime_grp
+ transaction  | status               | UPDATE         | parkit_runtime_grp
+ vehicle      | license_plate        | SELECT         | parkit_readonly_grp
+ vehicle      | vehicle_id           | SELECT         | parkit_readonly_grp
+ vehicle      | vehicle_type         | SELECT         | parkit_readonly_grp
+ vehicle      | license_plate        | INSERT         | parkit_runtime_grp
+ vehicle      | vehicle_id           | INSERT         | parkit_runtime_grp
+ vehicle      | vehicle_type         | INSERT         | parkit_runtime_grp
+ vehicle      | license_plate        | SELECT         | parkit_runtime_grp
+ vehicle      | vehicle_id           | SELECT         | parkit_runtime_grp
+ vehicle      | vehicle_type         | SELECT         | parkit_runtime_grp
+ vehicle      | license_plate        | UPDATE         | parkit_runtime_grp
+ vehicle      | vehicle_type         | UPDATE         | parkit_runtime_grp
+(67 rows)
+
+  table_name  |                  conname                   | contype |                             definition                              
+--------------+--------------------------------------------+---------+---------------------------------------------------------------------
+ parking_zone | parking_zone_check                         | c       | CHECK ((current_active_count <= max_capacity))
+ parking_zone | parking_zone_current_active_count_not_null | n       | NOT NULL current_active_count
+ parking_zone | parking_zone_max_capacity_not_null         | n       | NOT NULL max_capacity
+ parking_zone | parking_zone_pkey                          | p       | PRIMARY KEY (zone_id)
+ parking_zone | parking_zone_zone_id_not_null              | n       | NOT NULL zone_id
+ parking_zone | parking_zone_zone_name_key                 | u       | UNIQUE (zone_name)
+ parking_zone | parking_zone_zone_name_not_null            | n       | NOT NULL zone_name
+ payment      | payment_amount_check                       | c       | CHECK ((amount >= (0)::numeric))
+ payment      | payment_amount_not_null                    | n       | NOT NULL amount
+ payment      | payment_payment_id_not_null                | n       | NOT NULL payment_id
+ payment      | payment_payment_method_not_null            | n       | NOT NULL payment_method
+ payment      | payment_payment_time_not_null              | n       | NOT NULL payment_time
+ payment      | payment_pkey                               | p       | PRIMARY KEY (payment_id)
+ payment      | payment_transaction_id_fkey                | f       | FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id)
+ payment      | payment_transaction_id_key                 | u       | UNIQUE (transaction_id)
+ payment      | payment_transaction_id_not_null            | n       | NOT NULL transaction_id
+ staff_user   | staff_user_password_hash_not_null          | n       | NOT NULL password_hash
+ staff_user   | staff_user_pkey                            | p       | PRIMARY KEY (user_id)
+ staff_user   | staff_user_role_not_null                   | n       | NOT NULL role
+ staff_user   | staff_user_user_id_not_null                | n       | NOT NULL user_id
+ staff_user   | staff_user_username_key                    | u       | UNIQUE (username)
+ staff_user   | staff_user_username_not_null               | n       | NOT NULL username
+ transaction  | transaction_entry_time_not_null            | n       | NOT NULL entry_time
+ transaction  | transaction_is_lost_ticket_not_null        | n       | NOT NULL is_lost_ticket
+ transaction  | transaction_pkey                           | p       | PRIMARY KEY (transaction_id)
+ transaction  | transaction_status_not_null                | n       | NOT NULL status
+ transaction  | transaction_transaction_id_not_null        | n       | NOT NULL transaction_id
+ transaction  | transaction_vehicle_id_fkey                | f       | FOREIGN KEY (vehicle_id) REFERENCES vehicle(vehicle_id)
+ transaction  | transaction_vehicle_id_not_null            | n       | NOT NULL vehicle_id
+ transaction  | transaction_zone_id_fkey                   | f       | FOREIGN KEY (zone_id) REFERENCES parking_zone(zone_id)
+ transaction  | transaction_zone_id_not_null               | n       | NOT NULL zone_id
+ vehicle      | vehicle_license_plate_key                  | u       | UNIQUE (license_plate)
+ vehicle      | vehicle_license_plate_not_null             | n       | NOT NULL license_plate
+ vehicle      | vehicle_pkey                               | p       | PRIMARY KEY (vehicle_id)
+ vehicle      | vehicle_vehicle_id_not_null                | n       | NOT NULL vehicle_id
+ vehicle      | vehicle_vehicle_type_not_null              | n       | NOT NULL vehicle_type
+(36 rows)
+
+  table_name  |     column_name      |                   column_default                    | is_nullable 
+--------------+----------------------+-----------------------------------------------------+-------------
+ parking_zone | zone_id              | nextval('parking_zone_zone_id_seq'::regclass)       | NO
+ parking_zone | zone_name            |                                                     | NO
+ parking_zone | max_capacity         |                                                     | NO
+ parking_zone | current_active_count | 0                                                   | NO
+ payment      | payment_id           | nextval('payment_payment_id_seq'::regclass)         | NO
+ payment      | transaction_id       |                                                     | NO
+ payment      | amount               |                                                     | NO
+ payment      | payment_method       |                                                     | NO
+ payment      | payment_time         |                                                     | NO
+ staff_user   | user_id              | nextval('staff_user_user_id_seq'::regclass)         | NO
+ staff_user   | username             |                                                     | NO
+ staff_user   | password_hash        |                                                     | NO
+ staff_user   | role                 |                                                     | NO
+ transaction  | transaction_id       | nextval('transaction_transaction_id_seq'::regclass) | NO
+ transaction  | vehicle_id           |                                                     | NO
+ transaction  | zone_id              |                                                     | NO
+ transaction  | entry_time           |                                                     | NO
+ transaction  | exit_time            |                                                     | YES
+ transaction  | status               | 'Active'::character varying                         | NO
+ transaction  | is_lost_ticket       | false                                               | NO
+ vehicle      | vehicle_id           | nextval('vehicle_vehicle_id_seq'::regclass)         | NO
+ vehicle      | license_plate        |                                                     | NO
+ vehicle      | vehicle_type         |                                                     | NO
+(23 rows)
+
+ schemaname |         indexname          |                                           indexdef                                            
+------------+----------------------------+-----------------------------------------------------------------------------------------------
+ public     | parking_zone_pkey          | CREATE UNIQUE INDEX parking_zone_pkey ON public.parking_zone USING btree (zone_id)
+ public     | parking_zone_zone_name_key | CREATE UNIQUE INDEX parking_zone_zone_name_key ON public.parking_zone USING btree (zone_name)
+ public     | payment_pkey               | CREATE UNIQUE INDEX payment_pkey ON public.payment USING btree (payment_id)
+ public     | payment_transaction_id_key | CREATE UNIQUE INDEX payment_transaction_id_key ON public.payment USING btree (transaction_id)
+ public     | staff_user_pkey            | CREATE UNIQUE INDEX staff_user_pkey ON public.staff_user USING btree (user_id)
+ public     | staff_user_username_key    | CREATE UNIQUE INDEX staff_user_username_key ON public.staff_user USING btree (username)
+ public     | transaction_pkey           | CREATE UNIQUE INDEX transaction_pkey ON public.transaction USING btree (transaction_id)
+ public     | vehicle_license_plate_key  | CREATE UNIQUE INDEX vehicle_license_plate_key ON public.vehicle USING btree (license_plate)
+ public     | vehicle_pkey               | CREATE UNIQUE INDEX vehicle_pkey ON public.vehicle USING btree (vehicle_id)
+(9 rows)
+
+    defaclrole    | defaclnamespace | defaclobjtype |               defaclacl               
+------------------+-----------------+---------------+---------------------------------------
+ parkit_owner_grp | -               | f             | {parkit_owner_grp=X/parkit_owner_grp}
+ parkit_dba       | -               | f             | {parkit_dba=X/parkit_dba}
+(2 rows)
+
+  table_name  | count 
+--------------+-------
+ parking_zone |     1
+ staff_user   |     2
+ vehicle      |     0
+ transaction  |     0
+ payment      |     0
+(5 rows)
+
+ zone_id |    zone_name     | max_capacity | current_active_count 
+---------+------------------+--------------+----------------------
+       1 | Main Parking Lot |           50 |                    0
+(1 row)
+
+ user_id | username | role  
+---------+----------+-------
+       1 | admin    | Admin
+       2 | staff    | Staff
+(2 rows)
+
+ application_functions 
+-----------------------
+                     0
+(1 row)
+
+ application_triggers 
+----------------------
+                    0
+(1 row)
+

@@ -1,0 +1,652 @@
+Captured UTC: 2026-11-06T13:24:08.152393+00:00
+
+E01 Direct SCRAM login and identity
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+SELECT session_user = current_user AS identity_matches;
+ identity_matches 
+------------------
+ t
+(1 row)
+
+
+E02 Database creation denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+CREATE DATABASE parkit_forbidden_probe;
+ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:977
+
+E03 Role creation denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+CREATE ROLE parkit_forbidden_role;
+ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:316
+
+E04 Unrelated/default database CONNECT denied
+Expected: denied CONNECT privilege diagnostic (psql omits startup SQLSTATE)
+psql: error: connection to server at "127.0.0.1", port 55442 failed: FATAL:  permission denied for database "parkit_unrelateddb"
+DETAIL:  User does not have CONNECT privilege.
+
+E05 Unrelated/default database CONNECT denied
+Expected: denied CONNECT privilege diagnostic (psql omits startup SQLSTATE)
+psql: error: connection to server at "127.0.0.1", port 55442 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+E06 Unrelated/default database CONNECT denied
+Expected: denied CONNECT privilege diagnostic (psql omits startup SQLSTATE)
+psql: error: connection to server at "127.0.0.1", port 55442 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+E07 Cannot inherit provisioning superuser
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+SET ROLE postgres;
+ERROR:  42501: permission denied to set role "postgres"
+LOCATION:  call_string_check_hook, guc.c:6936
+
+E22 Runtime reads parking_zone
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+SELECT count(*) FROM public."parking_zone";
+ count 
+-------
+     1
+(1 row)
+
+
+E24 Runtime reads vehicle
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+SELECT count(*) FROM public."vehicle";
+ count 
+-------
+     0
+(1 row)
+
+
+E26 Runtime reads transaction
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+SELECT count(*) FROM public."transaction";
+ count 
+-------
+     0
+(1 row)
+
+
+E28 Runtime reads payment
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+SELECT count(*) FROM public."payment";
+ count 
+-------
+     0
+(1 row)
+
+
+E30 Runtime staff authentication fields accessible
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+SELECT user_id,username,role,(length(password_hash)>0) AS hash_present FROM public.staff_user;
+ user_id | username | role  | hash_present 
+---------+----------+-------+--------------
+       1 | admin    | Admin | t
+       2 | staff    | Staff | t
+(2 rows)
+
+
+E34 Runtime complete parking lifecycle, generated IDs and narrow updates
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+SELECT zone_id FROM public.parking_zone ORDER BY zone_id LIMIT 1 FOR UPDATE;
+ zone_id 
+---------
+       1
+(1 row)
+
+INSERT INTO public.vehicle(license_plate,vehicle_type) VALUES ('ACT4-PROBE','Car') RETURNING vehicle_id \gset
+INSERT 0 1
+INSERT INTO public."transaction"(vehicle_id,zone_id,entry_time)
+VALUES (:vehicle_id,(SELECT min(zone_id) FROM public.parking_zone),CURRENT_TIMESTAMP)
+RETURNING transaction_id \gset
+INSERT 0 1
+UPDATE public.parking_zone SET current_active_count=current_active_count+1;
+UPDATE 1
+SELECT t.transaction_id,t.status,v.license_plate FROM public."transaction" t
+JOIN public.vehicle v USING(vehicle_id) WHERE t.transaction_id=:transaction_id FOR UPDATE;
+ transaction_id | status | license_plate 
+----------------+--------+---------------
+              5 | Active | ACT4-PROBE
+(1 row)
+
+INSERT INTO public.payment(transaction_id,amount,payment_method,payment_time)
+VALUES (:transaction_id,50,'Cash',CURRENT_TIMESTAMP) RETURNING payment_id \gset
+INSERT 0 1
+UPDATE public."transaction" SET exit_time=CURRENT_TIMESTAMP,status='Completed',is_lost_ticket=false
+WHERE transaction_id=:transaction_id;
+UPDATE 1
+UPDATE public.parking_zone SET current_active_count=GREATEST(0,current_active_count-1);
+UPDATE 1
+UPDATE public.payment SET payment_method='GCash' WHERE payment_id=:payment_id;
+UPDATE 1
+SELECT t.status,p.amount,p.payment_method FROM public."transaction" t
+JOIN public.payment p USING(transaction_id) WHERE t.transaction_id=:transaction_id;
+  status   | amount | payment_method 
+-----------+--------+----------------
+ Completed |  50.00 | GCash
+(1 row)
+
+ROLLBACK;
+ROLLBACK
+
+E35 Runtime edits and deletes unreferenced vehicle
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+INSERT INTO public.vehicle(license_plate,vehicle_type) VALUES ('ACT4-PROBE','Car') RETURNING vehicle_id \gset
+INSERT 0 1
+UPDATE public.vehicle SET license_plate='ACT4-EDITED',vehicle_type='Motorcycle' WHERE vehicle_id=:vehicle_id;
+UPDATE 1
+DELETE FROM public.vehicle WHERE vehicle_id=:vehicle_id RETURNING license_plate;
+ license_plate 
+---------------
+ ACT4-EDITED
+(1 row)
+
+DELETE 1
+ROLLBACK;
+ROLLBACK
+
+E36 Foreign key protects referenced vehicle
+Expected: denied SQLSTATE 23503
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+INSERT INTO public.vehicle(license_plate,vehicle_type) VALUES ('ACT4-PROBE','Car') RETURNING vehicle_id \gset
+INSERT 0 1
+INSERT INTO public."transaction"(vehicle_id,zone_id,entry_time)
+VALUES (:vehicle_id,(SELECT min(zone_id) FROM public.parking_zone),CURRENT_TIMESTAMP)
+RETURNING transaction_id \gset
+INSERT 0 1
+DELETE FROM public.vehicle WHERE vehicle_id=:vehicle_id;
+ERROR:  23503: update or delete on table "vehicle" violates foreign key constraint "transaction_vehicle_id_fkey" on table "transaction"
+DETAIL:  Key (vehicle_id)=(7) is still referenced from table "transaction".
+SCHEMA NAME:  public
+TABLE NAME:  transaction
+CONSTRAINT NAME:  transaction_vehicle_id_fkey
+LOCATION:  ri_ReportViolation, ri_triggers.c:2799
+
+E37 Runtime denied capacity
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public.parking_zone SET max_capacity=100;
+ERROR:  42501: permission denied for table parking_zone
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E38 Runtime denied vehicle ID
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public.vehicle SET vehicle_id=vehicle_id;
+ERROR:  42501: permission denied for table vehicle
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E39 Runtime denied entry timestamp
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public."transaction" SET entry_time=entry_time;
+ERROR:  42501: permission denied for table transaction
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E40 Runtime denied transaction linkage
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public."transaction" SET vehicle_id=vehicle_id;
+ERROR:  42501: permission denied for table transaction
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E41 Runtime denied payment amount
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public.payment SET amount=amount;
+ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E42 Runtime denied payment timestamp
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public.payment SET payment_time=payment_time;
+ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E43 Runtime denied payment linkage
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public.payment SET transaction_id=transaction_id;
+ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E44 Runtime denied staff role
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+UPDATE public.staff_user SET role=role;
+ERROR:  42501: permission denied for table staff_user
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E45 Runtime denied zone insertion
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+INSERT INTO public.parking_zone(zone_name,max_capacity) VALUES('ACT4-NO',1);
+ERROR:  42501: permission denied for table parking_zone
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E46 Runtime denied staff insertion
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+INSERT INTO public.staff_user(username,password_hash,role) VALUES('ACT4-NO','noncredential-probe','Staff');
+ERROR:  42501: permission denied for table staff_user
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E47 Runtime denied staff deletion
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+DELETE FROM public.staff_user;
+ERROR:  42501: permission denied for table staff_user
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E48 Runtime denied zone deletion
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+DELETE FROM public.parking_zone;
+ERROR:  42501: permission denied for table parking_zone
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E49 Runtime denied transaction deletion
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+DELETE FROM public."transaction";
+ERROR:  42501: permission denied for table transaction
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E50 Runtime denied payment deletion
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+DELETE FROM public.payment;
+ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E51 schema CREATE denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+CREATE TABLE public.act4_forbidden(id integer);
+ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.act4_forbidden(id integer);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E52 database CREATE denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+CREATE SCHEMA act4_forbidden;
+ERROR:  42501: permission denied for database grp_parkitdb
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E53 TEMPORARY denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+CREATE TEMP TABLE act4_forbidden(id integer);
+ERROR:  42501: permission denied to create temporary tables in database "grp_parkitdb"
+LINE 1: CREATE TEMP TABLE act4_forbidden(id integer);
+                          ^
+LOCATION:  InitTempTableNamespace, namespace.c:4413
+
+E54 TRUNCATE denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+TRUNCATE public.vehicle;
+ERROR:  42501: permission denied for table vehicle
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E55 ALTER denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+ALTER TABLE public.vehicle ADD COLUMN act4_forbidden integer;
+ERROR:  42501: must be owner of table vehicle
+LOCATION:  aclcheck_error, aclchk.c:2931
+
+E56 owner membership escalation denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+GRANT parkit_owner_grp TO parkit_app;
+ERROR:  42501: permission denied to grant role "parkit_owner_grp"
+DETAIL:  Only roles with the ADMIN option on role "parkit_owner_grp" may grant this role.
+LOCATION:  check_role_membership_authorization, user.c:2158
+
+E57 staff sequence denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+SELECT nextval('public.staff_user_user_id_seq');
+ERROR:  42501: permission denied for sequence staff_user_user_id_seq
+LOCATION:  nextval_internal, sequence.c:652
+
+E58 zone sequence denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+SELECT nextval('public.parking_zone_zone_id_seq');
+ERROR:  42501: permission denied for sequence parking_zone_zone_id_seq
+LOCATION:  nextval_internal, sequence.c:652
+
+E59 setval denied
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+SELECT setval('public.vehicle_vehicle_id_seq',999);
+ERROR:  42501: permission denied for sequence vehicle_vehicle_id_seq
+LOCATION:  do_setval, sequence.c:961
+
+E89 Future table has no automatic grants
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+SELECT * FROM public.act4_future_probe;
+ERROR:  42501: permission denied for table act4_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E90 Future sequence has no automatic grants
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+SELECT nextval('public.act4_future_probe_id_seq');
+ERROR:  42501: permission denied for sequence act4_future_probe_id_seq
+LOCATION:  nextval_internal, sequence.c:652
+
+E91 Future function PUBLIC execute revoked
+Expected: denied SQLSTATE 42501
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+SELECT public.act4_future_function();
+ERROR:  42501: permission denied for function act4_future_function
+LOCATION:  aclcheck_error, aclchk.c:2793
+
+E95 Business rule gap: duplicate active entries permitted by schema
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN;
+BEGIN
+INSERT INTO public.vehicle(license_plate,vehicle_type) VALUES ('ACT4-PROBE','Car') RETURNING vehicle_id \gset
+INSERT 0 1
+INSERT INTO public."transaction"(vehicle_id,zone_id,entry_time)
+VALUES (:vehicle_id,(SELECT min(zone_id) FROM public.parking_zone),CURRENT_TIMESTAMP)
+RETURNING transaction_id \gset
+INSERT 0 1
+INSERT INTO public."transaction"(vehicle_id,zone_id,entry_time)
+VALUES (:vehicle_id,(SELECT min(zone_id) FROM public.parking_zone),CURRENT_TIMESTAMP);
+INSERT 0 1
+SELECT count(*) AS active_entries FROM public."transaction" WHERE vehicle_id=:vehicle_id AND status='Active';
+ active_entries 
+----------------
+              2
+(1 row)
+
+ROLLBACK;
+ROLLBACK
+
+E96 Business rule gap: negative occupancy permitted by schema
+Expected: allowed
+SELECT session_user,current_user,current_database();
+ session_user | current_user | current_database 
+--------------+--------------+------------------
+ parkit_app   | parkit_app   | grp_parkitdb
+(1 row)
+
+BEGIN; UPDATE public.parking_zone SET current_active_count=-1 RETURNING current_active_count; ROLLBACK;
+BEGIN
+ current_active_count 
+----------------------
+                   -1
+(1 row)
+
+UPDATE 1
+ROLLBACK

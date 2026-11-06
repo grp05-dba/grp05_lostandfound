@@ -1,0 +1,22 @@
+Source inspection recorded UTC: 2026-11-06T13:31:10.769126+00:00
+Repository: https://github.com/millerdevera6-glitch/park-it-database
+Branch: main
+Commit: 0c01b3e87cf3d623f5f8c4936e3fe7fe56daeeb3
+Checkout status: clean
+SHA-256 of reviewed upstream files (content and credentials not reproduced):
+4169aa9c79f695314664c00832ac04738c9584731d3cbc5583181e45b3ced075  park-it/README.md
+babc0ddeef3016903b34d9a5da4e19fb26eb5b85838f14e6c8edf51196f348a3  user-role.md
+3485eff4c6f068a6a66a162d5b19f4db76c81d7b4735f1409eaa79e918c0e0f7  park-it/schema.sql
+aafa060254d34876f1385951eb4f4d23eebfb3530e4a2dbf9422a57355ea4fa4  PARK IT_ DATABASE MANAGEMENT SYSTEM (1).pdf
+fbff73f64f2621fdecaf957fa81d048b61338b534cb7001d998ba37a406b03d9  park-it/config/database.php
+99a32d169721147d9a931f3ef02862c9d6c74efa47a9c5c7ad8be4ab5272824d  park-it/config/seed.php
+8d06467d776ddc9b3f086656bd60e159e973ae2d18b8dbc6329616c3ef8623db  park-it/includes/functions.php
+933149a24a0f4ae447c14d800a722c55be3dc70b1f38818d45c237a4411a6dc5  park-it/auth/login.php
+890b35848bd887628eaf960a609652539680d779be8a0742eecc8de884d65acc  park-it/modules/vehicles/index.php
+845670bed7c5eb49c15a33afce936f62dc7414d7466b4288de3682723dd044ca  park-it/modules/vehicles/edit.php
+30910d628cc91958bd38d1312b65adcb3dd9e59db039bba13d6afe52dd6aeea5  park-it/modules/vehicles/delete.php
+da98779d11bfa6e12dcc7e64ba57b0ac39d9d5893977f62f76886daed7b57703  park-it/modules/payments/process.php
+b450e88b1cece0f25660d9556e90893182ee15c366e224a0eb124574fd59e107  park-it/modules/payments/history.php
+8715cef08f9e1b839a72c1f50931d6f1107d4f4857f1c73195ab469a1558b25b  park-it/modules/monitoring/api_status.php
+
+Assignment PDF: 944664c87715e981d4fed408988b26286d8bf5a362fe7d26c84ccf901d8230f9  COMP018_Activity_4.docx-1.pdf

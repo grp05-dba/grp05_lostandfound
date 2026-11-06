@@ -1,135 +1,84 @@
+# Part A - Database Setup and Assessment
 
-# Part A – Database Setup and Assessment
+## 1. Project and reviewed sources
 
-## 1. Objective
+Group 5 evaluated **Group 02 - Park It** for COMP 018 Activity 4 on **6 November 2026**, using the Activity 4 PDF in the parent directory. This report replaces the previous Group 02 assessment and uses the repository supplied for this task.
 
-This part covers the setup and assessment of the Park It application from the Activity 3 repository.
-
-The purpose is to understand the existing database structure, identify the application's database operations, determine which users and system components require database access, and prepare an access-control plan before implementing PostgreSQL roles and privileges.
-
-The assessment follows the principle of least privilege. Each database account should receive only the permissions necessary for its intended responsibilities.
-
-## 2. Project Information
-
-| Item | Details |
+| Item | Evaluated value |
 |---|---|
-| Project | Park It – Database Management System |
 | Repository | https://github.com/millerdevera6-glitch/park-it-database |
-| Branch reviewed | `final` |
-| Application language | PHP |
-| Database platform | PostgreSQL 18.6 |
-| Database administration tool | pgAdmin 4 |
-| Local web server | Apache (XAMPP) |
-| Database name | `grp_parkitdb` |
-| Database schema | `public` |
+| Application directory | `park-it/` |
+| Branch / commit | `main` / `0c01b3e87cf3d623f5f8c4936e3fe7fe56daeeb3` |
+| Application | PHP with PDO PostgreSQL; HTML/CSS/JavaScript |
+| Database | PostgreSQL 18.6; `grp_parkitdb`; `public` schema |
+| Lab | Dedicated cluster `/tmp/activity4-grp02-lab`, loopback `127.0.0.1:55442` |
+| Application test | Private copy served temporarily by PHP on `127.0.0.1:18082` |
+| Runtime login | `parkit_app`, a member of `parkit_runtime_grp` |
 
-## 3. Application Setup
+Reviewed sources, pinned to the evaluated commit:
 
-The project documentation specifies the following setup requirements:
+- [Installation guide](https://github.com/millerdevera6-glitch/park-it-database/blob/0c01b3e87cf3d623f5f8c4936e3fe7fe56daeeb3/park-it/README.md).
+- [Database schema dump](https://github.com/millerdevera6-glitch/park-it-database/blob/0c01b3e87cf3d623f5f8c4936e3fe7fe56daeeb3/park-it/schema.sql).
+- [Application user roles and proposed database mapping](https://github.com/millerdevera6-glitch/park-it-database/blob/0c01b3e87cf3d623f5f8c4936e3fe7fe56daeeb3/user-role.md).
+- [Activity 3 project PDF](https://github.com/millerdevera6-glitch/park-it-database/blob/0c01b3e87cf3d623f5f8c4936e3fe7fe56daeeb3/PARK%20IT_%20DATABASE%20MANAGEMENT%20SYSTEM%20%281%29.pdf).
+- PHP database configuration, seeder, session/authorization helpers, login, dashboard, vehicle, payment, history and monitoring modules in that same revision.
 
-- PostgreSQL 18.6
-- pgAdmin 4
-- XAMPP with Apache and PHP
-- Enabled PHP PostgreSQL extensions (`pdo_pgsql` and `pgsql`)
-- A web browser
+[Source review evidence](evidence/source_review.txt) records the commit and SHA-256 values. No source configuration secrets or password hashes are copied into the reports. The upstream checkout remains unchanged.
 
-### Database initialization
+## 2. Setup performed
 
-1. Create a PostgreSQL database named `grp_parkitdb`.
-2. Use the provided `schema.sql` file to create the database objects.
-3. Verify that the database tables were created successfully.
-4. Configure the connection details in `config/database.php`.
-5. Place the project folder inside the XAMPP `htdocs` directory.
-6. Start Apache and run the application's initial setup script when required.
+The upstream guide uses Windows XAMPP/pgAdmin, creates `grp_parkitdb` owned by `postgres`, imports `schema.sql`, and runs `config/seed.php`. The same database/application steps were executed with psql and installed PHP on Linux. PostgreSQL and the PHP `pdo_pgsql` extension were available; no dependency installation was required.
 
-The repository's setup instructions specify `postgres` as the database connection account. This will be reviewed as part of the access-control assessment because ordinary application operations should not use an unrestricted PostgreSQL superuser account.
+The default PostgreSQL socket had no running server. A fresh dedicated cluster was initialized in `/tmp`, without replacing an existing database or changing an operating-system service. It listens only on loopback port **55442** and its private Unix socket. Project logins use password authentication with SCRAM; provisioning uses an OS-peer mapping to the lab's `postgres` account.
 
-**Setup status:** Pending local verification.
+Executed procedure:
 
-## 4. Database Structure Assessment
+1. Review the source operations and prepare [the access-control plan](part_b.md).
+2. Create the three NOLOGIN groups, three restricted logins, project database and unrelated test database using [01_roles_database.sql](sql/01_roles_database.sql).
+3. Assign generated private passwords locally. Import upstream `park-it/schema.sql` unchanged with `psql -v ON_ERROR_STOP=1`. Its `\restrict`/`\unrestrict` commands are valid in psql and were retained; the README's removal instruction applies to pgAdmin Query Tool.
+4. The dump explicitly sets object owners to `postgres`. Transfer the five tables and their owned sequences to `parkit_owner_grp`, transfer the schema, and apply the reviewed grants with [02_privileges.sql](sql/02_privileges.sql). No table or column definitions were changed.
+5. Copy the application outside the checkout into a protected `/tmp` directory. In that copy only, change connection constants to read private environment values. Execute upstream `config/seed.php` by PHP CLI as `parkit_dba`; suppress its credential-bearing HTML from submitted evidence.
+6. Run normal application requests as `parkit_app`, never the DBA or provisioning superuser. Test all three logins independently and capture actual outcomes in [Part E](part_e.md).
 
-The database uses the `public` schema and contains five tables and five associated sequences.
+**Setup result: Success with issues.** [Setup output](evidence/setup.txt), [final catalog](evidence/catalog.txt), [direct-login tests](evidence/results.json), and [application validation](evidence/application_validation.txt) support the result. The PHP test server was stopped after verification; the isolated database cluster remains available for local follow-up. `/tmp` is temporary storage, so this lab must be recreated if those files are cleared.
 
-### 4.1 Tables
+## 3. Actual database inventory
 
-| Table | Purpose |
+| Table | Primary key / sequence | Purpose | Rows after test cleanup |
+|---|---|---|---:|
+| `parking_zone` | `zone_id` / `parking_zone_zone_id_seq` | Zone name, capacity, occupied-space counter | 1 |
+| `vehicle` | `vehicle_id` / `vehicle_vehicle_id_seq` | License plate and type | 0 |
+| `staff_user` | `user_id` / `staff_user_user_id_seq` | Application username, password hash and role | 2 |
+| `transaction` | `transaction_id` / `transaction_transaction_id_seq` | Entry/exit, vehicle/zone, status and lost-ticket flag | 0 |
+| `payment` | `payment_id` / `payment_payment_id_seq` | Payment, transaction link, amount, method and timestamp | 0 |
+
+The dump contains structure without sample rows. The PHP seeder creates **Main Parking Lot**, capacity **50**, occupancy **0**, and two users with roles **Admin** and **Staff**. Disposable parking/payment records were created for verification and removed. SQL probes roll back; sequence increments are not rolled back, so ID gaps are expected.
+
+The final catalog contains **five tables, five sequences, nine indexes, five primary keys, four unique constraints, three foreign keys, and two CHECK constraints**. There are no application views/materialized views, custom functions/procedures or user-defined triggers after probe cleanup.
+
+Foreign keys are `transaction.vehicle_id → vehicle.vehicle_id`, `transaction.zone_id → parking_zone.zone_id`, and `payment.transaction_id → transaction.transaction_id`, with default NO ACTION behavior. The unique constraints cover zone name, license plate, username and payment transaction ID. CHECKs enforce `current_active_count <= max_capacity` and `amount >= 0`; they do not enforce nonnegative occupancy, valid role/status/type/method values, or a unique active transaction per vehicle. Nullability and all constraint definitions are captured in the catalog evidence.
+
+## 4. Application operations and required access
+
+| Reviewed feature | Actual operations / relevant objects |
 |---|---|
-| `parking_zone` | Stores parking zone names, maximum capacity, and current occupancy. |
-| `vehicle` | Stores vehicle license plates and vehicle types. |
-| `staff_user` | Stores staff and administrator login information, password hashes, and application roles. |
-| `transaction` | Stores vehicle entry and exit records, parking zones, timestamps, and transaction status. |
-| `payment` | Stores payment amounts, payment methods, and payment timestamps. |
+| `auth/login.php` | SELECT staff identity, hash and role; verify hash in PHP |
+| `config/seed.php` | SELECT, INSERT zone/staff; run by provisioning/DBA account only |
+| `modules/vehicles/index.php` | SELECT/INSERT vehicle and transaction; lock zone; UPDATE occupied count |
+| `modules/vehicles/edit.php` | SELECT vehicle; UPDATE license plate/type |
+| `modules/vehicles/delete.php` | SELECT references; DELETE only unreferenced vehicles |
+| `modules/payments/process.php` | Lock transaction/vehicle and zone; INSERT payment; UPDATE exit/status/lost flag and occupancy, atomically |
+| `modules/payments/history.php` | SELECT joined receipts; UPDATE payment method only |
+| Dashboard and monitoring | SELECT summaries; `getParkingSummary()` can also UPDATE occupancy to reconcile counters |
 
-### 4.2 Sequences
+The runtime requires three insert-sequence USAGE grants. Staff/zone sequences belong to setup operations. The auditor is a database inspection account added for Activity 4, not an upstream web feature; it reads safe staff columns without reading password hashes.
 
-| Sequence | Associated table |
-|---|---|
-| `parking_zone_zone_id_seq` | `parking_zone` |
-| `vehicle_vehicle_id_seq` | `vehicle` |
-| `staff_user_user_id_seq` | `staff_user` |
-| `transaction_transaction_id_seq` | `transaction` |
-| `payment_payment_id_seq` | `payment` |
+## 5. Issues and owner recommendations
 
-These sequences generate identifiers for newly inserted records.
+1. **Source configuration uses `postgres` and contains a hardcoded database credential.** The local copy uses the restricted runtime login and private environment configuration. Owners should remove committed credentials, rotate any that are used, and use local secret configuration.
+2. **Documented and actual permissions differ.** `user-role.md` omits sequence grants, vehicle DELETE and payment-method UPDATE required by the implementation. The evaluated plan supplies only the needed sequence and column permissions.
+3. **Admin/Staff policy is not enforced by vehicle endpoints.** They call `requireLogin()` but do not enforce `isAdmin()`. Actual Staff HTTP requests registered and edited a vehicle. Both sessions share the database service login, so PostgreSQL roles cannot resolve this human-user authorization gap.
+4. **Business invariants depend on PHP.** Direct runtime SQL can create duplicate active entries or negative occupancy; both were reproduced and rolled back. Owners should consider reviewed CHECK/partial-unique constraints and guarded operations. These are recommendations; the upstream schema was preserved.
+5. **Seeder is a privileged setup task.** It prints demo credentials on first creation. Run it privately with the DBA, do not publish its output, replace demo credentials for real use, and restrict/remove public setup access after provisioning.
 
-### 4.3 Relationships
-
-The database contains the following foreign-key relationships:
-
-- `transaction.vehicle_id` references `vehicle.vehicle_id`.
-- `transaction.zone_id` references `parking_zone.zone_id`.
-- `payment.transaction_id` references `transaction.transaction_id`.
-
-### 4.4 Constraints and restrictions
-
-The schema includes:
-
-- Primary keys for all five tables.
-- Unique license plates in `vehicle`.
-- Unique usernames in `staff_user`.
-- Unique parking zone names in `parking_zone`.
-- A unique transaction reference in `payment`.
-- A non-negative payment amount constraint.
-- A parking capacity check that prevents the current occupancy from exceeding the maximum capacity.
-
-## 5. Application Database Operations
-
-The application's PHP modules were reviewed to identify the database operations required by its features.
-
-| Application feature | Database operations | Tables involved |
-|---|---|---|
-| User authentication | SELECT | `staff_user` |
-| Vehicle registration | SELECT, INSERT | `vehicle`, `transaction`, `parking_zone` |
-| Active parking monitoring | SELECT, UPDATE | `transaction`, `vehicle`, `parking_zone` |
-| Vehicle directory | SELECT, UPDATE, DELETE | `vehicle` |
-| Parking payment and exit | SELECT, INSERT, UPDATE | `payment`, `transaction`, `parking_zone`, `vehicle` |
-| Payment history | SELECT, UPDATE | `payment`, `transaction`, `vehicle`, `parking_zone` |
-| Dashboard | SELECT | All operational tables |
-
-The application uses database transactions when registering vehicles and processing payments to keep related changes consistent.
-
-## 6. Application User Roles
-
-The project identifies two application-level user roles:
-
-| Application role | Responsibility |
-|---|---|
-| Administrator | Uses the administrative account to access the system's available management functions. |
-| Staff | Uses the staff account to perform ordinary parking operations. |
-
-These are application roles stored in `staff_user.role`. They are distinct from PostgreSQL login roles and group roles.
-
-The application's PHP code establishes a database connection through `config/database.php`. Consequently, the application users do not automatically connect to PostgreSQL using separate database accounts.
-
-## 7. Initial Access-Control Findings
-
-The following findings will be considered when preparing the access-control plan:
-
-1. The application currently connects to PostgreSQL using the `postgres` account.
-2. The application requires access to all five database tables for its existing features.
-3. The application uses generated identifiers, so the required sequence privileges must also be considered.
-4. Staff and administrator accounts are authenticated by the application through `staff_user`.
-5. Application-level roles do not automatically restrict PostgreSQL privileges.
-6. The initial database setup script inserts records into `parking_zone` and `staff_user`.
-
-The use of the PostgreSQL superuser account for normal application access is a security concern that must be addressed.
+The four reports and supporting scripts/evidence are kept in our repository. Findings are prepared here for owners; no feedback was sent, tracker rows edited, consolidated PDF produced, or commits created as part of this scoped request. Existing Activity 5 reports describe an earlier environment/source and were not changed or represented as verification of this new lab.
