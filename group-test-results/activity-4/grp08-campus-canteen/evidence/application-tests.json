@@ -1,0 +1,210 @@
+[
+  {
+    "name": "public-vendors",
+    "method": "GET",
+    "path": "/api/vendors",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "login-student",
+    "method": "POST",
+    "path": "/api/auth/login",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "login-other-student",
+    "method": "POST",
+    "path": "/api/auth/login",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "login-vendor",
+    "method": "POST",
+    "path": "/api/auth/login",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "login-other-vendor",
+    "method": "POST",
+    "path": "/api/auth/login",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "login-admin",
+    "method": "POST",
+    "path": "/api/auth/login",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "inactive-vendor-denied",
+    "method": "POST",
+    "path": "/api/auth/login",
+    "expected": 401,
+    "actual": 401,
+    "passed": true
+  },
+  {
+    "name": "unauthenticated-orders",
+    "method": "GET",
+    "path": "/api/orders",
+    "expected": 401,
+    "actual": 401,
+    "passed": true
+  },
+  {
+    "name": "student-denied-admin",
+    "method": "GET",
+    "path": "/api/admin/vendors",
+    "expected": 401,
+    "actual": 401,
+    "passed": true
+  },
+  {
+    "name": "vendor-denied-student",
+    "method": "GET",
+    "path": "/api/orders",
+    "expected": 401,
+    "actual": 401,
+    "passed": true
+  },
+  {
+    "name": "admin-vendors",
+    "method": "GET",
+    "path": "/api/admin/vendors",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "vendor-menu",
+    "method": "GET",
+    "path": "/api/vendor/menu",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "menu-create",
+    "method": "POST",
+    "path": "/api/vendor/menu",
+    "expected": 201,
+    "actual": 201,
+    "passed": true
+  },
+  {
+    "name": "menu-update",
+    "method": "PUT",
+    "path": "/api/vendor/menu/13",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "menu-delete",
+    "method": "DELETE",
+    "path": "/api/vendor/menu/13",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "student-place-order",
+    "method": "POST",
+    "path": "/api/orders",
+    "expected": 201,
+    "actual": 201,
+    "passed": true
+  },
+  {
+    "name": "student-own-order",
+    "method": "GET",
+    "path": "/api/orders/4",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "other-student-order-denied",
+    "method": "GET",
+    "path": "/api/orders/4",
+    "expected": 404,
+    "actual": 404,
+    "passed": true
+  },
+  {
+    "name": "other-vendor-order-denied",
+    "method": "PATCH",
+    "path": "/api/vendor/orders/4/status",
+    "expected": 404,
+    "actual": 404,
+    "passed": true
+  },
+  {
+    "name": "vendor-status-preparing",
+    "method": "PATCH",
+    "path": "/api/vendor/orders/4/status",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "vendor-status-ready",
+    "method": "PATCH",
+    "path": "/api/vendor/orders/4/status",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "vendor-status-completed",
+    "method": "PATCH",
+    "path": "/api/vendor/orders/4/status",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "completed-status-reversal-denied",
+    "method": "PATCH",
+    "path": "/api/vendor/orders/4/status",
+    "expected": 409,
+    "actual": 409,
+    "passed": true
+  },
+  {
+    "name": "student-notifications",
+    "method": "GET",
+    "path": "/api/notifications",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "vendor-sales",
+    "method": "GET",
+    "path": "/api/vendor/reports/sales",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  },
+  {
+    "name": "admin-sales",
+    "method": "GET",
+    "path": "/api/admin/reports/sales",
+    "expected": 200,
+    "actual": 200,
+    "passed": true
+  }
+]

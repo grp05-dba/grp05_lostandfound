@@ -1,0 +1,1277 @@
+===== runtime-read-approved-tables =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+SELECT 'customer',count(*) FROM customer UNION ALL SELECT 'staff',count(*) FROM staff UNION ALL SELECT 'menu_item',count(*) FROM menu_item UNION ALL SELECT 'restaurant_table',count(*) FROM restaurant_table UNION ALL SELECT 'orders',count(*) FROM orders UNION ALL SELECT 'order_item',count(*) FROM order_item UNION ALL SELECT 'reservation',count(*) FROM reservation UNION ALL SELECT 'payment',count(*) FROM payment;
+Expected: Allowed
+Actual:
+     ?column?     | count
+------------------+-------
+ customer         |    51
+ staff            |    10
+ menu_item        |    50
+ restaurant_table |    20
+ orders           |    60
+ order_item       |   167
+ reservation      |    50
+ payment          |    56
+(8 rows)
+
+
+
+===== runtime-positive-workflow =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN;
+INSERT INTO customer(first_name,last_name,email,phone,password) VALUES('G05','Probe','g05-a4@example.invalid','000','non-login-test-marker') RETURNING customer_id AS cid \gset
+INSERT INTO staff(first_name,last_name,email,role,password) VALUES('G05','Probe','g05-staff@example.invalid','staff','non-login-test-marker') RETURNING staff_id AS sid \gset
+INSERT INTO menu_item(item_name,category,price) VALUES('G05 A4 probe','Probe',8.75) RETURNING menu_item_id AS mid \gset
+INSERT INTO restaurant_table(table_number,capacity) VALUES(900001,4) RETURNING table_id AS tid \gset
+INSERT INTO orders(customer_id) VALUES(:cid) RETURNING order_id AS oid \gset
+INSERT INTO order_item(order_id,menu_item_id,quantity,unit_price,subtotal) VALUES(:oid,:mid,2,8.75,17.50);
+INSERT INTO payment(order_id,payment_method,amount) VALUES(:oid,'cash',17.50);
+INSERT INTO reservation(customer_id,table_id,reservation_date,reservation_time,number_of_guests) VALUES(:cid,:tid,'2099-01-01','10:00',2) RETURNING reservation_id AS rid \gset
+UPDATE customer SET first_name='G05 updated' WHERE customer_id=:cid;
+UPDATE staff SET first_name='G05 updated' WHERE staff_id=:sid;
+UPDATE menu_item SET price=10 WHERE menu_item_id=:mid;
+UPDATE restaurant_table SET status='reserved' WHERE table_id=:tid;
+UPDATE orders SET order_status='confirmed' WHERE order_id=:oid;
+UPDATE payment SET payment_status='paid' WHERE order_id=:oid;
+UPDATE reservation SET reservation_status='cancelled' WHERE reservation_id=:rid;
+SELECT total_amount AS captured_total FROM orders WHERE order_id=:oid;
+SET CONSTRAINTS ALL IMMEDIATE;
+DELETE FROM reservation WHERE reservation_id=:rid;
+DELETE FROM restaurant_table WHERE table_id=:tid;
+DELETE FROM staff WHERE staff_id=:sid;
+ROLLBACK;
+Expected: Allowed
+Actual:
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+ captured_total
+----------------
+          17.50
+(1 row)
+
+SET CONSTRAINTS
+DELETE 1
+DELETE 1
+DELETE 1
+ROLLBACK
+
+
+===== runtime-read-v_order_summary =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+SELECT count(*) FROM v_order_summary;
+Expected: Allowed
+Actual:
+ count
+-------
+    60
+(1 row)
+
+
+
+===== runtime-read-v_reservation_schedule =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+SELECT count(*) FROM v_reservation_schedule;
+Expected: Allowed
+Actual:
+ count
+-------
+    50
+(1 row)
+
+
+
+===== report-read-v_customer_directory =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+SELECT count(*) FROM v_customer_directory;
+Expected: Allowed
+Actual:
+ count
+-------
+    51
+(1 row)
+
+
+
+===== report-read-v_staff_directory =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+SELECT count(*) FROM v_staff_directory;
+Expected: Allowed
+Actual:
+ count
+-------
+    10
+(1 row)
+
+
+
+===== report-read-v_order_summary =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+SELECT count(*) FROM v_order_summary;
+Expected: Allowed
+Actual:
+ count
+-------
+    60
+(1 row)
+
+
+
+===== report-read-v_reservation_schedule =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+SELECT count(*) FROM v_reservation_schedule;
+Expected: Allowed
+Actual:
+ count
+-------
+    50
+(1 row)
+
+
+
+===== report-deny-insert-customer =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO customer DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table customer
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-customer =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; UPDATE customer SET first_name=first_name WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table customer
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-customer =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM customer WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table customer
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-staff =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO staff DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table staff
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-staff =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; UPDATE staff SET first_name=first_name WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table staff
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-staff =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM staff WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table staff
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-menu_item =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO menu_item DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-menu_item =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; UPDATE menu_item SET item_name=item_name WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-menu_item =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM menu_item WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-restaurant_table =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO restaurant_table DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table restaurant_table
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-restaurant_table =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; UPDATE restaurant_table SET status=status WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table restaurant_table
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-restaurant_table =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM restaurant_table WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table restaurant_table
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-orders =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO orders DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table orders
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-orders =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; UPDATE orders SET order_status=order_status WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table orders
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-orders =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM orders WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table orders
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-order_item =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO order_item DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table order_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-order_item =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; UPDATE order_item SET quantity=quantity WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table order_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-order_item =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM order_item WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table order_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-reservation =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO reservation DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table reservation
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-reservation =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; UPDATE reservation SET reservation_status=reservation_status WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table reservation
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-reservation =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM reservation WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table reservation
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-payment =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO payment DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-payment =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; UPDATE payment SET amount=amount WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-payment =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM payment WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-customer =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM customer WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table customer
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-orders =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM orders WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table orders
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-payment =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM payment WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-order_item =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; DELETE FROM order_item WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table order_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-update-order-item =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; UPDATE order_item SET quantity=quantity WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table order_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-customer-credentials =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+SELECT password FROM customer;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for table customer
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-staff-credentials =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+SELECT password FROM staff;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for table staff
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-menu-delete =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO menu_item(item_name,category,price) VALUES('G05 delete probe','Probe',1); DELETE FROM menu_item WHERE item_name='G05 delete probe'; ROLLBACK;
+Expected: Allowed
+Actual:
+BEGIN
+INSERT 0 1
+DELETE 1
+ROLLBACK
+
+
+===== constraint-negative-price =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO menu_item(item_name,category,price) VALUES('G05 invalid probe','Probe',-1); ROLLBACK;
+Expected: Denied (23514)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  23514: new row for relation "menu_item" violates check constraint "chk_menu_item_price"
+DETAIL:  Failing row contains (53, G05 invalid probe, null, Probe, -1.00, t).
+SCHEMA NAME:  public
+TABLE NAME:  menu_item
+CONSTRAINT NAME:  chk_menu_item_price
+LOCATION:  ExecConstraints, execMain.c:2081
+
+
+===== constraint-empty-order =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO orders(customer_id) SELECT min(customer_id) FROM customer; COMMIT;
+Expected: Denied (23514)
+Actual:
+BEGIN
+INSERT 0 1
+psql:<stdin>:1: ERROR:  23514: Order 62 must contain at least one order item
+CONTEXT:  PL/pgSQL function fn_require_order_items() line 13 at RAISE
+LOCATION:  exec_stmt_raise, pl_exec.c:3923
+
+
+===== constraint-reservation-overlap =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; INSERT INTO reservation(customer_id,table_id,reservation_date,reservation_time,number_of_guests) SELECT (SELECT min(customer_id) FROM customer),min(table_id),'2099-01-02','10:00',1 FROM restaurant_table; INSERT INTO reservation(customer_id,table_id,reservation_date,reservation_time,number_of_guests) SELECT (SELECT min(customer_id) FROM customer),min(table_id),'2099-01-02','11:00',1 FROM restaurant_table; ROLLBACK;
+Expected: Denied (23P01)
+Actual:
+BEGIN
+INSERT 0 1
+psql:<stdin>:1: ERROR:  23P01: conflicting key value violates exclusion constraint "ex_reservation_no_overlap"
+DETAIL:  Key (table_id, tsrange(reservation_date + reservation_time, reservation_date + reservation_time + '02:00:00'::interval))=(1, ["2099-01-02 11:00:00","2099-01-02 13:00:00")) conflicts with existing key (table_id, tsrange(reservation_date + reservation_time, reservation_date + reservation_time + '02:00:00'::interval))=(1, ["2099-01-02 10:00:00","2099-01-02 12:00:00")).
+SCHEMA NAME:  public
+TABLE NAME:  reservation
+CONSTRAINT NAME:  ex_reservation_no_overlap
+LOCATION:  check_exclusion_or_unique_constraint, execIndexing.c:929
+
+
+===== runtime-shared-account-boundary =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; UPDATE staff SET role='admin' WHERE email='staff@rors.example'; ROLLBACK;
+Expected: Allowed
+Actual:
+BEGIN
+UPDATE 1
+ROLLBACK
+
+
+===== rors_app-deny-createdb =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+CREATE DATABASE g05_forbidden;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+
+===== rors_app-deny-createrole =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+CREATE ROLE g05_forbidden NOLOGIN;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+
+===== rors_app-deny-connect-rors_unrelated_lab =====
+Account: rors_app
+Database: rors_unrelated_lab
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55410 failed: FATAL:  permission denied for database "rors_unrelated_lab"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== rors_app-deny-connect-postgres =====
+Account: rors_app
+Database: postgres
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55410 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== rors_app-deny-connect-template1 =====
+Account: rors_app
+Database: template1
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55410 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== rors_report-deny-createdb =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+CREATE DATABASE g05_forbidden;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+
+===== rors_report-deny-createrole =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+CREATE ROLE g05_forbidden NOLOGIN;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+
+===== rors_report-deny-connect-rors_unrelated_lab =====
+Account: rors_report
+Database: rors_unrelated_lab
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55410 failed: FATAL:  permission denied for database "rors_unrelated_lab"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== rors_report-deny-connect-postgres =====
+Account: rors_report
+Database: postgres
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55410 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== rors_report-deny-connect-template1 =====
+Account: rors_report
+Database: template1
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55410 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== rors_dba-deny-createdb =====
+Account: rors_dba
+Database: mesa_g05_activity4
+SQL:
+CREATE DATABASE g05_forbidden;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+
+===== rors_dba-deny-createrole =====
+Account: rors_dba
+Database: mesa_g05_activity4
+SQL:
+CREATE ROLE g05_forbidden NOLOGIN;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+
+===== rors_dba-deny-connect-rors_unrelated_lab =====
+Account: rors_dba
+Database: rors_unrelated_lab
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55410 failed: FATAL:  permission denied for database "rors_unrelated_lab"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== rors_dba-deny-connect-postgres =====
+Account: rors_dba
+Database: postgres
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55410 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== rors_dba-deny-connect-template1 =====
+Account: rors_dba
+Database: template1
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55410 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== rors_app-deny-schema =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; CREATE SCHEMA g05_forbidden; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for database mesa_g05_activity4
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== rors_app-deny-table =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.g05_forbidden(id int);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== rors_app-deny-owner =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; SET ROLE rors_owner_grp; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied to set role "rors_owner_grp"
+LOCATION:  call_string_check_hook, guc.c:6945
+
+
+===== rors_app-deny-truncate =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; TRUNCATE payment; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== rors_app-deny-alter =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; ALTER TABLE customer ADD COLUMN g05_forbidden int; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: must be owner of table customer
+LOCATION:  aclcheck_error, aclchk.c:2933
+
+
+===== rors_app-deny-sequence-reset =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+BEGIN; SELECT setval('customer_customer_id_seq',1); ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence customer_customer_id_seq
+LOCATION:  do_setval, sequence.c:964
+
+
+===== rors_report-deny-schema =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; CREATE SCHEMA g05_forbidden; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for database mesa_g05_activity4
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== rors_report-deny-table =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.g05_forbidden(id int);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== rors_report-deny-owner =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; SET ROLE rors_owner_grp; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied to set role "rors_owner_grp"
+LOCATION:  call_string_check_hook, guc.c:6945
+
+
+===== rors_report-deny-truncate =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; TRUNCATE payment; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== rors_report-deny-alter =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; ALTER TABLE customer ADD COLUMN g05_forbidden int; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: must be owner of table customer
+LOCATION:  aclcheck_error, aclchk.c:2933
+
+
+===== rors_report-deny-sequence-reset =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+BEGIN; SELECT setval('customer_customer_id_seq',1); ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence customer_customer_id_seq
+LOCATION:  do_setval, sequence.c:964
+
+
+===== runtime-deny-sequence-state =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+SELECT last_value FROM customer_customer_id_seq;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence customer_customer_id_seq
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-sequence =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+SELECT nextval('customer_customer_id_seq');
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence customer_customer_id_seq
+LOCATION:  nextval_internal, sequence.c:655
+
+
+===== runtime-deny-membership =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+GRANT rors_runtime_grp TO rors_report;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to grant role "rors_runtime_grp"
+DETAIL:  Only roles with the ADMIN option on role "rors_runtime_grp" may grant this role.
+LOCATION:  check_role_membership_authorization, user.c:2163
+
+
+===== admin-needs-owner-role =====
+Account: rors_dba
+Database: mesa_g05_activity4
+SQL:
+BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.g05_forbidden(id int);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== admin-maintenance =====
+Account: rors_dba
+Database: mesa_g05_activity4
+SQL:
+BEGIN; SET ROLE rors_owner_grp; CREATE TABLE g05_maintenance(id int); INSERT INTO g05_maintenance VALUES(1); ALTER TABLE g05_maintenance ADD COLUMN note text; DROP TABLE g05_maintenance; ROLLBACK;
+Expected: Allowed
+Actual:
+BEGIN
+SET
+CREATE TABLE
+INSERT 0 1
+ALTER TABLE
+DROP TABLE
+ROLLBACK
+
+
+===== admin-create-future-objects =====
+Account: rors_dba
+Database: mesa_g05_activity4
+SQL:
+SET ROLE rors_owner_grp; CREATE TABLE g05_future_probe(id serial PRIMARY KEY); CREATE FUNCTION g05_future_function() RETURNS int LANGUAGE sql AS 'SELECT 1';
+Expected: Allowed
+Actual:
+SET
+CREATE TABLE
+CREATE FUNCTION
+
+
+===== rors_app-deny-future-table =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+SELECT * FROM g05_future_probe;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for table g05_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== rors_app-deny-future-function =====
+Account: rors_app
+Database: mesa_g05_activity4
+SQL:
+SELECT g05_future_function();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for function g05_future_function
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== rors_report-deny-future-table =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+SELECT * FROM g05_future_probe;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for table g05_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== rors_report-deny-future-function =====
+Account: rors_report
+Database: mesa_g05_activity4
+SQL:
+SELECT g05_future_function();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for function g05_future_function
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== admin-future-use =====
+Account: rors_dba
+Database: mesa_g05_activity4
+SQL:
+BEGIN; SET ROLE rors_owner_grp; INSERT INTO g05_future_probe DEFAULT VALUES; SELECT g05_future_function(); ROLLBACK;
+Expected: Allowed
+Actual:
+BEGIN
+SET
+INSERT 0 1
+ g05_future_function
+---------------------
+                   1
+(1 row)
+
+ROLLBACK
+
+
+===== admin-remove-future-objects =====
+Account: rors_dba
+Database: mesa_g05_activity4
+SQL:
+SET ROLE rors_owner_grp; DROP TABLE g05_future_probe; DROP FUNCTION g05_future_function();
+Expected: Allowed
+Actual:
+SET
+DROP TABLE
+DROP FUNCTION
+
+
+===== catalog-and-cleanup =====
+Account: lab_admin
+Database: mesa_g05_activity4
+SQL:
+SELECT version(),current_database();
+SELECT rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolinherit FROM pg_roles WHERE rolname LIKE 'rors_%' ORDER BY 1;
+SELECT a.rolname AS member,b.rolname AS parent,m.admin_option,m.inherit_option,m.set_option FROM pg_auth_members m JOIN pg_roles a ON a.oid=m.member JOIN pg_roles b ON b.oid=m.roleid WHERE a.rolname LIKE 'rors_%';
+SELECT datname,pg_get_userbyid(datdba),datacl FROM pg_database ORDER BY datname;
+SELECT nspname,nspacl FROM pg_namespace WHERE nspname='public';
+SELECT c.relname,c.relkind,pg_get_userbyid(c.relowner) AS owner,c.relacl FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind IN('r','S','v') ORDER BY c.relname;
+SELECT proname,pg_get_userbyid(proowner),prosecdef,proacl FROM pg_proc p WHERE pronamespace='public'::regnamespace AND NOT EXISTS(SELECT 1 FROM pg_depend d WHERE d.classid='pg_proc'::regclass AND d.objid=p.oid AND d.deptype='e') ORDER BY proname;
+SELECT t.tgrelid::regclass,t.tgname,t.tgenabled FROM pg_trigger t WHERE NOT t.tgisinternal ORDER BY 1,2;
+SELECT extname,extversion FROM pg_extension ORDER BY 1;
+SELECT defaclrole::regrole,defaclobjtype,defaclacl FROM pg_default_acl;
+SELECT conrelid::regclass,conname,pg_get_constraintdef(oid) FROM pg_constraint WHERE connamespace='public'::regnamespace ORDER BY 1,2;
+SELECT 'customer',count(*) FROM customer UNION ALL SELECT 'staff',count(*) FROM staff UNION ALL SELECT 'menu_item',count(*) FROM menu_item UNION ALL SELECT 'restaurant_table',count(*) FROM restaurant_table UNION ALL SELECT 'orders',count(*) FROM orders UNION ALL SELECT 'order_item',count(*) FROM order_item UNION ALL SELECT 'reservation',count(*) FROM reservation UNION ALL SELECT 'payment',count(*) FROM payment;
+SELECT to_regclass('g05_future_probe') IS NULL AS probe_table_removed,to_regprocedure('g05_future_function()') IS NULL AS probe_function_removed;
+Expected: Allowed
+Actual:
+                                 version                                 |  current_database
+-------------------------------------------------------------------------+--------------------
+ PostgreSQL 18.3 on x86_64-windows, compiled by msvc-19.44.35225, 64-bit | mesa_g05_activity4
+(1 row)
+
+      rolname      | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolbypassrls | rolinherit
+-------------------+-------------+----------+-------------+---------------+----------------+--------------+------------
+ rors_app          | t           | f        | f           | f             | f              | f            | t
+ rors_dba          | t           | f        | f           | f             | f              | f            | f
+ rors_owner_grp    | f           | f        | f           | f             | f              | f            | t
+ rors_readonly_grp | f           | f        | f           | f             | f              | f            | t
+ rors_report       | t           | f        | f           | f             | f              | f            | t
+ rors_runtime_grp  | f           | f        | f           | f             | f              | f            | t
+(6 rows)
+
+   member    |      parent       | admin_option | inherit_option | set_option
+-------------+-------------------+--------------+----------------+------------
+ rors_dba    | rors_owner_grp    | f            | f              | t
+ rors_app    | rors_runtime_grp  | f            | t              | t
+ rors_report | rors_readonly_grp | f            | t              | t
+(3 rows)
+
+      datname       | pg_get_userbyid |                                                               datacl
+--------------------+-----------------+------------------------------------------------------------------------------------------------------------------------------------
+ mesa_g05_activity4 | rors_owner_grp  | {rors_owner_grp=CTc/rors_owner_grp,rors_dba=c/rors_owner_grp,rors_runtime_grp=c/rors_owner_grp,rors_readonly_grp=c/rors_owner_grp}
+ postgres           | lab_admin       | {lab_admin=CTc/lab_admin}
+ rors_unrelated_lab | lab_admin       | {lab_admin=CTc/lab_admin}
+ template0          | lab_admin       | {=c/lab_admin,lab_admin=CTc/lab_admin}
+ template1          | lab_admin       | {lab_admin=CTc/lab_admin}
+(5 rows)
+
+ nspname |                                                                         nspacl
+---------+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ public  | {pg_database_owner=UC/pg_database_owner,rors_runtime_grp=U/pg_database_owner,rors_readonly_grp=U/pg_database_owner,rors_owner_grp=UC/pg_database_owner}
+(1 row)
+
+            relname             | relkind |     owner      |                                                      relacl
+--------------------------------+---------+----------------+------------------------------------------------------------------------------------------------------------------
+ customer                       | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arw/rors_owner_grp}
+ customer_customer_id_seq       | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ menu_item                      | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ menu_item_menu_item_id_seq     | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ order_item                     | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=ar/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ orders                         | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arw/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ orders_order_id_seq            | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ payment                        | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arw/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ payment_payment_id_seq         | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ reservation                    | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ reservation_reservation_id_seq | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ restaurant_table               | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ restaurant_table_table_id_seq  | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ staff                          | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp}
+ staff_staff_id_seq             | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ v_customer_directory           | v       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ v_order_summary                | v       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ v_reservation_schedule         | v       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ v_staff_directory              | v       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+(19 rows)
+
+            proname            | pg_get_userbyid | prosecdef |                               proacl
+-------------------------------+-----------------+-----------+---------------------------------------------------------------------
+ fn_check_reservation_capacity | rors_owner_grp  | f         | {rors_owner_grp=X/rors_owner_grp,rors_runtime_grp=X/rors_owner_grp}
+ fn_refresh_order_total        | rors_owner_grp  | f         | {rors_owner_grp=X/rors_owner_grp,rors_runtime_grp=X/rors_owner_grp}
+ fn_require_order_items        | rors_owner_grp  | f         | {rors_owner_grp=X/rors_owner_grp,rors_runtime_grp=X/rors_owner_grp}
+(3 rows)
+
+   tgrelid   |          tgname          | tgenabled
+-------------+--------------------------+-----------
+ orders      | trg_orders_require_items | O
+ order_item  | trg_order_item_keep_one  | O
+ order_item  | trg_order_item_total     | O
+ reservation | trg_reservation_capacity | O
+(4 rows)
+
+  extname   | extversion
+------------+------------
+ btree_gist | 1.8
+ pgcrypto   | 1.4
+ plpgsql    | 1.0
+(3 rows)
+
+   defaclrole   | defaclobjtype |             defaclacl
+----------------+---------------+-----------------------------------
+ rors_owner_grp | f             | {rors_owner_grp=X/rors_owner_grp}
+ rors_dba       | f             | {rors_dba=X/rors_dba}
+(2 rows)
+
+     conrelid     |                 conname                 |                                                                                                                                                 pg_get_constraintdef
+------------------+-----------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ customer         | chk_customer_email                      | CHECK (((email)::text ~* '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$'::text))
+ customer         | customer_created_at_not_null            | NOT NULL created_at
+ customer         | customer_customer_id_not_null           | NOT NULL customer_id
+ customer         | customer_email_not_null                 | NOT NULL email
+ customer         | customer_first_name_not_null            | NOT NULL first_name
+ customer         | customer_last_name_not_null             | NOT NULL last_name
+ customer         | customer_password_not_null              | NOT NULL password
+ customer         | customer_phone_not_null                 | NOT NULL phone
+ customer         | customer_pkey                           | PRIMARY KEY (customer_id)
+ customer         | uq_customer_email                       | UNIQUE (email)
+ menu_item        | chk_menu_item_price                     | CHECK ((price >= (0)::numeric))
+ menu_item        | menu_item_availability_not_null         | NOT NULL availability
+ menu_item        | menu_item_category_not_null             | NOT NULL category
+ menu_item        | menu_item_item_name_not_null            | NOT NULL item_name
+ menu_item        | menu_item_menu_item_id_not_null         | NOT NULL menu_item_id
+ menu_item        | menu_item_pkey                          | PRIMARY KEY (menu_item_id)
+ menu_item        | menu_item_price_not_null                | NOT NULL price
+ restaurant_table | chk_restaurant_table_capacity           | CHECK ((capacity > 0))
+ restaurant_table | chk_restaurant_table_status             | CHECK (((status)::text = ANY ((ARRAY['available'::character varying, 'occupied'::character varying, 'reserved'::character varying, 'out_of_service'::character varying])::text[])))
+ restaurant_table | restaurant_table_capacity_not_null      | NOT NULL capacity
+ restaurant_table | restaurant_table_pkey                   | PRIMARY KEY (table_id)
+ restaurant_table | restaurant_table_status_not_null        | NOT NULL status
+ restaurant_table | restaurant_table_table_id_not_null      | NOT NULL table_id
+ restaurant_table | restaurant_table_table_number_not_null  | NOT NULL table_number
+ restaurant_table | uq_restaurant_table_number              | UNIQUE (table_number)
+ staff            | chk_staff_role                          | CHECK (((role)::text = ANY ((ARRAY['admin'::character varying, 'staff'::character varying])::text[])))
+ staff            | staff_email_not_null                    | NOT NULL email
+ staff            | staff_first_name_not_null               | NOT NULL first_name
+ staff            | staff_last_name_not_null                | NOT NULL last_name
+ staff            | staff_password_not_null                 | NOT NULL password
+ staff            | staff_pkey                              | PRIMARY KEY (staff_id)
+ staff            | staff_role_not_null                     | NOT NULL role
+ staff            | staff_staff_id_not_null                 | NOT NULL staff_id
+ staff            | uq_staff_email                          | UNIQUE (email)
+ orders           | chk_orders_status                       | CHECK (((order_status)::text = ANY ((ARRAY['pending'::character varying, 'confirmed'::character varying, 'preparing'::character varying, 'ready'::character varying, 'completed'::character varying, 'cancelled'::character varying])::text[])))
+ orders           | chk_orders_total                        | CHECK ((total_amount >= (0)::numeric))
+ orders           | fk_orders_customer                      | FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ orders           | orders_customer_id_not_null             | NOT NULL customer_id
+ orders           | orders_order_date_not_null              | NOT NULL order_date
+ orders           | orders_order_id_not_null                | NOT NULL order_id
+ orders           | orders_order_status_not_null            | NOT NULL order_status
+ orders           | orders_pkey                             | PRIMARY KEY (order_id)
+ orders           | orders_total_amount_not_null            | NOT NULL total_amount
+ orders           | trg_orders_require_items                | TRIGGER DEFERRABLE INITIALLY DEFERRED
+ order_item       | chk_order_item_math                     | CHECK ((subtotal = ((quantity)::numeric * unit_price)))
+ order_item       | chk_order_item_quantity                 | CHECK ((quantity > 0))
+ order_item       | chk_order_item_subtotal                 | CHECK ((subtotal >= (0)::numeric))
+ order_item       | chk_order_item_unit_price               | CHECK ((unit_price >= (0)::numeric))
+ order_item       | fk_order_item_menu_item                 | FOREIGN KEY (menu_item_id) REFERENCES menu_item(menu_item_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ order_item       | fk_order_item_order                     | FOREIGN KEY (order_id) REFERENCES orders(order_id) ON UPDATE CASCADE ON DELETE CASCADE
+ order_item       | order_item_menu_item_id_not_null        | NOT NULL menu_item_id
+ order_item       | order_item_order_id_not_null            | NOT NULL order_id
+ order_item       | order_item_quantity_not_null            | NOT NULL quantity
+ order_item       | order_item_subtotal_not_null            | NOT NULL subtotal
+ order_item       | order_item_unit_price_not_null          | NOT NULL unit_price
+ order_item       | pk_order_item                           | PRIMARY KEY (order_id, menu_item_id)
+ order_item       | trg_order_item_keep_one                 | TRIGGER DEFERRABLE INITIALLY DEFERRED
+ reservation      | chk_reservation_guests                  | CHECK ((number_of_guests > 0))
+ reservation      | chk_reservation_status                  | CHECK (((reservation_status)::text = ANY ((ARRAY['pending'::character varying, 'confirmed'::character varying, 'seated'::character varying, 'completed'::character varying, 'cancelled'::character varying, 'no_show'::character varying])::text[])))
+ reservation      | ex_reservation_no_overlap               | EXCLUDE USING gist (table_id WITH =, tsrange((reservation_date + reservation_time), ((reservation_date + reservation_time) + '02:00:00'::interval)) WITH &&) WHERE (((reservation_status)::text = ANY ((ARRAY['pending'::character varying, 'confirmed'::character varying, 'seated'::character varying])::text[])))
+ reservation      | fk_reservation_customer                 | FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ reservation      | fk_reservation_table                    | FOREIGN KEY (table_id) REFERENCES restaurant_table(table_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ reservation      | reservation_customer_id_not_null        | NOT NULL customer_id
+ reservation      | reservation_number_of_guests_not_null   | NOT NULL number_of_guests
+ reservation      | reservation_pkey                        | PRIMARY KEY (reservation_id)
+ reservation      | reservation_reservation_date_not_null   | NOT NULL reservation_date
+ reservation      | reservation_reservation_id_not_null     | NOT NULL reservation_id
+ reservation      | reservation_reservation_status_not_null | NOT NULL reservation_status
+ reservation      | reservation_reservation_time_not_null   | NOT NULL reservation_time
+ reservation      | reservation_table_id_not_null           | NOT NULL table_id
+ payment          | chk_payment_amount                      | CHECK ((amount >= (0)::numeric))
+ payment          | chk_payment_method                      | CHECK (((payment_method)::text = ANY ((ARRAY['cash'::character varying, 'card'::character varying, 'gcash'::character varying, 'bank_transfer'::character varying])::text[])))
+ payment          | chk_payment_status                      | CHECK (((payment_status)::text = ANY ((ARRAY['pending'::character varying, 'paid'::character varying, 'failed'::character varying, 'refunded'::character varying, 'cancelled'::character varying])::text[])))
+ payment          | fk_payment_order                        | FOREIGN KEY (order_id) REFERENCES orders(order_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ payment          | payment_amount_not_null                 | NOT NULL amount
+ payment          | payment_order_id_not_null               | NOT NULL order_id
+ payment          | payment_payment_date_not_null           | NOT NULL payment_date
+ payment          | payment_payment_id_not_null             | NOT NULL payment_id
+ payment          | payment_payment_method_not_null         | NOT NULL payment_method
+ payment          | payment_payment_status_not_null         | NOT NULL payment_status
+ payment          | payment_pkey                            | PRIMARY KEY (payment_id)
+ payment          | uq_payment_order                        | UNIQUE (order_id)
+(82 rows)
+
+     ?column?     | count
+------------------+-------
+ customer         |    51
+ staff            |    10
+ menu_item        |    50
+ restaurant_table |    20
+ orders           |    60
+ order_item       |   167
+ reservation      |    50
+ payment          |    56
+(8 rows)
+
+ probe_table_removed | probe_function_removed
+---------------------+------------------------
+ t                   | t
+(1 row)

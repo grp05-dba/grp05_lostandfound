@@ -1,0 +1,1228 @@
+===== runtime-read-approved-tables =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+SELECT 'property',count(*) FROM property UNION ALL SELECT 'room',count(*) FROM room UNION ALL SELECT 'tenant',count(*) FROM tenant UNION ALL SELECT 'lease',count(*) FROM lease UNION ALL SELECT 'payment',count(*) FROM payment UNION ALL SELECT 'utility_bill',count(*) FROM utility_bill;
+Expected: Allowed
+Actual:
+   ?column?   | count
+--------------+-------
+ property     |     2
+ room         |     6
+ tenant       |     4
+ lease        |     4
+ payment      |     6
+ utility_bill |     4
+(6 rows)
+
+
+
+===== runtime-positive-workflow =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN;
+INSERT INTO property(property_name,address) VALUES('G05 A4 probe','Local test') RETURNING property_id AS pid \gset
+INSERT INTO room(property_id,room_number,monthly_rate) VALUES(:pid,'probe',100) RETURNING room_id AS rid \gset
+INSERT INTO tenant(full_name,contact_number,email) VALUES('G05 A4 probe','000','g05-a4@example.invalid') RETURNING tenant_id AS tid \gset
+INSERT INTO lease(tenant_id,room_id,start_date,end_date,monthly_rent) VALUES(:tid,:rid,'2099-01-01','2099-12-31',100) RETURNING lease_id AS lid \gset
+SELECT status AS room_after_insert FROM room WHERE room_id=:rid;
+INSERT INTO payment(lease_id,amount,payment_method) VALUES(:lid,100,'CASH');
+INSERT INTO utility_bill(lease_id,billing_period,utility_type,amount) VALUES(:lid,'2099-01-01','WATER',20);
+UPDATE property SET property_name='G05 A4 updated' WHERE property_id=:pid;
+UPDATE room SET monthly_rate=120 WHERE room_id=:rid;
+UPDATE tenant SET full_name='G05 A4 updated' WHERE tenant_id=:tid;
+UPDATE lease SET monthly_rent=120 WHERE lease_id=:lid;
+UPDATE payment SET amount=110 WHERE lease_id=:lid;
+UPDATE utility_bill SET amount=25 WHERE lease_id=:lid;
+SELECT total_paid,utilities_billed FROM v_lease_summary WHERE lease_id=:lid;
+UPDATE lease SET status='TERMINATED' WHERE lease_id=:lid;
+SELECT status AS room_after_termination FROM room WHERE room_id=:rid;
+DELETE FROM payment WHERE lease_id=:lid;
+DELETE FROM utility_bill WHERE lease_id=:lid;
+DELETE FROM lease WHERE lease_id=:lid;
+DELETE FROM tenant WHERE tenant_id=:tid;
+DELETE FROM room WHERE room_id=:rid;
+DELETE FROM property WHERE property_id=:pid;
+ROLLBACK;
+Expected: Allowed
+Actual:
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+ room_after_insert
+-------------------
+ OCCUPIED
+(1 row)
+
+INSERT 0 1
+INSERT 0 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+ total_paid | utilities_billed
+------------+------------------
+     110.00 |            25.00
+(1 row)
+
+UPDATE 1
+ room_after_termination
+------------------------
+ AVAILABLE
+(1 row)
+
+DELETE 1
+DELETE 1
+DELETE 1
+DELETE 1
+DELETE 1
+DELETE 1
+ROLLBACK
+
+
+===== runtime-read-v_lease_summary =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+SELECT count(*) FROM v_lease_summary;
+Expected: Allowed
+Actual:
+ count
+-------
+     4
+(1 row)
+
+
+
+===== report-read-v_lease_summary =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+SELECT count(*) FROM v_lease_summary;
+Expected: Allowed
+Actual:
+ count
+-------
+     4
+(1 row)
+
+
+
+===== report-deny-insert-property =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; INSERT INTO property DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table property
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-property =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; UPDATE property SET property_name=property_name WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table property
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-property =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; DELETE FROM property WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table property
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-room =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; INSERT INTO room DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table room
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-room =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; UPDATE room SET monthly_rate=monthly_rate WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table room
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-room =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; DELETE FROM room WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table room
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-tenant =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; INSERT INTO tenant DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table tenant
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-tenant =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; UPDATE tenant SET full_name=full_name WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table tenant
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-tenant =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; DELETE FROM tenant WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table tenant
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-lease =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; INSERT INTO lease DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table lease
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-lease =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; UPDATE lease SET status=status WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table lease
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-lease =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; DELETE FROM lease WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table lease
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-payment =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; INSERT INTO payment DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-payment =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; UPDATE payment SET amount=amount WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-payment =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; DELETE FROM payment WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table payment
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-utility_bill =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; INSERT INTO utility_bill DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table utility_bill
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-utility_bill =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; UPDATE utility_bill SET amount=amount WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table utility_bill
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-utility_bill =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; DELETE FROM utility_bill WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table utility_bill
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-app_user =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; INSERT INTO app_user DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-app_user =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; UPDATE app_user SET username=username WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-app_user =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; DELETE FROM app_user WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-insert-schema_migrations =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; INSERT INTO schema_migrations DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table schema_migrations
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-update-schema_migrations =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; UPDATE schema_migrations SET name=name WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table schema_migrations
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-delete-schema_migrations =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; DELETE FROM schema_migrations WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table schema_migrations
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-insert-app_user =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; INSERT INTO app_user DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-update-app_user =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; UPDATE app_user SET username=username WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-app_user =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; DELETE FROM app_user WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-insert-schema_migrations =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; INSERT INTO schema_migrations DEFAULT VALUES; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table schema_migrations
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-update-schema_migrations =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; UPDATE schema_migrations SET name=name WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table schema_migrations
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-schema_migrations =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; DELETE FROM schema_migrations WHERE false; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table schema_migrations
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-migration-table =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+SELECT * FROM schema_migrations;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for table schema_migrations
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-account-sequence =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+SELECT nextval('app_user_user_id_seq');
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence app_user_user_id_seq
+LOCATION:  nextval_internal, sequence.c:655
+
+
+===== report-deny-password-hash =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+SELECT password_hash FROM app_user;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for table app_user
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-raw-tenant =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+SELECT * FROM tenant;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for table tenant
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-crypt =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+SELECT crypt('public-probe','xx');
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for function crypt
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== constraint-overlapping-lease =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; INSERT INTO lease(tenant_id,room_id,start_date,end_date,monthly_rent) VALUES(2,1,'2026-06-01','2026-12-01',100); ROLLBACK;
+Expected: Denied (23P01)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  23P01: conflicting key value violates exclusion constraint "ex_lease_no_overlap"
+DETAIL:  Key (room_id, daterange(start_date, end_date, '[]'::text))=(1, [2026-06-01,2026-12-02)) conflicts with existing key (room_id, daterange(start_date, end_date, '[]'::text))=(1, [2026-01-01,2027-01-01)).
+SCHEMA NAME:  public
+TABLE NAME:  lease
+CONSTRAINT NAME:  ex_lease_no_overlap
+LOCATION:  check_exclusion_or_unique_constraint, execIndexing.c:929
+
+
+===== constraint-room-status =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; UPDATE room SET status='AVAILABLE' WHERE room_id=1; ROLLBACK;
+Expected: Denied (P0001)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  P0001: This room has an ACTIVE lease, so it cannot be AVAILABLE. Terminate the lease first.
+CONTEXT:  PL/pgSQL function guard_room_status() line 8 at RAISE
+LOCATION:  exec_stmt_raise, pl_exec.c:3923
+
+
+===== runtime-shared-account-boundary =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+SELECT count(*) AS all_tenant_rows FROM tenant;
+Expected: Allowed
+Actual:
+ all_tenant_rows
+-----------------
+               4
+(1 row)
+
+
+
+===== boardtrack_app-deny-createdb =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+CREATE DATABASE g05_forbidden;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+
+===== boardtrack_app-deny-createrole =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+CREATE ROLE g05_forbidden NOLOGIN;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+
+===== boardtrack_app-deny-connect-boardtrack_unrelated_lab =====
+Account: boardtrack_app
+Database: boardtrack_unrelated_lab
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55411 failed: FATAL:  permission denied for database "boardtrack_unrelated_lab"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== boardtrack_app-deny-connect-postgres =====
+Account: boardtrack_app
+Database: postgres
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55411 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== boardtrack_app-deny-connect-template1 =====
+Account: boardtrack_app
+Database: template1
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55411 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== boardtrack_report-deny-createdb =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+CREATE DATABASE g05_forbidden;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+
+===== boardtrack_report-deny-createrole =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+CREATE ROLE g05_forbidden NOLOGIN;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+
+===== boardtrack_report-deny-connect-boardtrack_unrelated_lab =====
+Account: boardtrack_report
+Database: boardtrack_unrelated_lab
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55411 failed: FATAL:  permission denied for database "boardtrack_unrelated_lab"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== boardtrack_report-deny-connect-postgres =====
+Account: boardtrack_report
+Database: postgres
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55411 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== boardtrack_report-deny-connect-template1 =====
+Account: boardtrack_report
+Database: template1
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55411 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== boardtrack_dba-deny-createdb =====
+Account: boardtrack_dba
+Database: boardtrack_g05_activity4
+SQL:
+CREATE DATABASE g05_forbidden;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+
+===== boardtrack_dba-deny-createrole =====
+Account: boardtrack_dba
+Database: boardtrack_g05_activity4
+SQL:
+CREATE ROLE g05_forbidden NOLOGIN;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+
+===== boardtrack_dba-deny-connect-boardtrack_unrelated_lab =====
+Account: boardtrack_dba
+Database: boardtrack_unrelated_lab
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55411 failed: FATAL:  permission denied for database "boardtrack_unrelated_lab"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== boardtrack_dba-deny-connect-postgres =====
+Account: boardtrack_dba
+Database: postgres
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55411 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== boardtrack_dba-deny-connect-template1 =====
+Account: boardtrack_dba
+Database: template1
+SQL:
+SELECT current_database();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql: error: connection to server at "127.0.0.1", port 55411 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== boardtrack_app-deny-schema =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; CREATE SCHEMA g05_forbidden; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for database boardtrack_g05_activity4
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== boardtrack_app-deny-table =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.g05_forbidden(id int);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== boardtrack_app-deny-owner =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; SET ROLE boardtrack_owner_grp; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied to set role "boardtrack_owner_grp"
+LOCATION:  call_string_check_hook, guc.c:6945
+
+
+===== boardtrack_app-deny-truncate =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; TRUNCATE utility_bill; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table utility_bill
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== boardtrack_app-deny-alter =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; ALTER TABLE property ADD COLUMN g05_forbidden int; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: must be owner of table property
+LOCATION:  aclcheck_error, aclchk.c:2933
+
+
+===== boardtrack_app-deny-sequence-reset =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; SELECT setval('property_property_id_seq',1); ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence property_property_id_seq
+LOCATION:  do_setval, sequence.c:964
+
+
+===== boardtrack_report-deny-schema =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; CREATE SCHEMA g05_forbidden; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for database boardtrack_g05_activity4
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== boardtrack_report-deny-table =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.g05_forbidden(id int);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== boardtrack_report-deny-owner =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; SET ROLE boardtrack_owner_grp; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied to set role "boardtrack_owner_grp"
+LOCATION:  call_string_check_hook, guc.c:6945
+
+
+===== boardtrack_report-deny-truncate =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; TRUNCATE utility_bill; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table utility_bill
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== boardtrack_report-deny-alter =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; ALTER TABLE property ADD COLUMN g05_forbidden int; ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: must be owner of table property
+LOCATION:  aclcheck_error, aclchk.c:2933
+
+
+===== boardtrack_report-deny-sequence-reset =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; SELECT setval('property_property_id_seq',1); ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence property_property_id_seq
+LOCATION:  do_setval, sequence.c:964
+
+
+===== runtime-deny-sequence-state =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+SELECT last_value FROM property_property_id_seq;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence property_property_id_seq
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== report-deny-sequence =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+SELECT nextval('property_property_id_seq');
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence property_property_id_seq
+LOCATION:  nextval_internal, sequence.c:655
+
+
+===== runtime-deny-membership =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+GRANT boardtrack_runtime_grp TO boardtrack_report;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied to grant role "boardtrack_runtime_grp"
+DETAIL:  Only roles with the ADMIN option on role "boardtrack_runtime_grp" may grant this role.
+LOCATION:  check_role_membership_authorization, user.c:2163
+
+
+===== admin-needs-owner-role =====
+Account: boardtrack_dba
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;
+Expected: Denied (42501 / CONNECT)
+Actual:
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.g05_forbidden(id int);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== admin-maintenance =====
+Account: boardtrack_dba
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; SET ROLE boardtrack_owner_grp; CREATE TABLE g05_maintenance(id int); INSERT INTO g05_maintenance VALUES(1); ALTER TABLE g05_maintenance ADD COLUMN note text; DROP TABLE g05_maintenance; ROLLBACK;
+Expected: Allowed
+Actual:
+BEGIN
+SET
+CREATE TABLE
+INSERT 0 1
+ALTER TABLE
+DROP TABLE
+ROLLBACK
+
+
+===== admin-create-future-objects =====
+Account: boardtrack_dba
+Database: boardtrack_g05_activity4
+SQL:
+SET ROLE boardtrack_owner_grp; CREATE TABLE g05_future_probe(id serial PRIMARY KEY); CREATE FUNCTION g05_future_function() RETURNS int LANGUAGE sql AS 'SELECT 1';
+Expected: Allowed
+Actual:
+SET
+CREATE TABLE
+CREATE FUNCTION
+
+
+===== boardtrack_app-deny-future-table =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+SELECT * FROM g05_future_probe;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for table g05_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== boardtrack_app-deny-future-function =====
+Account: boardtrack_app
+Database: boardtrack_g05_activity4
+SQL:
+SELECT g05_future_function();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for function g05_future_function
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== boardtrack_report-deny-future-table =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+SELECT * FROM g05_future_probe;
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for table g05_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== boardtrack_report-deny-future-function =====
+Account: boardtrack_report
+Database: boardtrack_g05_activity4
+SQL:
+SELECT g05_future_function();
+Expected: Denied (42501 / CONNECT)
+Actual:
+psql:<stdin>:1: ERROR:  42501: permission denied for function g05_future_function
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== admin-future-use =====
+Account: boardtrack_dba
+Database: boardtrack_g05_activity4
+SQL:
+BEGIN; SET ROLE boardtrack_owner_grp; INSERT INTO g05_future_probe DEFAULT VALUES; SELECT g05_future_function(); ROLLBACK;
+Expected: Allowed
+Actual:
+BEGIN
+SET
+INSERT 0 1
+ g05_future_function
+---------------------
+                   1
+(1 row)
+
+ROLLBACK
+
+
+===== admin-remove-future-objects =====
+Account: boardtrack_dba
+Database: boardtrack_g05_activity4
+SQL:
+SET ROLE boardtrack_owner_grp; DROP TABLE g05_future_probe; DROP FUNCTION g05_future_function();
+Expected: Allowed
+Actual:
+SET
+DROP TABLE
+DROP FUNCTION
+
+
+===== catalog-and-cleanup =====
+Account: lab_admin
+Database: boardtrack_g05_activity4
+SQL:
+SELECT version(),current_database();
+SELECT rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolinherit FROM pg_roles WHERE rolname LIKE 'boardtrack_%' ORDER BY 1;
+SELECT a.rolname AS member,b.rolname AS parent,m.admin_option,m.inherit_option,m.set_option FROM pg_auth_members m JOIN pg_roles a ON a.oid=m.member JOIN pg_roles b ON b.oid=m.roleid WHERE a.rolname LIKE 'boardtrack_%';
+SELECT datname,pg_get_userbyid(datdba),datacl FROM pg_database ORDER BY datname;
+SELECT nspname,nspacl FROM pg_namespace WHERE nspname='public';
+SELECT c.relname,c.relkind,pg_get_userbyid(c.relowner) AS owner,c.relacl FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind IN('r','S','v') ORDER BY c.relname;
+SELECT proname,pg_get_userbyid(proowner),prosecdef,proacl FROM pg_proc p WHERE pronamespace='public'::regnamespace AND NOT EXISTS(SELECT 1 FROM pg_depend d WHERE d.classid='pg_proc'::regclass AND d.objid=p.oid AND d.deptype='e') ORDER BY proname;
+SELECT t.tgrelid::regclass,t.tgname,t.tgenabled FROM pg_trigger t WHERE NOT t.tgisinternal ORDER BY 1,2;
+SELECT extname,extversion FROM pg_extension ORDER BY 1;
+SELECT defaclrole::regrole,defaclobjtype,defaclacl FROM pg_default_acl;
+SELECT conrelid::regclass,conname,pg_get_constraintdef(oid) FROM pg_constraint WHERE connamespace='public'::regnamespace ORDER BY 1,2;
+SELECT 'property',count(*) FROM property UNION ALL SELECT 'room',count(*) FROM room UNION ALL SELECT 'tenant',count(*) FROM tenant UNION ALL SELECT 'lease',count(*) FROM lease UNION ALL SELECT 'payment',count(*) FROM payment UNION ALL SELECT 'utility_bill',count(*) FROM utility_bill UNION ALL SELECT 'app_user',count(*) FROM app_user UNION ALL SELECT 'schema_migrations',count(*) FROM schema_migrations;
+SELECT to_regclass('g05_future_probe') IS NULL AS probe_table_removed,to_regprocedure('g05_future_function()') IS NULL AS probe_function_removed;
+Expected: Allowed
+Actual:
+                                 version                                 |     current_database
+-------------------------------------------------------------------------+--------------------------
+ PostgreSQL 18.3 on x86_64-windows, compiled by msvc-19.44.35225, 64-bit | boardtrack_g05_activity4
+(1 row)
+
+         rolname         | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolbypassrls | rolinherit
+-------------------------+-------------+----------+-------------+---------------+----------------+--------------+------------
+ boardtrack_app          | t           | f        | f           | f             | f              | f            | t
+ boardtrack_dba          | t           | f        | f           | f             | f              | f            | f
+ boardtrack_owner_grp    | f           | f        | f           | f             | f              | f            | t
+ boardtrack_readonly_grp | f           | f        | f           | f             | f              | f            | t
+ boardtrack_report       | t           | f        | f           | f             | f              | f            | t
+ boardtrack_runtime_grp  | f           | f        | f           | f             | f              | f            | t
+(6 rows)
+
+      member       |         parent          | admin_option | inherit_option | set_option
+-------------------+-------------------------+--------------+----------------+------------
+ boardtrack_dba    | boardtrack_owner_grp    | f            | f              | t
+ boardtrack_app    | boardtrack_runtime_grp  | f            | t              | t
+ boardtrack_report | boardtrack_readonly_grp | f            | t              | t
+(3 rows)
+
+         datname          |   pg_get_userbyid    |                                                                                       datacl
+--------------------------+----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ boardtrack_g05_activity4 | boardtrack_owner_grp | {boardtrack_owner_grp=CTc/boardtrack_owner_grp,boardtrack_dba=c/boardtrack_owner_grp,boardtrack_runtime_grp=c/boardtrack_owner_grp,boardtrack_readonly_grp=c/boardtrack_owner_grp}
+ boardtrack_unrelated_lab | lab_admin            | {lab_admin=CTc/lab_admin}
+ postgres                 | lab_admin            | {lab_admin=CTc/lab_admin}
+ template0                | lab_admin            | {=c/lab_admin,lab_admin=CTc/lab_admin}
+ template1                | lab_admin            | {lab_admin=CTc/lab_admin}
+(5 rows)
+
+ nspname |                                                                                  nspacl
+---------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ public  | {pg_database_owner=UC/pg_database_owner,boardtrack_runtime_grp=U/pg_database_owner,boardtrack_readonly_grp=U/pg_database_owner,boardtrack_owner_grp=UC/pg_database_owner}
+(1 row)
+
+             relname              | relkind |        owner         |                                                                      relacl
+----------------------------------+---------+----------------------+---------------------------------------------------------------------------------------------------------------------------------------------------
+ app_user                         | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=r/boardtrack_owner_grp}
+ app_user_user_id_seq             | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp}
+ lease                            | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ lease_lease_id_seq               | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ payment                          | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ payment_payment_id_seq           | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ property                         | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ property_property_id_seq         | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ room                             | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ room_room_id_seq                 | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ schema_migrations                | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp}
+ tenant                           | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ tenant_tenant_id_seq             | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ utility_bill                     | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ utility_bill_utility_bill_id_seq | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ v_lease_summary                  | v       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=r/boardtrack_owner_grp,boardtrack_readonly_grp=r/boardtrack_owner_grp}
+(16 rows)
+
+      proname      |   pg_get_userbyid    | prosecdef |                                           proacl
+-------------------+----------------------+-----------+---------------------------------------------------------------------------------------------
+ guard_room_status | boardtrack_owner_grp | f         | {boardtrack_owner_grp=X/boardtrack_owner_grp,boardtrack_runtime_grp=X/boardtrack_owner_grp}
+ sync_room_status  | boardtrack_owner_grp | f         | {boardtrack_owner_grp=X/boardtrack_owner_grp,boardtrack_runtime_grp=X/boardtrack_owner_grp}
+(2 rows)
+
+ tgrelid |        tgname         | tgenabled
+---------+-----------------------+-----------
+ room    | trg_room_status_guard | O
+ lease   | trg_lease_sync_room   | O
+(2 rows)
+
+  extname   | extversion
+------------+------------
+ btree_gist | 1.8
+ pgcrypto   | 1.4
+ plpgsql    | 1.0
+(3 rows)
+
+      defaclrole      | defaclobjtype |                   defaclacl
+----------------------+---------------+-----------------------------------------------
+ boardtrack_owner_grp | f             | {boardtrack_owner_grp=X/boardtrack_owner_grp}
+ boardtrack_dba       | f             | {boardtrack_dba=X/boardtrack_dba}
+(2 rows)
+
+     conrelid      |                conname                |                                                                pg_get_constraintdef
+-------------------+---------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------
+ schema_migrations | schema_migrations_name_not_null       | NOT NULL name
+ schema_migrations | schema_migrations_pkey                | PRIMARY KEY (name)
+ property          | property_address_not_null             | NOT NULL address
+ property          | property_pkey                         | PRIMARY KEY (property_id)
+ property          | property_property_id_not_null         | NOT NULL property_id
+ property          | property_property_name_not_null       | NOT NULL property_name
+ room              | room_monthly_rate_check               | CHECK ((monthly_rate > (0)::numeric))
+ room              | room_monthly_rate_not_null            | NOT NULL monthly_rate
+ room              | room_pkey                             | PRIMARY KEY (room_id)
+ room              | room_property_id_fkey                 | FOREIGN KEY (property_id) REFERENCES property(property_id)
+ room              | room_property_id_not_null             | NOT NULL property_id
+ room              | room_room_id_not_null                 | NOT NULL room_id
+ room              | room_room_number_not_null             | NOT NULL room_number
+ room              | room_status_check                     | CHECK (((status)::text = ANY ((ARRAY['AVAILABLE'::character varying, 'OCCUPIED'::character varying, 'MAINTENANCE'::character varying])::text[])))
+ room              | room_status_not_null                  | NOT NULL status
+ room              | uq_room_per_property                  | UNIQUE (property_id, room_number)
+ tenant            | tenant_contact_number_not_null        | NOT NULL contact_number
+ tenant            | tenant_email_key                      | UNIQUE (email)
+ tenant            | tenant_full_name_not_null             | NOT NULL full_name
+ tenant            | tenant_pkey                           | PRIMARY KEY (tenant_id)
+ tenant            | tenant_tenant_id_not_null             | NOT NULL tenant_id
+ lease             | ck_lease_dates                        | CHECK ((end_date > start_date))
+ lease             | ck_lease_moveout                      | CHECK (((moved_out_on IS NULL) OR (moved_out_on >= start_date)))
+ lease             | ex_lease_no_overlap                   | EXCLUDE USING gist (room_id WITH =, daterange(start_date, end_date, '[]'::text) WITH &&) WHERE (((status)::text = 'ACTIVE'::text))
+ lease             | lease_end_date_not_null               | NOT NULL end_date
+ lease             | lease_lease_id_not_null               | NOT NULL lease_id
+ lease             | lease_monthly_rent_check              | CHECK ((monthly_rent > (0)::numeric))
+ lease             | lease_monthly_rent_not_null           | NOT NULL monthly_rent
+ lease             | lease_pkey                            | PRIMARY KEY (lease_id)
+ lease             | lease_room_id_fkey                    | FOREIGN KEY (room_id) REFERENCES room(room_id)
+ lease             | lease_room_id_not_null                | NOT NULL room_id
+ lease             | lease_start_date_not_null             | NOT NULL start_date
+ lease             | lease_status_check                    | CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'TERMINATED'::character varying, 'EXPIRED'::character varying])::text[])))
+ lease             | lease_status_not_null                 | NOT NULL status
+ lease             | lease_tenant_id_fkey                  | FOREIGN KEY (tenant_id) REFERENCES tenant(tenant_id)
+ lease             | lease_tenant_id_not_null              | NOT NULL tenant_id
+ payment           | payment_amount_check                  | CHECK ((amount > (0)::numeric))
+ payment           | payment_amount_not_null               | NOT NULL amount
+ payment           | payment_lease_id_fkey                 | FOREIGN KEY (lease_id) REFERENCES lease(lease_id)
+ payment           | payment_lease_id_not_null             | NOT NULL lease_id
+ payment           | payment_payment_date_not_null         | NOT NULL payment_date
+ payment           | payment_payment_id_not_null           | NOT NULL payment_id
+ payment           | payment_payment_method_check          | CHECK (((payment_method)::text = ANY ((ARRAY['CASH'::character varying, 'GCASH'::character varying, 'BANK_TRANSFER'::character varying])::text[])))
+ payment           | payment_payment_method_not_null       | NOT NULL payment_method
+ payment           | payment_pkey                          | PRIMARY KEY (payment_id)
+ payment           | payment_status_check                  | CHECK (((status)::text = ANY ((ARRAY['COMPLETED'::character varying, 'PENDING'::character varying, 'FAILED'::character varying])::text[])))
+ payment           | payment_status_not_null               | NOT NULL status
+ utility_bill      | utility_bill_amount_check             | CHECK ((amount >= (0)::numeric))
+ utility_bill      | utility_bill_amount_not_null          | NOT NULL amount
+ utility_bill      | utility_bill_billing_period_check     | CHECK ((EXTRACT(day FROM billing_period) = (1)::numeric))
+ utility_bill      | utility_bill_billing_period_not_null  | NOT NULL billing_period
+ utility_bill      | utility_bill_lease_id_fkey            | FOREIGN KEY (lease_id) REFERENCES lease(lease_id)
+ utility_bill      | utility_bill_lease_id_not_null        | NOT NULL lease_id
+ utility_bill      | utility_bill_pkey                     | PRIMARY KEY (utility_bill_id)
+ utility_bill      | utility_bill_status_check             | CHECK (((status)::text = ANY ((ARRAY['UNPAID'::character varying, 'PAID'::character varying])::text[])))
+ utility_bill      | utility_bill_status_not_null          | NOT NULL status
+ utility_bill      | utility_bill_utility_bill_id_not_null | NOT NULL utility_bill_id
+ utility_bill      | utility_bill_utility_type_check       | CHECK (((utility_type)::text = ANY ((ARRAY['ELECTRICITY'::character varying, 'WATER'::character varying, 'INTERNET'::character varying])::text[])))
+ utility_bill      | utility_bill_utility_type_not_null    | NOT NULL utility_type
+ app_user          | app_user_is_active_not_null           | NOT NULL is_active
+ app_user          | app_user_password_hash_not_null       | NOT NULL password_hash
+ app_user          | app_user_pkey                         | PRIMARY KEY (user_id)
+ app_user          | app_user_role_check                   | CHECK (((role)::text = ANY ((ARRAY['admin'::character varying, 'staff'::character varying, 'tenant'::character varying])::text[])))
+ app_user          | app_user_role_not_null                | NOT NULL role
+ app_user          | app_user_tenant_id_fkey               | FOREIGN KEY (tenant_id) REFERENCES tenant(tenant_id)
+ app_user          | app_user_user_id_not_null             | NOT NULL user_id
+ app_user          | app_user_username_key                 | UNIQUE (username)
+ app_user          | app_user_username_not_null            | NOT NULL username
+ app_user          | ck_tenant_user                        | CHECK ((((role)::text = 'tenant'::text) = (tenant_id IS NOT NULL)))
+(69 rows)
+
+     ?column?      | count
+-------------------+-------
+ property          |     2
+ room              |     6
+ tenant            |     4
+ lease             |     4
+ payment           |     6
+ utility_bill      |     4
+ app_user          |     3
+ schema_migrations |     1
+(8 rows)
+
+ probe_table_removed | probe_function_removed
+---------------------+------------------------
+ t                   | t
+(1 row)

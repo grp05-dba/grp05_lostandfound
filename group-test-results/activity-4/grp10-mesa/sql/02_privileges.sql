@@ -1,0 +1,23 @@
+\set ON_ERROR_STOP on
+BEGIN;
+DO $$ BEGIN IF current_database()<>'mesa_g05_activity4' THEN RAISE EXCEPTION 'Wrong evaluation database'; END IF; END $$;
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC,rors_app,rors_report,rors_runtime_grp,rors_readonly_grp;
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC,rors_app,rors_report,rors_runtime_grp,rors_readonly_grp;
+REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA public FROM PUBLIC;
+GRANT USAGE ON SCHEMA public TO rors_runtime_grp,rors_readonly_grp;
+GRANT USAGE,CREATE ON SCHEMA public TO rors_owner_grp;
+GRANT SELECT,INSERT,UPDATE ON customer,orders,payment TO rors_runtime_grp;
+GRANT SELECT,INSERT,UPDATE,DELETE ON menu_item,restaurant_table,reservation,staff TO rors_runtime_grp;
+GRANT SELECT,INSERT ON order_item TO rors_runtime_grp;
+GRANT SELECT ON v_customer_directory,v_staff_directory,v_order_summary,v_reservation_schedule TO rors_runtime_grp,rors_readonly_grp;
+GRANT SELECT ON menu_item,restaurant_table,orders,order_item,reservation,payment TO rors_readonly_grp;
+GRANT EXECUTE ON FUNCTION fn_refresh_order_total(),fn_require_order_items(),fn_check_reservation_capacity() TO rors_runtime_grp;
+GRANT USAGE ON SEQUENCE customer_customer_id_seq,staff_staff_id_seq,menu_item_menu_item_id_seq,restaurant_table_table_id_seq,orders_order_id_seq,reservation_reservation_id_seq,payment_payment_id_seq TO rors_runtime_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE rors_owner_grp REVOKE ALL ON TABLES FROM PUBLIC,rors_runtime_grp,rors_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE rors_owner_grp REVOKE ALL ON SEQUENCES FROM PUBLIC,rors_runtime_grp,rors_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE rors_owner_grp REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+ALTER DEFAULT PRIVILEGES FOR ROLE rors_dba REVOKE ALL ON TABLES FROM PUBLIC,rors_runtime_grp,rors_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE rors_dba REVOKE ALL ON SEQUENCES FROM PUBLIC,rors_runtime_grp,rors_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE rors_dba REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+COMMIT;

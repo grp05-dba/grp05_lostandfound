@@ -1,0 +1,68 @@
+FILE D:\Data Administration\grp05_lostandfound-1\group-test-results\activity-4\grp08-campus-canteen\sql\01_roles_database.sql
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+CREATE ROLE
+GRANT ROLE
+GRANT ROLE
+GRANT ROLE
+CREATE DATABASE
+CREATE DATABASE
+REVOKE
+GRANT
+
+UPSTREAM FILE database/migrations/001_create_tables.sql (executed unchanged under owner role; SQL not echoed)
+SET
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+
+UPSTREAM FILE database/migrations/002_auth_columns.sql (executed unchanged under owner role; SQL not echoed)
+SET
+ALTER TABLE
+ALTER TABLE
+ALTER TABLE
+
+UPSTREAM FILE database/seed/001_sample_data.sql (executed unchanged under owner role; SQL not echoed)
+SET
+INSERT 0 3
+INSERT 0 4
+INSERT 0 10
+DO
+
+FILE D:\Data Administration\grp05_lostandfound-1\group-test-results\activity-4\grp08-campus-canteen\sql\02_privileges.sql
+BEGIN
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+GRANT
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+COMMIT
+
+FILE D:\Data Administration\grp05_lostandfound-1\group-test-results\activity-4\grp08-campus-canteen\sql\03_lab_isolation.sql
+REVOKE
+REVOKE
+REVOKE
+REVOKE
+GRANT

@@ -1,0 +1,740 @@
+[
+  {
+    "name": "runtime-read-approved-tables",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT 'property',count(*) FROM property UNION ALL SELECT 'room',count(*) FROM room UNION ALL SELECT 'tenant',count(*) FROM tenant UNION ALL SELECT 'lease',count(*) FROM lease UNION ALL SELECT 'payment',count(*) FROM payment UNION ALL SELECT 'utility_bill',count(*) FROM utility_bill;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "runtime-positive-workflow",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN;\nINSERT INTO property(property_name,address) VALUES('G05 A4 probe','Local test') RETURNING property_id AS pid \\gset\nINSERT INTO room(property_id,room_number,monthly_rate) VALUES(:pid,'probe',100) RETURNING room_id AS rid \\gset\nINSERT INTO tenant(full_name,contact_number,email) VALUES('G05 A4 probe','000','g05-a4@example.invalid') RETURNING tenant_id AS tid \\gset\nINSERT INTO lease(tenant_id,room_id,start_date,end_date,monthly_rent) VALUES(:tid,:rid,'2099-01-01','2099-12-31',100) RETURNING lease_id AS lid \\gset\nSELECT status AS room_after_insert FROM room WHERE room_id=:rid;\nINSERT INTO payment(lease_id,amount,payment_method) VALUES(:lid,100,'CASH');\nINSERT INTO utility_bill(lease_id,billing_period,utility_type,amount) VALUES(:lid,'2099-01-01','WATER',20);\nUPDATE property SET property_name='G05 A4 updated' WHERE property_id=:pid;\nUPDATE room SET monthly_rate=120 WHERE room_id=:rid;\nUPDATE tenant SET full_name='G05 A4 updated' WHERE tenant_id=:tid;\nUPDATE lease SET monthly_rent=120 WHERE lease_id=:lid;\nUPDATE payment SET amount=110 WHERE lease_id=:lid;\nUPDATE utility_bill SET amount=25 WHERE lease_id=:lid;\nSELECT total_paid,utilities_billed FROM v_lease_summary WHERE lease_id=:lid;\nUPDATE lease SET status='TERMINATED' WHERE lease_id=:lid;\nSELECT status AS room_after_termination FROM room WHERE room_id=:rid;\nDELETE FROM payment WHERE lease_id=:lid;\nDELETE FROM utility_bill WHERE lease_id=:lid;\nDELETE FROM lease WHERE lease_id=:lid;\nDELETE FROM tenant WHERE tenant_id=:tid;\nDELETE FROM room WHERE room_id=:rid;\nDELETE FROM property WHERE property_id=:pid;\nROLLBACK;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "runtime-read-v_lease_summary",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT count(*) FROM v_lease_summary;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "report-read-v_lease_summary",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT count(*) FROM v_lease_summary;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-property",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; INSERT INTO property DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-property",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; UPDATE property SET property_name=property_name WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-property",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; DELETE FROM property WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-room",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; INSERT INTO room DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-room",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; UPDATE room SET monthly_rate=monthly_rate WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-room",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; DELETE FROM room WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-tenant",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; INSERT INTO tenant DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-tenant",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; UPDATE tenant SET full_name=full_name WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-tenant",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; DELETE FROM tenant WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-lease",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; INSERT INTO lease DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-lease",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; UPDATE lease SET status=status WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-lease",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; DELETE FROM lease WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-payment",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; INSERT INTO payment DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-payment",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; UPDATE payment SET amount=amount WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-payment",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; DELETE FROM payment WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-utility_bill",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; INSERT INTO utility_bill DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-utility_bill",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; UPDATE utility_bill SET amount=amount WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-utility_bill",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; DELETE FROM utility_bill WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-app_user",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; INSERT INTO app_user DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-app_user",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; UPDATE app_user SET username=username WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-app_user",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; DELETE FROM app_user WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-insert-schema_migrations",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; INSERT INTO schema_migrations DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-update-schema_migrations",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; UPDATE schema_migrations SET name=name WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-delete-schema_migrations",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; DELETE FROM schema_migrations WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-insert-app_user",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; INSERT INTO app_user DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-update-app_user",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; UPDATE app_user SET username=username WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-delete-app_user",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; DELETE FROM app_user WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-insert-schema_migrations",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; INSERT INTO schema_migrations DEFAULT VALUES; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-update-schema_migrations",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; UPDATE schema_migrations SET name=name WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-delete-schema_migrations",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; DELETE FROM schema_migrations WHERE false; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-migration-table",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT * FROM schema_migrations;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-account-sequence",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT nextval('app_user_user_id_seq');",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-password-hash",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT password_hash FROM app_user;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-raw-tenant",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT * FROM tenant;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-crypt",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT crypt('public-probe','xx');",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "constraint-overlapping-lease",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; INSERT INTO lease(tenant_id,room_id,start_date,end_date,monthly_rent) VALUES(2,1,'2026-06-01','2026-12-01',100); ROLLBACK;",
+    "expected": "Denied (23P01)",
+    "actual": "Denied 23P01",
+    "passed": true
+  },
+  {
+    "name": "constraint-room-status",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; UPDATE room SET status='AVAILABLE' WHERE room_id=1; ROLLBACK;",
+    "expected": "Denied (P0001)",
+    "actual": "Denied P0001",
+    "passed": true
+  },
+  {
+    "name": "runtime-shared-account-boundary",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT count(*) AS all_tenant_rows FROM tenant;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-createdb",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "CREATE DATABASE g05_forbidden;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-createrole",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "CREATE ROLE g05_forbidden NOLOGIN;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-connect-boardtrack_unrelated_lab",
+    "account": "boardtrack_app",
+    "database": "boardtrack_unrelated_lab",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-connect-postgres",
+    "account": "boardtrack_app",
+    "database": "postgres",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-connect-template1",
+    "account": "boardtrack_app",
+    "database": "template1",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-createdb",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "CREATE DATABASE g05_forbidden;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-createrole",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "CREATE ROLE g05_forbidden NOLOGIN;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-connect-boardtrack_unrelated_lab",
+    "account": "boardtrack_report",
+    "database": "boardtrack_unrelated_lab",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-connect-postgres",
+    "account": "boardtrack_report",
+    "database": "postgres",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-connect-template1",
+    "account": "boardtrack_report",
+    "database": "template1",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_dba-deny-createdb",
+    "account": "boardtrack_dba",
+    "database": "boardtrack_g05_activity4",
+    "sql": "CREATE DATABASE g05_forbidden;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_dba-deny-createrole",
+    "account": "boardtrack_dba",
+    "database": "boardtrack_g05_activity4",
+    "sql": "CREATE ROLE g05_forbidden NOLOGIN;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_dba-deny-connect-boardtrack_unrelated_lab",
+    "account": "boardtrack_dba",
+    "database": "boardtrack_unrelated_lab",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_dba-deny-connect-postgres",
+    "account": "boardtrack_dba",
+    "database": "postgres",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_dba-deny-connect-template1",
+    "account": "boardtrack_dba",
+    "database": "template1",
+    "sql": "SELECT current_database();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "CONNECT denied",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-schema",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; CREATE SCHEMA g05_forbidden; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-table",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-owner",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; SET ROLE boardtrack_owner_grp; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-truncate",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; TRUNCATE utility_bill; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-alter",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; ALTER TABLE property ADD COLUMN g05_forbidden int; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-sequence-reset",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; SELECT setval('property_property_id_seq',1); ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-schema",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; CREATE SCHEMA g05_forbidden; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-table",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-owner",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; SET ROLE boardtrack_owner_grp; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-truncate",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; TRUNCATE utility_bill; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-alter",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; ALTER TABLE property ADD COLUMN g05_forbidden int; ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-sequence-reset",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; SELECT setval('property_property_id_seq',1); ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-sequence-state",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT last_value FROM property_property_id_seq;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "report-deny-sequence",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT nextval('property_property_id_seq');",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "runtime-deny-membership",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "GRANT boardtrack_runtime_grp TO boardtrack_report;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "admin-needs-owner-role",
+    "account": "boardtrack_dba",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "admin-maintenance",
+    "account": "boardtrack_dba",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; SET ROLE boardtrack_owner_grp; CREATE TABLE g05_maintenance(id int); INSERT INTO g05_maintenance VALUES(1); ALTER TABLE g05_maintenance ADD COLUMN note text; DROP TABLE g05_maintenance; ROLLBACK;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "admin-create-future-objects",
+    "account": "boardtrack_dba",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SET ROLE boardtrack_owner_grp; CREATE TABLE g05_future_probe(id serial PRIMARY KEY); CREATE FUNCTION g05_future_function() RETURNS int LANGUAGE sql AS 'SELECT 1';",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-future-table",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT * FROM g05_future_probe;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_app-deny-future-function",
+    "account": "boardtrack_app",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT g05_future_function();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-future-table",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT * FROM g05_future_probe;",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "boardtrack_report-deny-future-function",
+    "account": "boardtrack_report",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT g05_future_function();",
+    "expected": "Denied (42501 / CONNECT)",
+    "actual": "Denied 42501",
+    "passed": true
+  },
+  {
+    "name": "admin-future-use",
+    "account": "boardtrack_dba",
+    "database": "boardtrack_g05_activity4",
+    "sql": "BEGIN; SET ROLE boardtrack_owner_grp; INSERT INTO g05_future_probe DEFAULT VALUES; SELECT g05_future_function(); ROLLBACK;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "admin-remove-future-objects",
+    "account": "boardtrack_dba",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SET ROLE boardtrack_owner_grp; DROP TABLE g05_future_probe; DROP FUNCTION g05_future_function();",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  },
+  {
+    "name": "catalog-and-cleanup",
+    "account": "lab_admin",
+    "database": "boardtrack_g05_activity4",
+    "sql": "SELECT version(),current_database();\nSELECT rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolinherit FROM pg_roles WHERE rolname LIKE 'boardtrack_%' ORDER BY 1;\nSELECT a.rolname AS member,b.rolname AS parent,m.admin_option,m.inherit_option,m.set_option FROM pg_auth_members m JOIN pg_roles a ON a.oid=m.member JOIN pg_roles b ON b.oid=m.roleid WHERE a.rolname LIKE 'boardtrack_%';\nSELECT datname,pg_get_userbyid(datdba),datacl FROM pg_database ORDER BY datname;\nSELECT nspname,nspacl FROM pg_namespace WHERE nspname='public';\nSELECT c.relname,c.relkind,pg_get_userbyid(c.relowner) AS owner,c.relacl FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind IN('r','S','v') ORDER BY c.relname;\nSELECT proname,pg_get_userbyid(proowner),prosecdef,proacl FROM pg_proc p WHERE pronamespace='public'::regnamespace AND NOT EXISTS(SELECT 1 FROM pg_depend d WHERE d.classid='pg_proc'::regclass AND d.objid=p.oid AND d.deptype='e') ORDER BY proname;\nSELECT t.tgrelid::regclass,t.tgname,t.tgenabled FROM pg_trigger t WHERE NOT t.tgisinternal ORDER BY 1,2;\nSELECT extname,extversion FROM pg_extension ORDER BY 1;\nSELECT defaclrole::regrole,defaclobjtype,defaclacl FROM pg_default_acl;\nSELECT conrelid::regclass,conname,pg_get_constraintdef(oid) FROM pg_constraint WHERE connamespace='public'::regnamespace ORDER BY 1,2;\nSELECT 'property',count(*) FROM property UNION ALL SELECT 'room',count(*) FROM room UNION ALL SELECT 'tenant',count(*) FROM tenant UNION ALL SELECT 'lease',count(*) FROM lease UNION ALL SELECT 'payment',count(*) FROM payment UNION ALL SELECT 'utility_bill',count(*) FROM utility_bill UNION ALL SELECT 'app_user',count(*) FROM app_user UNION ALL SELECT 'schema_migrations',count(*) FROM schema_migrations;\nSELECT to_regclass('g05_future_probe') IS NULL AS probe_table_removed,to_regprocedure('g05_future_function()') IS NULL AS probe_function_removed;",
+    "expected": "Allowed",
+    "actual": "Succeeded",
+    "passed": true
+  }
+]

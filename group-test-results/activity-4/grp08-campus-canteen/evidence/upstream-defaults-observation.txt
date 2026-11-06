@@ -1,0 +1,44 @@
+Account: lab_admin
+Database: canteen_g05_activity4
+SQL:
+BEGIN;
+-- Run as a superuser or canteen_admin. Default ACLs apply only to objects
+-- subsequently created by canteen_admin in public.
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin IN SCHEMA public
+    REVOKE ALL ON TABLES FROM PUBLIC, canteen_app_grp, canteen_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin IN SCHEMA public
+    REVOKE ALL ON SEQUENCES FROM PUBLIC, canteen_app_grp, canteen_readonly_grp;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin
+    REVOKE ALL ON TABLES FROM PUBLIC, canteen_app_grp, canteen_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin
+    REVOKE ALL ON SEQUENCES FROM PUBLIC, canteen_app_grp, canteen_readonly_grp;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin IN SCHEMA public
+    GRANT SELECT, INSERT, UPDATE ON TABLES TO canteen_app_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin IN SCHEMA public
+    GRANT USAGE, SELECT ON SEQUENCES TO canteen_app_grp;
+
+-- Read-only access is granted explicitly per approved table/column in script 04.
+
+GRANT USAGE,CREATE ON SCHEMA public TO canteen_admin; SET ROLE canteen_admin; CREATE TABLE public.g05_upstream_probe(id int); RESET ROLE; SELECT has_table_privilege('canteen_app','public.g05_upstream_probe','SELECT') AS runtime_select, has_table_privilege('canteen_app','public.g05_upstream_probe','INSERT') AS runtime_insert, has_table_privilege('canteen_app','public.g05_upstream_probe','UPDATE') AS runtime_update; ROLLBACK;
+Expected: Allowed
+Exit code: 0
+
+BEGIN
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+GRANT
+SET
+CREATE TABLE
+RESET
+ runtime_select | runtime_insert | runtime_update
+----------------+----------------+----------------
+ t              | t              | t
+(1 row)
+
+ROLLBACK

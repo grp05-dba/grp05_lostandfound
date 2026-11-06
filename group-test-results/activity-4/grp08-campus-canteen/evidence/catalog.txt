@@ -1,0 +1,192 @@
+Account: lab_admin
+Database: canteen_g05_activity4
+SQL:
+SELECT version(),current_database();
+SELECT rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolinherit FROM pg_roles WHERE rolname LIKE 'canteen_%' ORDER BY rolname;
+SELECT member.rolname AS member,parent.rolname AS parent,m.admin_option,m.inherit_option,m.set_option FROM pg_auth_members m JOIN pg_roles member ON member.oid=m.member JOIN pg_roles parent ON parent.oid=m.roleid WHERE member.rolname LIKE 'canteen_%' ORDER BY 1;
+SELECT datname,pg_get_userbyid(datdba) AS owner,datacl FROM pg_database ORDER BY datname;
+SELECT nspname,pg_get_userbyid(nspowner) AS owner,nspacl FROM pg_namespace WHERE nspname='public';
+SELECT c.relname,c.relkind,pg_get_userbyid(c.relowner) AS owner,c.relacl FROM pg_class c JOIN pg_namespace n ON c.relnamespace=n.oid WHERE n.nspname='public' AND c.relkind IN ('r','S','v','m') ORDER BY c.relname;
+SELECT table_name,column_name,privilege_type,grantee FROM information_schema.column_privileges WHERE grantee='canteen_readonly_grp' ORDER BY table_name,column_name;
+SELECT conrelid::regclass,conname,pg_get_constraintdef(oid) FROM pg_constraint WHERE connamespace='public'::regnamespace ORDER BY 1,2;
+SELECT defaclrole::regrole,defaclnamespace,defaclobjtype,defaclacl FROM pg_default_acl;
+SELECT count(*) AS application_functions FROM pg_proc WHERE pronamespace='public'::regnamespace;
+SELECT count(*) AS application_triggers FROM pg_trigger WHERE NOT tgisinternal;
+SELECT 'student',count(*) FROM student UNION ALL SELECT 'vendor',count(*) FROM vendor UNION ALL SELECT 'menu_item',count(*) FROM menu_item UNION ALL SELECT 'customer_order',count(*) FROM customer_order UNION ALL SELECT 'order_item',count(*) FROM order_item UNION ALL SELECT 'queue_entry',count(*) FROM queue_entry UNION ALL SELECT 'notification',count(*) FROM notification;
+SELECT count(*) AS probe_students FROM student WHERE email LIKE 'g05-%@example.invalid';
+SELECT to_regclass('g05_future_probe') IS NULL AS future_table_removed, to_regprocedure('g05_future_function()') IS NULL AS future_function_removed;
+
+Expected: Allowed
+Exit code: 0
+
+                                 version                                 |   current_database
+-------------------------------------------------------------------------+-----------------------
+ PostgreSQL 18.3 on x86_64-windows, compiled by msvc-19.44.35225, 64-bit | canteen_g05_activity4
+(1 row)
+
+       rolname        | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolbypassrls | rolinherit
+----------------------+-------------+----------+-------------+---------------+----------------+--------------+------------
+ canteen_admin        | t           | f        | f           | f             | f              | f            | f
+ canteen_app          | t           | f        | f           | f             | f              | f            | t
+ canteen_app_grp      | f           | f        | f           | f             | f              | f            | t
+ canteen_owner_grp    | f           | f        | f           | f             | f              | f            | t
+ canteen_readonly     | t           | f        | f           | f             | f              | f            | t
+ canteen_readonly_grp | f           | f        | f           | f             | f              | f            | t
+(6 rows)
+
+      member      |        parent        | admin_option | inherit_option | set_option
+------------------+----------------------+--------------+----------------+------------
+ canteen_admin    | canteen_owner_grp    | f            | f              | t
+ canteen_app      | canteen_app_grp      | f            | t              | t
+ canteen_readonly | canteen_readonly_grp | f            | t              | t
+(3 rows)
+
+        datname        |       owner       |                                                                          datacl
+-----------------------+-------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------
+ canteen_g05_activity4 | canteen_owner_grp | {canteen_owner_grp=CTc/canteen_owner_grp,canteen_admin=c/canteen_owner_grp,canteen_app_grp=c/canteen_owner_grp,canteen_readonly_grp=c/canteen_owner_grp}
+ canteen_unrelated_lab | lab_admin         | {lab_admin=CTc/lab_admin}
+ postgres              | lab_admin         | {lab_admin=CTc/lab_admin}
+ template0             | lab_admin         | {=c/lab_admin,lab_admin=CTc/lab_admin}
+ template1             | lab_admin         | {lab_admin=CTc/lab_admin}
+(5 rows)
+
+ nspname |       owner       |                                                                            nspacl
+---------+-------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+ public  | pg_database_owner | {pg_database_owner=UC/pg_database_owner,canteen_app_grp=U/pg_database_owner,canteen_readonly_grp=U/pg_database_owner,canteen_owner_grp=UC/pg_database_owner}
+(1 row)
+
+             relname              | relkind |       owner       |                                        relacl
+----------------------------------+---------+-------------------+---------------------------------------------------------------------------------------
+ customer_order                   | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}
+ customer_order_order_id_seq      | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ menu_item                        | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arwd/canteen_owner_grp}
+ menu_item_item_id_seq            | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ notification                     | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}
+ notification_notification_id_seq | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ order_item                       | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=ar/canteen_owner_grp}
+ order_item_order_item_id_seq     | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ queue_entry                      | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}
+ queue_entry_queue_id_seq         | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ student                          | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=ar/canteen_owner_grp}
+ student_student_id_seq           | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ vendor                           | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}
+ vendor_vendor_id_seq             | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+(14 rows)
+
+   table_name   |  column_name   | privilege_type |       grantee
+----------------+----------------+----------------+----------------------
+ customer_order | order_date     | SELECT         | canteen_readonly_grp
+ customer_order | order_id       | SELECT         | canteen_readonly_grp
+ customer_order | status         | SELECT         | canteen_readonly_grp
+ customer_order | vendor_id      | SELECT         | canteen_readonly_grp
+ menu_item      | is_available   | SELECT         | canteen_readonly_grp
+ menu_item      | item_id        | SELECT         | canteen_readonly_grp
+ menu_item      | item_name      | SELECT         | canteen_readonly_grp
+ menu_item      | price          | SELECT         | canteen_readonly_grp
+ menu_item      | vendor_id      | SELECT         | canteen_readonly_grp
+ order_item     | item_id        | SELECT         | canteen_readonly_grp
+ order_item     | order_id       | SELECT         | canteen_readonly_grp
+ order_item     | price_at_order | SELECT         | canteen_readonly_grp
+ order_item     | quantity       | SELECT         | canteen_readonly_grp
+ vendor         | vendor_id      | SELECT         | canteen_readonly_grp
+ vendor         | vendor_name    | SELECT         | canteen_readonly_grp
+(15 rows)
+
+    conrelid    |                 conname                 |                                                                                            pg_get_constraintdef
+----------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ student        | student_created_at_not_null             | NOT NULL created_at
+ student        | student_email_key                       | UNIQUE (email)
+ student        | student_email_not_null                  | NOT NULL email
+ student        | student_full_name_not_null              | NOT NULL full_name
+ student        | student_password_hash_not_null          | NOT NULL password_hash
+ student        | student_pkey                            | PRIMARY KEY (student_id)
+ student        | student_role_check                      | CHECK (((role)::text = ANY ((ARRAY['STUDENT'::character varying, 'ADMIN'::character varying])::text[])))
+ student        | student_role_not_null                   | NOT NULL role
+ student        | student_student_id_not_null             | NOT NULL student_id
+ vendor         | vendor_email_key                        | UNIQUE (email)
+ vendor         | vendor_is_active_not_null               | NOT NULL is_active
+ vendor         | vendor_pkey                             | PRIMARY KEY (vendor_id)
+ vendor         | vendor_vendor_id_not_null               | NOT NULL vendor_id
+ vendor         | vendor_vendor_name_not_null             | NOT NULL vendor_name
+ menu_item      | menu_item_is_available_not_null         | NOT NULL is_available
+ menu_item      | menu_item_item_id_not_null              | NOT NULL item_id
+ menu_item      | menu_item_item_name_not_null            | NOT NULL item_name
+ menu_item      | menu_item_pkey                          | PRIMARY KEY (item_id)
+ menu_item      | menu_item_price_check                   | CHECK ((price >= (0)::numeric))
+ menu_item      | menu_item_price_not_null                | NOT NULL price
+ menu_item      | menu_item_vendor_id_fkey                | FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id)
+ menu_item      | menu_item_vendor_id_not_null            | NOT NULL vendor_id
+ customer_order | customer_order_order_date_not_null      | NOT NULL order_date
+ customer_order | customer_order_order_id_not_null        | NOT NULL order_id
+ customer_order | customer_order_pickup_time_not_null     | NOT NULL pickup_time
+ customer_order | customer_order_pkey                     | PRIMARY KEY (order_id)
+ customer_order | customer_order_status_check             | CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'preparing'::character varying, 'ready'::character varying, 'completed'::character varying, 'cancelled'::character varying])::text[])))
+ customer_order | customer_order_status_not_null          | NOT NULL status
+ customer_order | customer_order_student_id_fkey          | FOREIGN KEY (student_id) REFERENCES student(student_id)
+ customer_order | customer_order_student_id_not_null      | NOT NULL student_id
+ customer_order | customer_order_vendor_id_fkey           | FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id)
+ customer_order | customer_order_vendor_id_not_null       | NOT NULL vendor_id
+ order_item     | order_item_item_id_fkey                 | FOREIGN KEY (item_id) REFERENCES menu_item(item_id)
+ order_item     | order_item_item_id_not_null             | NOT NULL item_id
+ order_item     | order_item_order_id_fkey                | FOREIGN KEY (order_id) REFERENCES customer_order(order_id)
+ order_item     | order_item_order_id_not_null            | NOT NULL order_id
+ order_item     | order_item_order_item_id_not_null       | NOT NULL order_item_id
+ order_item     | order_item_pkey                         | PRIMARY KEY (order_item_id)
+ order_item     | order_item_price_at_order_not_null      | NOT NULL price_at_order
+ order_item     | order_item_quantity_check               | CHECK ((quantity > 0))
+ order_item     | order_item_quantity_not_null            | NOT NULL quantity
+ queue_entry    | queue_entry_order_id_fkey               | FOREIGN KEY (order_id) REFERENCES customer_order(order_id)
+ queue_entry    | queue_entry_order_id_key                | UNIQUE (order_id)
+ queue_entry    | queue_entry_order_id_not_null           | NOT NULL order_id
+ queue_entry    | queue_entry_pkey                        | PRIMARY KEY (queue_id)
+ queue_entry    | queue_entry_queue_date_not_null         | NOT NULL queue_date
+ queue_entry    | queue_entry_queue_id_not_null           | NOT NULL queue_id
+ queue_entry    | queue_entry_queue_number_not_null       | NOT NULL queue_number
+ queue_entry    | queue_entry_queue_number_queue_date_key | UNIQUE (queue_number, queue_date)
+ queue_entry    | queue_entry_status_check                | CHECK (((status)::text = ANY ((ARRAY['waiting'::character varying, 'called'::character varying, 'served'::character varying])::text[])))
+ queue_entry    | queue_entry_status_not_null             | NOT NULL status
+ notification   | notification_is_read_not_null           | NOT NULL is_read
+ notification   | notification_message_not_null           | NOT NULL message
+ notification   | notification_notification_id_not_null   | NOT NULL notification_id
+ notification   | notification_order_id_fkey              | FOREIGN KEY (order_id) REFERENCES customer_order(order_id)
+ notification   | notification_order_id_not_null          | NOT NULL order_id
+ notification   | notification_pkey                       | PRIMARY KEY (notification_id)
+ notification   | notification_sent_at_not_null           | NOT NULL sent_at
+(58 rows)
+
+    defaclrole     | defaclnamespace | defaclobjtype |                defaclacl
+-------------------+-----------------+---------------+-----------------------------------------
+ canteen_owner_grp |               0 | f             | {canteen_owner_grp=X/canteen_owner_grp}
+ canteen_admin     |               0 | f             | {canteen_admin=X/canteen_admin}
+(2 rows)
+
+ application_functions
+-----------------------
+                     0
+(1 row)
+
+ application_triggers
+----------------------
+                    0
+(1 row)
+
+    ?column?    | count
+----------------+-------
+ student        |     3
+ vendor         |     4
+ menu_item      |    10
+ customer_order |     2
+ order_item     |     2
+ queue_entry    |     2
+ notification   |     3
+(7 rows)
+
+ probe_students
+----------------
+              0
+(1 row)
+
+ future_table_removed | future_function_removed
+----------------------+-------------------------
+ t                    | t
+(1 row)

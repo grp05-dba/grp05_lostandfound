@@ -1,0 +1,170 @@
+                                 version                                 |     current_database
+-------------------------------------------------------------------------+--------------------------
+ PostgreSQL 18.3 on x86_64-windows, compiled by msvc-19.44.35225, 64-bit | boardtrack_g05_activity4
+(1 row)
+
+         rolname         | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolbypassrls | rolinherit
+-------------------------+-------------+----------+-------------+---------------+----------------+--------------+------------
+ boardtrack_app          | t           | f        | f           | f             | f              | f            | t
+ boardtrack_dba          | t           | f        | f           | f             | f              | f            | f
+ boardtrack_owner_grp    | f           | f        | f           | f             | f              | f            | t
+ boardtrack_readonly_grp | f           | f        | f           | f             | f              | f            | t
+ boardtrack_report       | t           | f        | f           | f             | f              | f            | t
+ boardtrack_runtime_grp  | f           | f        | f           | f             | f              | f            | t
+(6 rows)
+
+      member       |         parent          | admin_option | inherit_option | set_option
+-------------------+-------------------------+--------------+----------------+------------
+ boardtrack_dba    | boardtrack_owner_grp    | f            | f              | t
+ boardtrack_app    | boardtrack_runtime_grp  | f            | t              | t
+ boardtrack_report | boardtrack_readonly_grp | f            | t              | t
+(3 rows)
+
+         datname          |   pg_get_userbyid    |                                                                                       datacl
+--------------------------+----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ boardtrack_g05_activity4 | boardtrack_owner_grp | {boardtrack_owner_grp=CTc/boardtrack_owner_grp,boardtrack_dba=c/boardtrack_owner_grp,boardtrack_runtime_grp=c/boardtrack_owner_grp,boardtrack_readonly_grp=c/boardtrack_owner_grp}
+ boardtrack_unrelated_lab | lab_admin            | {lab_admin=CTc/lab_admin}
+ postgres                 | lab_admin            | {lab_admin=CTc/lab_admin}
+ template0                | lab_admin            | {=c/lab_admin,lab_admin=CTc/lab_admin}
+ template1                | lab_admin            | {lab_admin=CTc/lab_admin}
+(5 rows)
+
+ nspname |                                                                                  nspacl
+---------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ public  | {pg_database_owner=UC/pg_database_owner,boardtrack_runtime_grp=U/pg_database_owner,boardtrack_readonly_grp=U/pg_database_owner,boardtrack_owner_grp=UC/pg_database_owner}
+(1 row)
+
+             relname              | relkind |        owner         |                                                                      relacl
+----------------------------------+---------+----------------------+---------------------------------------------------------------------------------------------------------------------------------------------------
+ app_user                         | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=r/boardtrack_owner_grp}
+ app_user_user_id_seq             | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp}
+ lease                            | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ lease_lease_id_seq               | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ payment                          | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ payment_payment_id_seq           | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ property                         | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ property_property_id_seq         | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ room                             | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ room_room_id_seq                 | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ schema_migrations                | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp}
+ tenant                           | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ tenant_tenant_id_seq             | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ utility_bill                     | r       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=arwd/boardtrack_owner_grp}
+ utility_bill_utility_bill_id_seq | S       | boardtrack_owner_grp | {boardtrack_owner_grp=rwU/boardtrack_owner_grp,boardtrack_runtime_grp=U/boardtrack_owner_grp}
+ v_lease_summary                  | v       | boardtrack_owner_grp | {boardtrack_owner_grp=arwdDxtm/boardtrack_owner_grp,boardtrack_runtime_grp=r/boardtrack_owner_grp,boardtrack_readonly_grp=r/boardtrack_owner_grp}
+(16 rows)
+
+      proname      |   pg_get_userbyid    | prosecdef |                                           proacl
+-------------------+----------------------+-----------+---------------------------------------------------------------------------------------------
+ guard_room_status | boardtrack_owner_grp | f         | {boardtrack_owner_grp=X/boardtrack_owner_grp,boardtrack_runtime_grp=X/boardtrack_owner_grp}
+ sync_room_status  | boardtrack_owner_grp | f         | {boardtrack_owner_grp=X/boardtrack_owner_grp,boardtrack_runtime_grp=X/boardtrack_owner_grp}
+(2 rows)
+
+ tgrelid |        tgname         | tgenabled
+---------+-----------------------+-----------
+ room    | trg_room_status_guard | O
+ lease   | trg_lease_sync_room   | O
+(2 rows)
+
+  extname   | extversion
+------------+------------
+ btree_gist | 1.8
+ pgcrypto   | 1.4
+ plpgsql    | 1.0
+(3 rows)
+
+      defaclrole      | defaclobjtype |                   defaclacl
+----------------------+---------------+-----------------------------------------------
+ boardtrack_owner_grp | f             | {boardtrack_owner_grp=X/boardtrack_owner_grp}
+ boardtrack_dba       | f             | {boardtrack_dba=X/boardtrack_dba}
+(2 rows)
+
+     conrelid      |                conname                |                                                                pg_get_constraintdef
+-------------------+---------------------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------
+ schema_migrations | schema_migrations_name_not_null       | NOT NULL name
+ schema_migrations | schema_migrations_pkey                | PRIMARY KEY (name)
+ property          | property_address_not_null             | NOT NULL address
+ property          | property_pkey                         | PRIMARY KEY (property_id)
+ property          | property_property_id_not_null         | NOT NULL property_id
+ property          | property_property_name_not_null       | NOT NULL property_name
+ room              | room_monthly_rate_check               | CHECK ((monthly_rate > (0)::numeric))
+ room              | room_monthly_rate_not_null            | NOT NULL monthly_rate
+ room              | room_pkey                             | PRIMARY KEY (room_id)
+ room              | room_property_id_fkey                 | FOREIGN KEY (property_id) REFERENCES property(property_id)
+ room              | room_property_id_not_null             | NOT NULL property_id
+ room              | room_room_id_not_null                 | NOT NULL room_id
+ room              | room_room_number_not_null             | NOT NULL room_number
+ room              | room_status_check                     | CHECK (((status)::text = ANY ((ARRAY['AVAILABLE'::character varying, 'OCCUPIED'::character varying, 'MAINTENANCE'::character varying])::text[])))
+ room              | room_status_not_null                  | NOT NULL status
+ room              | uq_room_per_property                  | UNIQUE (property_id, room_number)
+ tenant            | tenant_contact_number_not_null        | NOT NULL contact_number
+ tenant            | tenant_email_key                      | UNIQUE (email)
+ tenant            | tenant_full_name_not_null             | NOT NULL full_name
+ tenant            | tenant_pkey                           | PRIMARY KEY (tenant_id)
+ tenant            | tenant_tenant_id_not_null             | NOT NULL tenant_id
+ lease             | ck_lease_dates                        | CHECK ((end_date > start_date))
+ lease             | ck_lease_moveout                      | CHECK (((moved_out_on IS NULL) OR (moved_out_on >= start_date)))
+ lease             | ex_lease_no_overlap                   | EXCLUDE USING gist (room_id WITH =, daterange(start_date, end_date, '[]'::text) WITH &&) WHERE (((status)::text = 'ACTIVE'::text))
+ lease             | lease_end_date_not_null               | NOT NULL end_date
+ lease             | lease_lease_id_not_null               | NOT NULL lease_id
+ lease             | lease_monthly_rent_check              | CHECK ((monthly_rent > (0)::numeric))
+ lease             | lease_monthly_rent_not_null           | NOT NULL monthly_rent
+ lease             | lease_pkey                            | PRIMARY KEY (lease_id)
+ lease             | lease_room_id_fkey                    | FOREIGN KEY (room_id) REFERENCES room(room_id)
+ lease             | lease_room_id_not_null                | NOT NULL room_id
+ lease             | lease_start_date_not_null             | NOT NULL start_date
+ lease             | lease_status_check                    | CHECK (((status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'TERMINATED'::character varying, 'EXPIRED'::character varying])::text[])))
+ lease             | lease_status_not_null                 | NOT NULL status
+ lease             | lease_tenant_id_fkey                  | FOREIGN KEY (tenant_id) REFERENCES tenant(tenant_id)
+ lease             | lease_tenant_id_not_null              | NOT NULL tenant_id
+ payment           | payment_amount_check                  | CHECK ((amount > (0)::numeric))
+ payment           | payment_amount_not_null               | NOT NULL amount
+ payment           | payment_lease_id_fkey                 | FOREIGN KEY (lease_id) REFERENCES lease(lease_id)
+ payment           | payment_lease_id_not_null             | NOT NULL lease_id
+ payment           | payment_payment_date_not_null         | NOT NULL payment_date
+ payment           | payment_payment_id_not_null           | NOT NULL payment_id
+ payment           | payment_payment_method_check          | CHECK (((payment_method)::text = ANY ((ARRAY['CASH'::character varying, 'GCASH'::character varying, 'BANK_TRANSFER'::character varying])::text[])))
+ payment           | payment_payment_method_not_null       | NOT NULL payment_method
+ payment           | payment_pkey                          | PRIMARY KEY (payment_id)
+ payment           | payment_status_check                  | CHECK (((status)::text = ANY ((ARRAY['COMPLETED'::character varying, 'PENDING'::character varying, 'FAILED'::character varying])::text[])))
+ payment           | payment_status_not_null               | NOT NULL status
+ utility_bill      | utility_bill_amount_check             | CHECK ((amount >= (0)::numeric))
+ utility_bill      | utility_bill_amount_not_null          | NOT NULL amount
+ utility_bill      | utility_bill_billing_period_check     | CHECK ((EXTRACT(day FROM billing_period) = (1)::numeric))
+ utility_bill      | utility_bill_billing_period_not_null  | NOT NULL billing_period
+ utility_bill      | utility_bill_lease_id_fkey            | FOREIGN KEY (lease_id) REFERENCES lease(lease_id)
+ utility_bill      | utility_bill_lease_id_not_null        | NOT NULL lease_id
+ utility_bill      | utility_bill_pkey                     | PRIMARY KEY (utility_bill_id)
+ utility_bill      | utility_bill_status_check             | CHECK (((status)::text = ANY ((ARRAY['UNPAID'::character varying, 'PAID'::character varying])::text[])))
+ utility_bill      | utility_bill_status_not_null          | NOT NULL status
+ utility_bill      | utility_bill_utility_bill_id_not_null | NOT NULL utility_bill_id
+ utility_bill      | utility_bill_utility_type_check       | CHECK (((utility_type)::text = ANY ((ARRAY['ELECTRICITY'::character varying, 'WATER'::character varying, 'INTERNET'::character varying])::text[])))
+ utility_bill      | utility_bill_utility_type_not_null    | NOT NULL utility_type
+ app_user          | app_user_is_active_not_null           | NOT NULL is_active
+ app_user          | app_user_password_hash_not_null       | NOT NULL password_hash
+ app_user          | app_user_pkey                         | PRIMARY KEY (user_id)
+ app_user          | app_user_role_check                   | CHECK (((role)::text = ANY ((ARRAY['admin'::character varying, 'staff'::character varying, 'tenant'::character varying])::text[])))
+ app_user          | app_user_role_not_null                | NOT NULL role
+ app_user          | app_user_tenant_id_fkey               | FOREIGN KEY (tenant_id) REFERENCES tenant(tenant_id)
+ app_user          | app_user_user_id_not_null             | NOT NULL user_id
+ app_user          | app_user_username_key                 | UNIQUE (username)
+ app_user          | app_user_username_not_null            | NOT NULL username
+ app_user          | ck_tenant_user                        | CHECK ((((role)::text = 'tenant'::text) = (tenant_id IS NOT NULL)))
+(69 rows)
+
+     ?column?      | count
+-------------------+-------
+ property          |     2
+ room              |     6
+ tenant            |     4
+ lease             |     4
+ payment           |     6
+ utility_bill      |     4
+ app_user          |     3
+ schema_migrations |     1
+(8 rows)
+
+ probe_table_removed | probe_function_removed
+---------------------+------------------------
+ t                   | t
+(1 row)

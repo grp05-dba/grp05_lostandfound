@@ -1,0 +1,1317 @@
+===== runtime-read-seven-tables =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+SELECT 'student',count(*) FROM student UNION ALL SELECT 'vendor',count(*) FROM vendor UNION ALL SELECT 'menu_item',count(*) FROM menu_item UNION ALL SELECT 'customer_order',count(*) FROM customer_order UNION ALL SELECT 'order_item',count(*) FROM order_item UNION ALL SELECT 'queue_entry',count(*) FROM queue_entry UNION ALL SELECT 'notification',count(*) FROM notification;
+Expected: Allowed
+Exit code: 0
+
+    ?column?    | count
+----------------+-------
+ student        |     3
+ vendor         |     4
+ menu_item      |    10
+ customer_order |     2
+ order_item     |     2
+ queue_entry    |     2
+ notification   |     3
+(7 rows)
+
+
+
+===== runtime-generated-id-workflow =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN;
+INSERT INTO student(full_name,email,password_hash) VALUES ('G05 A4 probe','g05-a4-probe@example.invalid','non-login-test-marker') RETURNING student_id AS sid \gset
+INSERT INTO vendor(vendor_name,email,password_hash) VALUES ('G05 A4 probe','g05-vendor-probe@example.invalid','non-login-test-marker') RETURNING vendor_id AS vid \gset
+INSERT INTO menu_item(vendor_id,item_name,price) VALUES (:vid,'G05 A4 probe',10) RETURNING item_id AS iid \gset
+INSERT INTO customer_order(student_id,vendor_id,pickup_time) VALUES (:sid,:vid,'23:59') RETURNING order_id AS oid \gset
+INSERT INTO order_item(order_id,item_id,quantity,price_at_order) VALUES (:oid,:iid,2,10);
+INSERT INTO queue_entry(order_id,queue_number,queue_date) VALUES (:oid,900001,'2099-01-01');
+INSERT INTO notification(order_id,message) VALUES (:oid,'G05 A4 probe');
+UPDATE vendor SET is_active=false WHERE vendor_id=:vid;
+UPDATE menu_item SET price=12.5 WHERE item_id=:iid;
+UPDATE customer_order SET status='preparing' WHERE order_id=:oid;
+UPDATE queue_entry SET status='called' WHERE order_id=:oid;
+UPDATE notification SET is_read=true WHERE order_id=:oid;
+SELECT sum(quantity*price_at_order) AS probe_total FROM order_item WHERE order_id=:oid;
+ROLLBACK;
+Expected: Allowed
+Exit code: 0
+
+BEGIN
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+UPDATE 1
+ probe_total
+-------------
+       20.00
+(1 row)
+
+ROLLBACK
+
+
+===== runtime-menu-delete =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; INSERT INTO menu_item(vendor_id,item_name,price) SELECT min(vendor_id),'G05 delete probe',1 FROM vendor; DELETE FROM menu_item WHERE item_name='G05 delete probe'; ROLLBACK;
+Expected: Allowed
+Exit code: 0
+
+BEGIN
+INSERT 0 1
+DELETE 1
+ROLLBACK
+
+
+===== readonly-sales-query =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+SELECT v.vendor_name,m.item_name,o.status,sum(oi.quantity*oi.price_at_order) AS sales FROM vendor v JOIN menu_item m USING(vendor_id) JOIN order_item oi USING(item_id) JOIN customer_order o USING(order_id) WHERE o.status='completed' GROUP BY v.vendor_name,m.item_name,o.status ORDER BY 1,2;
+Expected: Allowed
+Exit code: 0
+
+ vendor_name | item_name | status | sales
+-------------+-----------+--------+-------
+(0 rows)
+
+
+
+===== readonly-deny-insert-student =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; INSERT INTO student DEFAULT VALUES; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table student
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-update-student =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; UPDATE student SET full_name=full_name WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table student
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-delete-student =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM student WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table student
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-student =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM student WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table student
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-insert-vendor =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; INSERT INTO vendor DEFAULT VALUES; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table vendor
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-update-vendor =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; UPDATE vendor SET vendor_name=vendor_name WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table vendor
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-delete-vendor =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM vendor WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table vendor
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-vendor =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM vendor WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table vendor
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-insert-menu_item =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; INSERT INTO menu_item DEFAULT VALUES; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-update-menu_item =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; UPDATE menu_item SET item_name=item_name WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-delete-menu_item =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM menu_item WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-insert-customer_order =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; INSERT INTO customer_order DEFAULT VALUES; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table customer_order
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-update-customer_order =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; UPDATE customer_order SET status=status WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table customer_order
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-delete-customer_order =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM customer_order WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table customer_order
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-customer_order =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM customer_order WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table customer_order
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-insert-order_item =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; INSERT INTO order_item DEFAULT VALUES; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table order_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-update-order_item =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; UPDATE order_item SET quantity=quantity WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table order_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-delete-order_item =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM order_item WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table order_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-order_item =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM order_item WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table order_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-insert-queue_entry =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; INSERT INTO queue_entry DEFAULT VALUES; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table queue_entry
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-update-queue_entry =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; UPDATE queue_entry SET status=status WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table queue_entry
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-delete-queue_entry =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM queue_entry WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table queue_entry
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-queue_entry =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM queue_entry WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table queue_entry
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-insert-notification =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; INSERT INTO notification DEFAULT VALUES; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table notification
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-update-notification =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; UPDATE notification SET message=message WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table notification
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-delete-notification =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM notification WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table notification
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-delete-notification =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; DELETE FROM notification WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table notification
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-update-student =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; UPDATE student SET full_name=full_name WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table student
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-update-order_item =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; UPDATE order_item SET quantity=quantity WHERE false; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table order_item
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-student-data =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+SELECT full_name FROM student;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for table student
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-vendor-hash =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+SELECT password_hash FROM vendor;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for table vendor
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-vendor-contact =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+SELECT contact_number FROM vendor;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for table vendor
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-order-student =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+SELECT student_id FROM customer_order;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for table customer_order
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-queue =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+SELECT * FROM queue_entry;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for table queue_entry
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-notification =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+SELECT * FROM notification;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for table notification
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== readonly-deny-whole-vendor =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+SELECT * FROM vendor;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for table vendor
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== canteen_app-deny-createdb =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+CREATE DATABASE g05_forbidden;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+
+===== canteen_app-deny-createrole =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+CREATE ROLE g05_forbidden NOLOGIN;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+
+===== canteen_app-deny-connect-canteen_unrelated_lab =====
+Account: canteen_app
+Database: canteen_unrelated_lab
+SQL:
+SELECT current_database();
+Expected: Denied for privilege reasons
+Exit code: 2
+
+psql: error: connection to server at "127.0.0.1", port 55408 failed: FATAL:  permission denied for database "canteen_unrelated_lab"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== canteen_app-deny-connect-postgres =====
+Account: canteen_app
+Database: postgres
+SQL:
+SELECT current_database();
+Expected: Denied for privilege reasons
+Exit code: 2
+
+psql: error: connection to server at "127.0.0.1", port 55408 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== canteen_app-deny-connect-template1 =====
+Account: canteen_app
+Database: template1
+SQL:
+SELECT current_database();
+Expected: Denied for privilege reasons
+Exit code: 2
+
+psql: error: connection to server at "127.0.0.1", port 55408 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== canteen_readonly-deny-createdb =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+CREATE DATABASE g05_forbidden;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+
+===== canteen_readonly-deny-createrole =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+CREATE ROLE g05_forbidden NOLOGIN;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+
+===== canteen_readonly-deny-connect-canteen_unrelated_lab =====
+Account: canteen_readonly
+Database: canteen_unrelated_lab
+SQL:
+SELECT current_database();
+Expected: Denied for privilege reasons
+Exit code: 2
+
+psql: error: connection to server at "127.0.0.1", port 55408 failed: FATAL:  permission denied for database "canteen_unrelated_lab"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== canteen_readonly-deny-connect-postgres =====
+Account: canteen_readonly
+Database: postgres
+SQL:
+SELECT current_database();
+Expected: Denied for privilege reasons
+Exit code: 2
+
+psql: error: connection to server at "127.0.0.1", port 55408 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== canteen_readonly-deny-connect-template1 =====
+Account: canteen_readonly
+Database: template1
+SQL:
+SELECT current_database();
+Expected: Denied for privilege reasons
+Exit code: 2
+
+psql: error: connection to server at "127.0.0.1", port 55408 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== canteen_admin-deny-createdb =====
+Account: canteen_admin
+Database: canteen_g05_activity4
+SQL:
+CREATE DATABASE g05_forbidden;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:979
+
+
+===== canteen_admin-deny-createrole =====
+Account: canteen_admin
+Database: canteen_g05_activity4
+SQL:
+CREATE ROLE g05_forbidden NOLOGIN;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:320
+
+
+===== canteen_admin-deny-connect-canteen_unrelated_lab =====
+Account: canteen_admin
+Database: canteen_unrelated_lab
+SQL:
+SELECT current_database();
+Expected: Denied for privilege reasons
+Exit code: 2
+
+psql: error: connection to server at "127.0.0.1", port 55408 failed: FATAL:  permission denied for database "canteen_unrelated_lab"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== canteen_admin-deny-connect-postgres =====
+Account: canteen_admin
+Database: postgres
+SQL:
+SELECT current_database();
+Expected: Denied for privilege reasons
+Exit code: 2
+
+psql: error: connection to server at "127.0.0.1", port 55408 failed: FATAL:  permission denied for database "postgres"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== canteen_admin-deny-connect-template1 =====
+Account: canteen_admin
+Database: template1
+SQL:
+SELECT current_database();
+Expected: Denied for privilege reasons
+Exit code: 2
+
+psql: error: connection to server at "127.0.0.1", port 55408 failed: FATAL:  permission denied for database "template1"
+DETAIL:  User does not have CONNECT privilege.
+
+
+===== canteen_app-deny-schema =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; CREATE SCHEMA g05_forbidden; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for database canteen_g05_activity4
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== canteen_app-deny-table =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.g05_forbidden(id int);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== canteen_app-deny-owner =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; SET ROLE canteen_owner_grp; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied to set role "canteen_owner_grp"
+LOCATION:  call_string_check_hook, guc.c:6945
+
+
+===== canteen_app-deny-truncate =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; TRUNCATE notification; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table notification
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== canteen_app-deny-alter =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; ALTER TABLE menu_item ADD COLUMN g05_forbidden int; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: must be owner of table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2933
+
+
+===== canteen_app-deny-sequence-reset =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; SELECT setval('menu_item_item_id_seq',1); ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence menu_item_item_id_seq
+LOCATION:  do_setval, sequence.c:964
+
+
+===== canteen_readonly-deny-schema =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; CREATE SCHEMA g05_forbidden; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for database canteen_g05_activity4
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== canteen_readonly-deny-table =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.g05_forbidden(id int);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== canteen_readonly-deny-owner =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; SET ROLE canteen_owner_grp; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied to set role "canteen_owner_grp"
+LOCATION:  call_string_check_hook, guc.c:6945
+
+
+===== canteen_readonly-deny-truncate =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; TRUNCATE notification; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for table notification
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== canteen_readonly-deny-alter =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; ALTER TABLE menu_item ADD COLUMN g05_forbidden int; ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: must be owner of table menu_item
+LOCATION:  aclcheck_error, aclchk.c:2933
+
+
+===== canteen_readonly-deny-sequence-reset =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+BEGIN; SELECT setval('menu_item_item_id_seq',1); ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence menu_item_item_id_seq
+LOCATION:  do_setval, sequence.c:964
+
+
+===== readonly-deny-nextval =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+SELECT nextval('menu_item_item_id_seq');
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence menu_item_item_id_seq
+LOCATION:  nextval_internal, sequence.c:655
+
+
+===== runtime-deny-raw-sequence-read =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+SELECT last_value FROM menu_item_item_id_seq;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for sequence menu_item_item_id_seq
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== runtime-deny-grant-membership =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+GRANT canteen_app_grp TO canteen_readonly;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied to grant role "canteen_app_grp"
+DETAIL:  Only roles with the ADMIN option on role "canteen_app_grp" may grant this role.
+LOCATION:  check_role_membership_authorization, user.c:2163
+
+
+===== admin-requires-owner-role =====
+Account: canteen_admin
+Database: canteen_g05_activity4
+SQL:
+BEGIN; CREATE TABLE public.g05_forbidden(id int); ROLLBACK;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+BEGIN
+psql:<stdin>:1: ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.g05_forbidden(id int);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== admin-maintenance =====
+Account: canteen_admin
+Database: canteen_g05_activity4
+SQL:
+BEGIN; SET ROLE canteen_owner_grp; CREATE TABLE public.g05_admin_probe(id int); INSERT INTO g05_admin_probe VALUES(1); UPDATE student SET full_name=full_name WHERE email='maria@student.test'; ALTER TABLE g05_admin_probe ADD COLUMN note text; DROP TABLE g05_admin_probe; ROLLBACK;
+Expected: Allowed
+Exit code: 0
+
+BEGIN
+SET
+CREATE TABLE
+INSERT 0 1
+UPDATE 1
+ALTER TABLE
+DROP TABLE
+ROLLBACK
+
+
+===== upstream-default-grant-observation =====
+Account: lab_admin
+Database: canteen_g05_activity4
+SQL:
+BEGIN;
+-- Run as a superuser or canteen_admin. Default ACLs apply only to objects
+-- subsequently created by canteen_admin in public.
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin IN SCHEMA public
+    REVOKE ALL ON TABLES FROM PUBLIC, canteen_app_grp, canteen_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin IN SCHEMA public
+    REVOKE ALL ON SEQUENCES FROM PUBLIC, canteen_app_grp, canteen_readonly_grp;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin
+    REVOKE ALL ON TABLES FROM PUBLIC, canteen_app_grp, canteen_readonly_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin
+    REVOKE ALL ON SEQUENCES FROM PUBLIC, canteen_app_grp, canteen_readonly_grp;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin IN SCHEMA public
+    GRANT SELECT, INSERT, UPDATE ON TABLES TO canteen_app_grp;
+ALTER DEFAULT PRIVILEGES FOR ROLE canteen_admin IN SCHEMA public
+    GRANT USAGE, SELECT ON SEQUENCES TO canteen_app_grp;
+
+-- Read-only access is granted explicitly per approved table/column in script 04.
+
+GRANT USAGE,CREATE ON SCHEMA public TO canteen_admin; SET ROLE canteen_admin; CREATE TABLE public.g05_upstream_probe(id int); RESET ROLE; SELECT has_table_privilege('canteen_app','public.g05_upstream_probe','SELECT') AS runtime_select, has_table_privilege('canteen_app','public.g05_upstream_probe','INSERT') AS runtime_insert, has_table_privilege('canteen_app','public.g05_upstream_probe','UPDATE') AS runtime_update; ROLLBACK;
+Expected: Allowed
+Exit code: 0
+
+BEGIN
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+ALTER DEFAULT PRIVILEGES
+GRANT
+SET
+CREATE TABLE
+RESET
+ runtime_select | runtime_insert | runtime_update
+----------------+----------------+----------------
+ t              | t              | t
+(1 row)
+
+ROLLBACK
+
+
+===== owner-create-future-objects =====
+Account: canteen_admin
+Database: canteen_g05_activity4
+SQL:
+SET ROLE canteen_owner_grp; CREATE TABLE public.g05_future_probe(id serial PRIMARY KEY,note text); CREATE FUNCTION public.g05_future_function() RETURNS integer LANGUAGE sql AS 'SELECT 1';
+Expected: Allowed
+Exit code: 0
+
+SET
+CREATE TABLE
+CREATE FUNCTION
+
+
+===== canteen_app-deny-future-table =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+SELECT * FROM public.g05_future_probe;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for table g05_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== canteen_app-deny-future-function =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+SELECT public.g05_future_function();
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for function g05_future_function
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== canteen_readonly-deny-future-table =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+SELECT * FROM public.g05_future_probe;
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for table g05_future_probe
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== canteen_readonly-deny-future-function =====
+Account: canteen_readonly
+Database: canteen_g05_activity4
+SQL:
+SELECT public.g05_future_function();
+Expected: Denied for privilege reasons
+Exit code: 3
+
+psql:<stdin>:1: ERROR:  42501: permission denied for function g05_future_function
+LOCATION:  aclcheck_error, aclchk.c:2795
+
+
+===== admin-future-object-use =====
+Account: canteen_admin
+Database: canteen_g05_activity4
+SQL:
+BEGIN; SET ROLE canteen_owner_grp; INSERT INTO g05_future_probe(note) VALUES('probe'); SELECT g05_future_function(); ROLLBACK;
+Expected: Allowed
+Exit code: 0
+
+BEGIN
+SET
+INSERT 0 1
+ g05_future_function
+---------------------
+                   1
+(1 row)
+
+ROLLBACK
+
+
+===== owner-drop-future-probes =====
+Account: canteen_admin
+Database: canteen_g05_activity4
+SQL:
+SET ROLE canteen_owner_grp; DROP TABLE g05_future_probe; DROP FUNCTION g05_future_function();
+Expected: Allowed
+Exit code: 0
+
+SET
+DROP TABLE
+DROP FUNCTION
+
+
+===== direct-sql-role-boundary =====
+Account: canteen_app
+Database: canteen_g05_activity4
+SQL:
+BEGIN; INSERT INTO student(full_name,email,password_hash,role) VALUES ('G05 boundary','g05-boundary@example.invalid','non-login-test-marker','ADMIN') RETURNING student_id,role; ROLLBACK;
+Expected: Allowed
+Exit code: 0
+
+BEGIN
+ student_id | role
+------------+-------
+          5 | ADMIN
+(1 row)
+
+INSERT 0 1
+ROLLBACK
+
+
+===== catalog-and-cleanup =====
+Account: lab_admin
+Database: canteen_g05_activity4
+SQL:
+SELECT version(),current_database();
+SELECT rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolreplication,rolbypassrls,rolinherit FROM pg_roles WHERE rolname LIKE 'canteen_%' ORDER BY rolname;
+SELECT member.rolname AS member,parent.rolname AS parent,m.admin_option,m.inherit_option,m.set_option FROM pg_auth_members m JOIN pg_roles member ON member.oid=m.member JOIN pg_roles parent ON parent.oid=m.roleid WHERE member.rolname LIKE 'canteen_%' ORDER BY 1;
+SELECT datname,pg_get_userbyid(datdba) AS owner,datacl FROM pg_database ORDER BY datname;
+SELECT nspname,pg_get_userbyid(nspowner) AS owner,nspacl FROM pg_namespace WHERE nspname='public';
+SELECT c.relname,c.relkind,pg_get_userbyid(c.relowner) AS owner,c.relacl FROM pg_class c JOIN pg_namespace n ON c.relnamespace=n.oid WHERE n.nspname='public' AND c.relkind IN ('r','S','v','m') ORDER BY c.relname;
+SELECT table_name,column_name,privilege_type,grantee FROM information_schema.column_privileges WHERE grantee='canteen_readonly_grp' ORDER BY table_name,column_name;
+SELECT conrelid::regclass,conname,pg_get_constraintdef(oid) FROM pg_constraint WHERE connamespace='public'::regnamespace ORDER BY 1,2;
+SELECT defaclrole::regrole,defaclnamespace,defaclobjtype,defaclacl FROM pg_default_acl;
+SELECT count(*) AS application_functions FROM pg_proc WHERE pronamespace='public'::regnamespace;
+SELECT count(*) AS application_triggers FROM pg_trigger WHERE NOT tgisinternal;
+SELECT 'student',count(*) FROM student UNION ALL SELECT 'vendor',count(*) FROM vendor UNION ALL SELECT 'menu_item',count(*) FROM menu_item UNION ALL SELECT 'customer_order',count(*) FROM customer_order UNION ALL SELECT 'order_item',count(*) FROM order_item UNION ALL SELECT 'queue_entry',count(*) FROM queue_entry UNION ALL SELECT 'notification',count(*) FROM notification;
+SELECT count(*) AS probe_students FROM student WHERE email LIKE 'g05-%@example.invalid';
+SELECT to_regclass('g05_future_probe') IS NULL AS future_table_removed, to_regprocedure('g05_future_function()') IS NULL AS future_function_removed;
+
+Expected: Allowed
+Exit code: 0
+
+                                 version                                 |   current_database
+-------------------------------------------------------------------------+-----------------------
+ PostgreSQL 18.3 on x86_64-windows, compiled by msvc-19.44.35225, 64-bit | canteen_g05_activity4
+(1 row)
+
+       rolname        | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolbypassrls | rolinherit
+----------------------+-------------+----------+-------------+---------------+----------------+--------------+------------
+ canteen_admin        | t           | f        | f           | f             | f              | f            | f
+ canteen_app          | t           | f        | f           | f             | f              | f            | t
+ canteen_app_grp      | f           | f        | f           | f             | f              | f            | t
+ canteen_owner_grp    | f           | f        | f           | f             | f              | f            | t
+ canteen_readonly     | t           | f        | f           | f             | f              | f            | t
+ canteen_readonly_grp | f           | f        | f           | f             | f              | f            | t
+(6 rows)
+
+      member      |        parent        | admin_option | inherit_option | set_option
+------------------+----------------------+--------------+----------------+------------
+ canteen_admin    | canteen_owner_grp    | f            | f              | t
+ canteen_app      | canteen_app_grp      | f            | t              | t
+ canteen_readonly | canteen_readonly_grp | f            | t              | t
+(3 rows)
+
+        datname        |       owner       |                                                                          datacl
+-----------------------+-------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------
+ canteen_g05_activity4 | canteen_owner_grp | {canteen_owner_grp=CTc/canteen_owner_grp,canteen_admin=c/canteen_owner_grp,canteen_app_grp=c/canteen_owner_grp,canteen_readonly_grp=c/canteen_owner_grp}
+ canteen_unrelated_lab | lab_admin         | {lab_admin=CTc/lab_admin}
+ postgres              | lab_admin         | {lab_admin=CTc/lab_admin}
+ template0             | lab_admin         | {=c/lab_admin,lab_admin=CTc/lab_admin}
+ template1             | lab_admin         | {lab_admin=CTc/lab_admin}
+(5 rows)
+
+ nspname |       owner       |                                                                            nspacl
+---------+-------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+ public  | pg_database_owner | {pg_database_owner=UC/pg_database_owner,canteen_app_grp=U/pg_database_owner,canteen_readonly_grp=U/pg_database_owner,canteen_owner_grp=UC/pg_database_owner}
+(1 row)
+
+             relname              | relkind |       owner       |                                        relacl
+----------------------------------+---------+-------------------+---------------------------------------------------------------------------------------
+ customer_order                   | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}
+ customer_order_order_id_seq      | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ menu_item                        | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arwd/canteen_owner_grp}
+ menu_item_item_id_seq            | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ notification                     | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}
+ notification_notification_id_seq | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ order_item                       | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=ar/canteen_owner_grp}
+ order_item_order_item_id_seq     | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ queue_entry                      | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}
+ queue_entry_queue_id_seq         | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ student                          | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=ar/canteen_owner_grp}
+ student_student_id_seq           | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+ vendor                           | r       | canteen_owner_grp | {canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}
+ vendor_vendor_id_seq             | S       | canteen_owner_grp | {canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}
+(14 rows)
+
+   table_name   |  column_name   | privilege_type |       grantee
+----------------+----------------+----------------+----------------------
+ customer_order | order_date     | SELECT         | canteen_readonly_grp
+ customer_order | order_id       | SELECT         | canteen_readonly_grp
+ customer_order | status         | SELECT         | canteen_readonly_grp
+ customer_order | vendor_id      | SELECT         | canteen_readonly_grp
+ menu_item      | is_available   | SELECT         | canteen_readonly_grp
+ menu_item      | item_id        | SELECT         | canteen_readonly_grp
+ menu_item      | item_name      | SELECT         | canteen_readonly_grp
+ menu_item      | price          | SELECT         | canteen_readonly_grp
+ menu_item      | vendor_id      | SELECT         | canteen_readonly_grp
+ order_item     | item_id        | SELECT         | canteen_readonly_grp
+ order_item     | order_id       | SELECT         | canteen_readonly_grp
+ order_item     | price_at_order | SELECT         | canteen_readonly_grp
+ order_item     | quantity       | SELECT         | canteen_readonly_grp
+ vendor         | vendor_id      | SELECT         | canteen_readonly_grp
+ vendor         | vendor_name    | SELECT         | canteen_readonly_grp
+(15 rows)
+
+    conrelid    |                 conname                 |                                                                                            pg_get_constraintdef
+----------------+-----------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ student        | student_created_at_not_null             | NOT NULL created_at
+ student        | student_email_key                       | UNIQUE (email)
+ student        | student_email_not_null                  | NOT NULL email
+ student        | student_full_name_not_null              | NOT NULL full_name
+ student        | student_password_hash_not_null          | NOT NULL password_hash
+ student        | student_pkey                            | PRIMARY KEY (student_id)
+ student        | student_role_check                      | CHECK (((role)::text = ANY ((ARRAY['STUDENT'::character varying, 'ADMIN'::character varying])::text[])))
+ student        | student_role_not_null                   | NOT NULL role
+ student        | student_student_id_not_null             | NOT NULL student_id
+ vendor         | vendor_email_key                        | UNIQUE (email)
+ vendor         | vendor_is_active_not_null               | NOT NULL is_active
+ vendor         | vendor_pkey                             | PRIMARY KEY (vendor_id)
+ vendor         | vendor_vendor_id_not_null               | NOT NULL vendor_id
+ vendor         | vendor_vendor_name_not_null             | NOT NULL vendor_name
+ menu_item      | menu_item_is_available_not_null         | NOT NULL is_available
+ menu_item      | menu_item_item_id_not_null              | NOT NULL item_id
+ menu_item      | menu_item_item_name_not_null            | NOT NULL item_name
+ menu_item      | menu_item_pkey                          | PRIMARY KEY (item_id)
+ menu_item      | menu_item_price_check                   | CHECK ((price >= (0)::numeric))
+ menu_item      | menu_item_price_not_null                | NOT NULL price
+ menu_item      | menu_item_vendor_id_fkey                | FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id)
+ menu_item      | menu_item_vendor_id_not_null            | NOT NULL vendor_id
+ customer_order | customer_order_order_date_not_null      | NOT NULL order_date
+ customer_order | customer_order_order_id_not_null        | NOT NULL order_id
+ customer_order | customer_order_pickup_time_not_null     | NOT NULL pickup_time
+ customer_order | customer_order_pkey                     | PRIMARY KEY (order_id)
+ customer_order | customer_order_status_check             | CHECK (((status)::text = ANY ((ARRAY['pending'::character varying, 'preparing'::character varying, 'ready'::character varying, 'completed'::character varying, 'cancelled'::character varying])::text[])))
+ customer_order | customer_order_status_not_null          | NOT NULL status
+ customer_order | customer_order_student_id_fkey          | FOREIGN KEY (student_id) REFERENCES student(student_id)
+ customer_order | customer_order_student_id_not_null      | NOT NULL student_id
+ customer_order | customer_order_vendor_id_fkey           | FOREIGN KEY (vendor_id) REFERENCES vendor(vendor_id)
+ customer_order | customer_order_vendor_id_not_null       | NOT NULL vendor_id
+ order_item     | order_item_item_id_fkey                 | FOREIGN KEY (item_id) REFERENCES menu_item(item_id)
+ order_item     | order_item_item_id_not_null             | NOT NULL item_id
+ order_item     | order_item_order_id_fkey                | FOREIGN KEY (order_id) REFERENCES customer_order(order_id)
+ order_item     | order_item_order_id_not_null            | NOT NULL order_id
+ order_item     | order_item_order_item_id_not_null       | NOT NULL order_item_id
+ order_item     | order_item_pkey                         | PRIMARY KEY (order_item_id)
+ order_item     | order_item_price_at_order_not_null      | NOT NULL price_at_order
+ order_item     | order_item_quantity_check               | CHECK ((quantity > 0))
+ order_item     | order_item_quantity_not_null            | NOT NULL quantity
+ queue_entry    | queue_entry_order_id_fkey               | FOREIGN KEY (order_id) REFERENCES customer_order(order_id)
+ queue_entry    | queue_entry_order_id_key                | UNIQUE (order_id)
+ queue_entry    | queue_entry_order_id_not_null           | NOT NULL order_id
+ queue_entry    | queue_entry_pkey                        | PRIMARY KEY (queue_id)
+ queue_entry    | queue_entry_queue_date_not_null         | NOT NULL queue_date
+ queue_entry    | queue_entry_queue_id_not_null           | NOT NULL queue_id
+ queue_entry    | queue_entry_queue_number_not_null       | NOT NULL queue_number
+ queue_entry    | queue_entry_queue_number_queue_date_key | UNIQUE (queue_number, queue_date)
+ queue_entry    | queue_entry_status_check                | CHECK (((status)::text = ANY ((ARRAY['waiting'::character varying, 'called'::character varying, 'served'::character varying])::text[])))
+ queue_entry    | queue_entry_status_not_null             | NOT NULL status
+ notification   | notification_is_read_not_null           | NOT NULL is_read
+ notification   | notification_message_not_null           | NOT NULL message
+ notification   | notification_notification_id_not_null   | NOT NULL notification_id
+ notification   | notification_order_id_fkey              | FOREIGN KEY (order_id) REFERENCES customer_order(order_id)
+ notification   | notification_order_id_not_null          | NOT NULL order_id
+ notification   | notification_pkey                       | PRIMARY KEY (notification_id)
+ notification   | notification_sent_at_not_null           | NOT NULL sent_at
+(58 rows)
+
+    defaclrole     | defaclnamespace | defaclobjtype |                defaclacl
+-------------------+-----------------+---------------+-----------------------------------------
+ canteen_owner_grp |               0 | f             | {canteen_owner_grp=X/canteen_owner_grp}
+ canteen_admin     |               0 | f             | {canteen_admin=X/canteen_admin}
+(2 rows)
+
+ application_functions
+-----------------------
+                     0
+(1 row)
+
+ application_triggers
+----------------------
+                    0
+(1 row)
+
+    ?column?    | count
+----------------+-------
+ student        |     3
+ vendor         |     4
+ menu_item      |    10
+ customer_order |     2
+ order_item     |     2
+ queue_entry    |     2
+ notification   |     3
+(7 rows)
+
+ probe_students
+----------------
+              0
+(1 row)
+
+ future_table_removed | future_function_removed
+----------------------+-------------------------
+ t                    | t
+(1 row)

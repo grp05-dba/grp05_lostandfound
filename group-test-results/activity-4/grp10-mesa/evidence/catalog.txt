@@ -1,0 +1,189 @@
+                                 version                                 |  current_database
+-------------------------------------------------------------------------+--------------------
+ PostgreSQL 18.3 on x86_64-windows, compiled by msvc-19.44.35225, 64-bit | mesa_g05_activity4
+(1 row)
+
+      rolname      | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolbypassrls | rolinherit
+-------------------+-------------+----------+-------------+---------------+----------------+--------------+------------
+ rors_app          | t           | f        | f           | f             | f              | f            | t
+ rors_dba          | t           | f        | f           | f             | f              | f            | f
+ rors_owner_grp    | f           | f        | f           | f             | f              | f            | t
+ rors_readonly_grp | f           | f        | f           | f             | f              | f            | t
+ rors_report       | t           | f        | f           | f             | f              | f            | t
+ rors_runtime_grp  | f           | f        | f           | f             | f              | f            | t
+(6 rows)
+
+   member    |      parent       | admin_option | inherit_option | set_option
+-------------+-------------------+--------------+----------------+------------
+ rors_dba    | rors_owner_grp    | f            | f              | t
+ rors_app    | rors_runtime_grp  | f            | t              | t
+ rors_report | rors_readonly_grp | f            | t              | t
+(3 rows)
+
+      datname       | pg_get_userbyid |                                                               datacl
+--------------------+-----------------+------------------------------------------------------------------------------------------------------------------------------------
+ mesa_g05_activity4 | rors_owner_grp  | {rors_owner_grp=CTc/rors_owner_grp,rors_dba=c/rors_owner_grp,rors_runtime_grp=c/rors_owner_grp,rors_readonly_grp=c/rors_owner_grp}
+ postgres           | lab_admin       | {lab_admin=CTc/lab_admin}
+ rors_unrelated_lab | lab_admin       | {lab_admin=CTc/lab_admin}
+ template0          | lab_admin       | {=c/lab_admin,lab_admin=CTc/lab_admin}
+ template1          | lab_admin       | {lab_admin=CTc/lab_admin}
+(5 rows)
+
+ nspname |                                                                         nspacl
+---------+---------------------------------------------------------------------------------------------------------------------------------------------------------
+ public  | {pg_database_owner=UC/pg_database_owner,rors_runtime_grp=U/pg_database_owner,rors_readonly_grp=U/pg_database_owner,rors_owner_grp=UC/pg_database_owner}
+(1 row)
+
+            relname             | relkind |     owner      |                                                      relacl
+--------------------------------+---------+----------------+------------------------------------------------------------------------------------------------------------------
+ customer                       | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arw/rors_owner_grp}
+ customer_customer_id_seq       | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ menu_item                      | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ menu_item_menu_item_id_seq     | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ order_item                     | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=ar/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ orders                         | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arw/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ orders_order_id_seq            | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ payment                        | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arw/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ payment_payment_id_seq         | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ reservation                    | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ reservation_reservation_id_seq | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ restaurant_table               | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ restaurant_table_table_id_seq  | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ staff                          | r       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=arwd/rors_owner_grp}
+ staff_staff_id_seq             | S       | rors_owner_grp | {rors_owner_grp=rwU/rors_owner_grp,rors_runtime_grp=U/rors_owner_grp}
+ v_customer_directory           | v       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ v_order_summary                | v       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ v_reservation_schedule         | v       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+ v_staff_directory              | v       | rors_owner_grp | {rors_owner_grp=arwdDxtm/rors_owner_grp,rors_runtime_grp=r/rors_owner_grp,rors_readonly_grp=r/rors_owner_grp}
+(19 rows)
+
+            proname            | pg_get_userbyid | prosecdef |                               proacl
+-------------------------------+-----------------+-----------+---------------------------------------------------------------------
+ fn_check_reservation_capacity | rors_owner_grp  | f         | {rors_owner_grp=X/rors_owner_grp,rors_runtime_grp=X/rors_owner_grp}
+ fn_refresh_order_total        | rors_owner_grp  | f         | {rors_owner_grp=X/rors_owner_grp,rors_runtime_grp=X/rors_owner_grp}
+ fn_require_order_items        | rors_owner_grp  | f         | {rors_owner_grp=X/rors_owner_grp,rors_runtime_grp=X/rors_owner_grp}
+(3 rows)
+
+   tgrelid   |          tgname          | tgenabled
+-------------+--------------------------+-----------
+ orders      | trg_orders_require_items | O
+ order_item  | trg_order_item_keep_one  | O
+ order_item  | trg_order_item_total     | O
+ reservation | trg_reservation_capacity | O
+(4 rows)
+
+  extname   | extversion
+------------+------------
+ btree_gist | 1.8
+ pgcrypto   | 1.4
+ plpgsql    | 1.0
+(3 rows)
+
+   defaclrole   | defaclobjtype |             defaclacl
+----------------+---------------+-----------------------------------
+ rors_owner_grp | f             | {rors_owner_grp=X/rors_owner_grp}
+ rors_dba       | f             | {rors_dba=X/rors_dba}
+(2 rows)
+
+     conrelid     |                 conname                 |                                                                                                                                                 pg_get_constraintdef
+------------------+-----------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ customer         | chk_customer_email                      | CHECK (((email)::text ~* '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$'::text))
+ customer         | customer_created_at_not_null            | NOT NULL created_at
+ customer         | customer_customer_id_not_null           | NOT NULL customer_id
+ customer         | customer_email_not_null                 | NOT NULL email
+ customer         | customer_first_name_not_null            | NOT NULL first_name
+ customer         | customer_last_name_not_null             | NOT NULL last_name
+ customer         | customer_password_not_null              | NOT NULL password
+ customer         | customer_phone_not_null                 | NOT NULL phone
+ customer         | customer_pkey                           | PRIMARY KEY (customer_id)
+ customer         | uq_customer_email                       | UNIQUE (email)
+ menu_item        | chk_menu_item_price                     | CHECK ((price >= (0)::numeric))
+ menu_item        | menu_item_availability_not_null         | NOT NULL availability
+ menu_item        | menu_item_category_not_null             | NOT NULL category
+ menu_item        | menu_item_item_name_not_null            | NOT NULL item_name
+ menu_item        | menu_item_menu_item_id_not_null         | NOT NULL menu_item_id
+ menu_item        | menu_item_pkey                          | PRIMARY KEY (menu_item_id)
+ menu_item        | menu_item_price_not_null                | NOT NULL price
+ restaurant_table | chk_restaurant_table_capacity           | CHECK ((capacity > 0))
+ restaurant_table | chk_restaurant_table_status             | CHECK (((status)::text = ANY ((ARRAY['available'::character varying, 'occupied'::character varying, 'reserved'::character varying, 'out_of_service'::character varying])::text[])))
+ restaurant_table | restaurant_table_capacity_not_null      | NOT NULL capacity
+ restaurant_table | restaurant_table_pkey                   | PRIMARY KEY (table_id)
+ restaurant_table | restaurant_table_status_not_null        | NOT NULL status
+ restaurant_table | restaurant_table_table_id_not_null      | NOT NULL table_id
+ restaurant_table | restaurant_table_table_number_not_null  | NOT NULL table_number
+ restaurant_table | uq_restaurant_table_number              | UNIQUE (table_number)
+ staff            | chk_staff_role                          | CHECK (((role)::text = ANY ((ARRAY['admin'::character varying, 'staff'::character varying])::text[])))
+ staff            | staff_email_not_null                    | NOT NULL email
+ staff            | staff_first_name_not_null               | NOT NULL first_name
+ staff            | staff_last_name_not_null                | NOT NULL last_name
+ staff            | staff_password_not_null                 | NOT NULL password
+ staff            | staff_pkey                              | PRIMARY KEY (staff_id)
+ staff            | staff_role_not_null                     | NOT NULL role
+ staff            | staff_staff_id_not_null                 | NOT NULL staff_id
+ staff            | uq_staff_email                          | UNIQUE (email)
+ orders           | chk_orders_status                       | CHECK (((order_status)::text = ANY ((ARRAY['pending'::character varying, 'confirmed'::character varying, 'preparing'::character varying, 'ready'::character varying, 'completed'::character varying, 'cancelled'::character varying])::text[])))
+ orders           | chk_orders_total                        | CHECK ((total_amount >= (0)::numeric))
+ orders           | fk_orders_customer                      | FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ orders           | orders_customer_id_not_null             | NOT NULL customer_id
+ orders           | orders_order_date_not_null              | NOT NULL order_date
+ orders           | orders_order_id_not_null                | NOT NULL order_id
+ orders           | orders_order_status_not_null            | NOT NULL order_status
+ orders           | orders_pkey                             | PRIMARY KEY (order_id)
+ orders           | orders_total_amount_not_null            | NOT NULL total_amount
+ orders           | trg_orders_require_items                | TRIGGER DEFERRABLE INITIALLY DEFERRED
+ order_item       | chk_order_item_math                     | CHECK ((subtotal = ((quantity)::numeric * unit_price)))
+ order_item       | chk_order_item_quantity                 | CHECK ((quantity > 0))
+ order_item       | chk_order_item_subtotal                 | CHECK ((subtotal >= (0)::numeric))
+ order_item       | chk_order_item_unit_price               | CHECK ((unit_price >= (0)::numeric))
+ order_item       | fk_order_item_menu_item                 | FOREIGN KEY (menu_item_id) REFERENCES menu_item(menu_item_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ order_item       | fk_order_item_order                     | FOREIGN KEY (order_id) REFERENCES orders(order_id) ON UPDATE CASCADE ON DELETE CASCADE
+ order_item       | order_item_menu_item_id_not_null        | NOT NULL menu_item_id
+ order_item       | order_item_order_id_not_null            | NOT NULL order_id
+ order_item       | order_item_quantity_not_null            | NOT NULL quantity
+ order_item       | order_item_subtotal_not_null            | NOT NULL subtotal
+ order_item       | order_item_unit_price_not_null          | NOT NULL unit_price
+ order_item       | pk_order_item                           | PRIMARY KEY (order_id, menu_item_id)
+ order_item       | trg_order_item_keep_one                 | TRIGGER DEFERRABLE INITIALLY DEFERRED
+ reservation      | chk_reservation_guests                  | CHECK ((number_of_guests > 0))
+ reservation      | chk_reservation_status                  | CHECK (((reservation_status)::text = ANY ((ARRAY['pending'::character varying, 'confirmed'::character varying, 'seated'::character varying, 'completed'::character varying, 'cancelled'::character varying, 'no_show'::character varying])::text[])))
+ reservation      | ex_reservation_no_overlap               | EXCLUDE USING gist (table_id WITH =, tsrange((reservation_date + reservation_time), ((reservation_date + reservation_time) + '02:00:00'::interval)) WITH &&) WHERE (((reservation_status)::text = ANY ((ARRAY['pending'::character varying, 'confirmed'::character varying, 'seated'::character varying])::text[])))
+ reservation      | fk_reservation_customer                 | FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ reservation      | fk_reservation_table                    | FOREIGN KEY (table_id) REFERENCES restaurant_table(table_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ reservation      | reservation_customer_id_not_null        | NOT NULL customer_id
+ reservation      | reservation_number_of_guests_not_null   | NOT NULL number_of_guests
+ reservation      | reservation_pkey                        | PRIMARY KEY (reservation_id)
+ reservation      | reservation_reservation_date_not_null   | NOT NULL reservation_date
+ reservation      | reservation_reservation_id_not_null     | NOT NULL reservation_id
+ reservation      | reservation_reservation_status_not_null | NOT NULL reservation_status
+ reservation      | reservation_reservation_time_not_null   | NOT NULL reservation_time
+ reservation      | reservation_table_id_not_null           | NOT NULL table_id
+ payment          | chk_payment_amount                      | CHECK ((amount >= (0)::numeric))
+ payment          | chk_payment_method                      | CHECK (((payment_method)::text = ANY ((ARRAY['cash'::character varying, 'card'::character varying, 'gcash'::character varying, 'bank_transfer'::character varying])::text[])))
+ payment          | chk_payment_status                      | CHECK (((payment_status)::text = ANY ((ARRAY['pending'::character varying, 'paid'::character varying, 'failed'::character varying, 'refunded'::character varying, 'cancelled'::character varying])::text[])))
+ payment          | fk_payment_order                        | FOREIGN KEY (order_id) REFERENCES orders(order_id) ON UPDATE CASCADE ON DELETE RESTRICT
+ payment          | payment_amount_not_null                 | NOT NULL amount
+ payment          | payment_order_id_not_null               | NOT NULL order_id
+ payment          | payment_payment_date_not_null           | NOT NULL payment_date
+ payment          | payment_payment_id_not_null             | NOT NULL payment_id
+ payment          | payment_payment_method_not_null         | NOT NULL payment_method
+ payment          | payment_payment_status_not_null         | NOT NULL payment_status
+ payment          | payment_pkey                            | PRIMARY KEY (payment_id)
+ payment          | uq_payment_order                        | UNIQUE (order_id)
+(82 rows)
+
+     ?column?     | count
+------------------+-------
+ customer         |    51
+ staff            |    10
+ menu_item        |    50
+ restaurant_table |    20
+ orders           |    60
+ order_item       |   167
+ reservation      |    50
+ payment          |    56
+(8 rows)
+
+ probe_table_removed | probe_function_removed
+---------------------+------------------------
+ t                   | t
+(1 row)

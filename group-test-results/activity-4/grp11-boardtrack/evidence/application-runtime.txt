@@ -1,0 +1,4 @@
+    usename     |         datname          | count
+----------------+--------------------------+-------
+ boardtrack_app | boardtrack_g05_activity4 |     1
+(1 row)
