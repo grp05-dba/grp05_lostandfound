@@ -1,0 +1,235 @@
+\pset pager off
+Pager usage is off.
+SELECT current_database(), session_user, current_user, version();
+ current_database | session_user | current_user |                                        version                                        
+------------------+--------------+--------------+---------------------------------------------------------------------------------------
+ ojt_managementdb | postgres     | postgres     | PostgreSQL 18.6 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 16.2.1 20260810, 64-bit
+(1 row)
+
+\dt public.*
+                       List of tables
+ Schema |         Name         | Type  |        Owner        
+--------+----------------------+-------+---------------------
+ public | academic_supervisors | table | grp03_ojt_admin_grp
+ public | attendance           | table | grp03_ojt_admin_grp
+ public | audit_log            | table | grp03_ojt_admin_grp
+ public | companies            | table | grp03_ojt_admin_grp
+ public | company_supervisors  | table | grp03_ojt_admin_grp
+ public | evaluations          | table | grp03_ojt_admin_grp
+ public | ojt_applications     | table | grp03_ojt_admin_grp
+ public | ojt_placements       | table | grp03_ojt_admin_grp
+ public | requirements         | table | grp03_ojt_admin_grp
+ public | student_requirements | table | grp03_ojt_admin_grp
+ public | students             | table | grp03_ojt_admin_grp
+ public | users                | table | grp03_ojt_admin_grp
+(12 rows)
+
+\ds public.*
+                                 List of sequences
+ Schema |                   Name                   |   Type   |        Owner        
+--------+------------------------------------------+----------+---------------------
+ public | academic_supervisors_academic_sup_id_seq | sequence | grp03_ojt_admin_grp
+ public | attendance_attendance_id_seq             | sequence | grp03_ojt_admin_grp
+ public | audit_log_audit_id_seq                   | sequence | grp03_ojt_admin_grp
+ public | companies_company_id_seq                 | sequence | grp03_ojt_admin_grp
+ public | company_supervisors_company_sup_id_seq   | sequence | grp03_ojt_admin_grp
+ public | evaluations_evaluation_id_seq            | sequence | grp03_ojt_admin_grp
+ public | ojt_applications_application_id_seq      | sequence | grp03_ojt_admin_grp
+ public | ojt_placements_placement_id_seq          | sequence | grp03_ojt_admin_grp
+ public | requirements_req_id_seq                  | sequence | grp03_ojt_admin_grp
+ public | student_requirements_student_req_id_seq  | sequence | grp03_ojt_admin_grp
+ public | students_student_id_seq                  | sequence | grp03_ojt_admin_grp
+ public | users_user_id_seq                        | sequence | grp03_ojt_admin_grp
+(12 rows)
+
+\dv public.*
+psql:grp03-Project-OJT-RMA-System/sql/04_verify_catalog.sql:5: error: Did not find any views named "public.*".
+\df public.*
+                       List of functions
+ Schema | Name | Result data type | Argument data types | Type 
+--------+------+------------------+---------------------+------
+(0 rows)
+
+\dn+
+                                         List of schemas
+  Name  |       Owner       |             Access privileges              |      Description       
+--------+-------------------+--------------------------------------------+------------------------
+ public | pg_database_owner | pg_database_owner=UC/pg_database_owner    +| standard public schema
+        |                   | grp03_ojt_runtime_grp=U/pg_database_owner +| 
+        |                   | grp03_ojt_readonly_grp=U/pg_database_owner | 
+(1 row)
+
+\dp public.*
+                                                                              Access privileges
+ Schema |                   Name                   |   Type   |                Access privileges                 |               Column privileges                | Policies 
+--------+------------------------------------------+----------+--------------------------------------------------+------------------------------------------------+----------
+ public | academic_supervisors                     | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=ar/grp03_ojt_admin_grp    +|                                                | 
+        |                                          |          | grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp     |                                                | 
+ public | academic_supervisors_academic_sup_id_seq | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp     +|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=U/grp03_ojt_admin_grp      |                                                | 
+ public | attendance                               | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+| is_verified:                                  +| 
+        |                                          |          | grp03_ojt_runtime_grp=ar/grp03_ojt_admin_grp    +|   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp  | 
+        |                                          |          | grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp     |                                                | 
+ public | attendance_attendance_id_seq             | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp     +|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=U/grp03_ojt_admin_grp      |                                                | 
+ public | audit_log                                | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+| audit_id:                                     +| 
+        |                                          |          | grp03_ojt_runtime_grp=r/grp03_ojt_admin_grp      |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp+| 
+        |                                          |          |                                                  | table_name:                                   +| 
+        |                                          |          |                                                  |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp+| 
+        |                                          |          |                                                  | action:                                       +| 
+        |                                          |          |                                                  |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp+| 
+        |                                          |          |                                                  | row_id:                                       +| 
+        |                                          |          |                                                  |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp+| 
+        |                                          |          |                                                  | action_time:                                  +| 
+        |                                          |          |                                                  |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp | 
+ public | audit_log_audit_id_seq                   | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp      |                                                | 
+ public | companies                                | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=ar/grp03_ojt_admin_grp    +|                                                | 
+        |                                          |          | grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp     |                                                | 
+ public | companies_company_id_seq                 | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp     +|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=U/grp03_ojt_admin_grp      |                                                | 
+ public | company_supervisors                      | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=ar/grp03_ojt_admin_grp    +|                                                | 
+        |                                          |          | grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp     |                                                | 
+ public | company_supervisors_company_sup_id_seq   | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp     +|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=U/grp03_ojt_admin_grp      |                                                | 
+ public | evaluations                              | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=ar/grp03_ojt_admin_grp    +|                                                | 
+        |                                          |          | grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp     |                                                | 
+ public | evaluations_evaluation_id_seq            | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp     +|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=U/grp03_ojt_admin_grp      |                                                | 
+ public | ojt_applications                         | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+| status:                                       +| 
+        |                                          |          | grp03_ojt_runtime_grp=ar/grp03_ojt_admin_grp    +|   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp +| 
+        |                                          |          | grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp     | remarks:                                      +| 
+        |                                          |          |                                                  |   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp  | 
+ public | ojt_applications_application_id_seq      | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp     +|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=U/grp03_ojt_admin_grp      |                                                | 
+ public | ojt_placements                           | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+| status:                                       +| 
+        |                                          |          | grp03_ojt_runtime_grp=ar/grp03_ojt_admin_grp    +|   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp  | 
+        |                                          |          | grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp     |                                                | 
+ public | ojt_placements_placement_id_seq          | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp     +|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=U/grp03_ojt_admin_grp      |                                                | 
+ public | requirements                             | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=ar/grp03_ojt_admin_grp    +|                                                | 
+        |                                          |          | grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp     |                                                | 
+ public | requirements_req_id_seq                  | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp     +|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=U/grp03_ojt_admin_grp      |                                                | 
+ public | student_requirements                     | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+| verified_by_sup_id:                           +| 
+        |                                          |          | grp03_ojt_runtime_grp=ar/grp03_ojt_admin_grp    +|   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp +| 
+        |                                          |          | grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp     | file_path:                                    +| 
+        |                                          |          |                                                  |   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp +| 
+        |                                          |          |                                                  | status:                                       +| 
+        |                                          |          |                                                  |   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp +| 
+        |                                          |          |                                                  | submission_date:                              +| 
+        |                                          |          |                                                  |   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp +| 
+        |                                          |          |                                                  | verified_at:                                  +| 
+        |                                          |          |                                                  |   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp +| 
+        |                                          |          |                                                  | remarks:                                      +| 
+        |                                          |          |                                                  |   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp  | 
+ public | student_requirements_student_req_id_seq  | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp     +|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=U/grp03_ojt_admin_grp      |                                                | 
+ public | students                                 | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=ar/grp03_ojt_admin_grp    +|                                                | 
+        |                                          |          | grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp     |                                                | 
+ public | students_student_id_seq                  | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp     +|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=U/grp03_ojt_admin_grp      |                                                | 
+ public | users                                    | table    | grp03_ojt_admin_grp=arwdDxtm/grp03_ojt_admin_grp+| user_id:                                      +| 
+        |                                          |          | grp03_ojt_runtime_grp=ar/grp03_ojt_admin_grp     |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp+| 
+        |                                          |          |                                                  | username:                                     +| 
+        |                                          |          |                                                  |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp+| 
+        |                                          |          |                                                  | role:                                         +| 
+        |                                          |          |                                                  |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp+| 
+        |                                          |          |                                                  | is_active:                                    +| 
+        |                                          |          |                                                  |   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp +| 
+        |                                          |          |                                                  |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp+| 
+        |                                          |          |                                                  | created_at:                                   +| 
+        |                                          |          |                                                  |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp+| 
+        |                                          |          |                                                  | updated_at:                                   +| 
+        |                                          |          |                                                  |   grp03_ojt_runtime_grp=w/grp03_ojt_admin_grp +| 
+        |                                          |          |                                                  |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp+| 
+        |                                          |          |                                                  | deleted_at:                                   +| 
+        |                                          |          |                                                  |   grp03_ojt_readonly_grp=r/grp03_ojt_admin_grp | 
+ public | users_user_id_seq                        | sequence | grp03_ojt_admin_grp=rwU/grp03_ojt_admin_grp     +|                                                | 
+        |                                          |          | grp03_ojt_runtime_grp=U/grp03_ojt_admin_grp      |                                                | 
+(24 rows)
+
+\ddp
+                              Default access privileges
+        Owner        | Schema |   Type   |             Access privileges             
+---------------------+--------+----------+-------------------------------------------
+ grp03_ojt_admin_grp |        | function | grp03_ojt_admin_grp=X/grp03_ojt_admin_grp
+(1 row)
+
+SELECT rolname, rolcanlogin, rolsuper, rolcreatedb, rolcreaterole, rolreplication, rolbypassrls
+FROM pg_roles WHERE rolname LIKE 'grp03%' ORDER BY rolname;
+        rolname         | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolreplication | rolbypassrls 
+------------------------+-------------+----------+-------------+---------------+----------------+--------------
+ grp03_ojt_admin_grp    | f           | f        | f           | f             | f              | f
+ grp03_ojt_app          | t           | f        | f           | f             | f              | f
+ grp03_ojt_auditor      | t           | f        | f           | f             | f              | f
+ grp03_ojt_dba          | t           | f        | f           | f             | f              | f
+ grp03_ojt_readonly_grp | f           | f        | f           | f             | f              | f
+ grp03_ojt_runtime_grp  | f           | f        | f           | f             | f              | f
+(6 rows)
+
+SELECT r.rolname AS member, g.rolname AS group_role, m.admin_option, m.inherit_option, m.set_option
+FROM pg_auth_members m JOIN pg_roles r ON r.oid=m.member JOIN pg_roles g ON g.oid=m.roleid
+WHERE r.rolname LIKE 'grp03%' ORDER BY r.rolname;
+      member       |       group_role       | admin_option | inherit_option | set_option 
+-------------------+------------------------+--------------+----------------+------------
+ grp03_ojt_app     | grp03_ojt_runtime_grp  | f            | t              | t
+ grp03_ojt_auditor | grp03_ojt_readonly_grp | f            | t              | t
+ grp03_ojt_dba     | grp03_ojt_admin_grp    | f            | t              | t
+(3 rows)
+
+SELECT datname, has_database_privilege('grp03_ojt_app',oid,'CONNECT') app_connect,
+has_database_privilege('grp03_ojt_auditor',oid,'CONNECT') auditor_connect,
+has_database_privilege('grp03_ojt_dba',oid,'CONNECT') dba_connect
+FROM pg_database WHERE datallowconn ORDER BY datname;
+          datname           | app_connect | auditor_connect | dba_connect 
+----------------------------+-------------+-----------------+-------------
+ company_db                 | t           | t               | t
+ grp05_lostandfounddb       | t           | t               | t
+ grp05_lostandfounddb_clone | t           | t               | t
+ grp_brewposdb              | t           | t               | t
+ grp_parkitdb               | t           | t               | t
+ loan_system_demo           | f           | f               | f
+ ojt_managementdb           | t           | t               | t
+ postgres                   | t           | t               | t
+ template1                  | t           | t               | t
+(9 rows)
+
+SELECT relname, relrowsecurity FROM pg_class WHERE relnamespace='public'::regnamespace AND relkind='r';
+       relname        | relrowsecurity 
+----------------------+----------------
+ audit_log            | f
+ users                | f
+ students             | f
+ academic_supervisors | f
+ company_supervisors  | f
+ companies            | f
+ requirements         | f
+ ojt_applications     | f
+ student_requirements | f
+ ojt_placements       | f
+ attendance           | f
+ evaluations          | f
+(12 rows)
+
+SELECT count(*) AS user_triggers FROM pg_trigger WHERE NOT tgisinternal;
+ user_triggers 
+---------------
+             0
+(1 row)
+
+SELECT (SELECT count(*) FROM users) users, (SELECT count(*) FROM students) students,
+(SELECT count(*) FROM companies) companies, (SELECT count(*) FROM requirements) requirements,
+(SELECT count(*) FROM ojt_applications) applications, (SELECT count(*) FROM ojt_placements) placements,
+(SELECT count(*) FROM attendance) attendance, (SELECT count(*) FROM evaluations) evaluations,
+(SELECT count(*) FROM student_requirements) submissions, (SELECT count(*) FROM audit_log) audit_log;
+ users | students | companies | requirements | applications | placements | attendance | evaluations | submissions | audit_log 
+-------+----------+-----------+--------------+--------------+------------+------------+-------------+-------------+-----------
+     5 |        1 |         1 |            3 |            0 |          0 |          0 |           0 |           0 |         0
+(1 row)
+

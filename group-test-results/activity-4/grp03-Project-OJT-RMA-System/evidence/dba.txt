@@ -1,0 +1,76 @@
+\pset pager off
+Pager usage is off.
+\set VERBOSITY verbose
+SELECT current_database(), session_user, current_user;
+ current_database | session_user  | current_user  
+------------------+---------------+---------------
+ ojt_managementdb | grp03_ojt_dba | grp03_ojt_dba
+(1 row)
+
+\echo D01: scoped ownership and maintenance
+D01: scoped ownership and maintenance
+BEGIN;
+BEGIN
+CREATE TABLE public.a4_dba_probe (id SERIAL PRIMARY KEY, note TEXT);
+CREATE TABLE
+INSERT INTO public.a4_dba_probe(note) VALUES ('test');
+INSERT 0 1
+UPDATE public.a4_dba_probe SET note='updated';
+UPDATE 1
+DELETE FROM public.a4_dba_probe;
+DELETE 1
+ALTER TABLE public.a4_dba_probe ADD COLUMN extra TEXT;
+ALTER TABLE
+GRANT SELECT ON public.a4_dba_probe TO grp03_ojt_readonly_grp;
+GRANT
+REVOKE SELECT ON public.a4_dba_probe FROM grp03_ojt_readonly_grp;
+REVOKE
+ROLLBACK;
+ROLLBACK
+SELECT to_regclass('public.a4_dba_probe') IS NULL AS probe_removed;
+ probe_removed 
+---------------
+ t
+(1 row)
+
+\echo D02: database admin has access to restricted operational columns
+D02: database admin has access to restricted operational columns
+SELECT password_hash FROM users LIMIT 0;
+ password_hash 
+---------------
+(0 rows)
+
+SELECT details FROM audit_log LIMIT 0;
+ details 
+---------
+(0 rows)
+
+\echo D03: no cluster administration
+D03: no cluster administration
+CREATE DATABASE grp03_a4_forbidden;
+psql:grp03-Project-OJT-RMA-System/sql/07_test_dba.sql:19: ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:977
+CREATE ROLE grp03_a4_forbidden NOLOGIN;
+psql:grp03-Project-OJT-RMA-System/sql/07_test_dba.sql:20: ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:316
+\echo D04: future objects under migration owner remain private
+D04: future objects under migration owner remain private
+BEGIN;
+BEGIN
+SET ROLE grp03_ojt_admin_grp;
+SET
+CREATE TABLE public.a4_future_probe(id SERIAL PRIMARY KEY);
+CREATE TABLE
+CREATE FUNCTION public.a4_future_fn() RETURNS integer LANGUAGE sql AS 'SELECT 1';
+CREATE FUNCTION
+SELECT has_table_privilege('grp03_ojt_app','public.a4_future_probe','SELECT') AS runtime_future_select,
+has_sequence_privilege('grp03_ojt_app','public.a4_future_probe_id_seq','USAGE') AS runtime_future_sequence,
+has_function_privilege('grp03_ojt_app','public.a4_future_fn()','EXECUTE') AS runtime_future_function;
+ runtime_future_select | runtime_future_sequence | runtime_future_function 
+-----------------------+-------------------------+-------------------------
+ f                     | f                       | f
+(1 row)
+
+ROLLBACK;
+ROLLBACK

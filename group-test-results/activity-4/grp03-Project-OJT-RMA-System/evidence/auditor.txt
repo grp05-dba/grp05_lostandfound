@@ -1,0 +1,127 @@
+\pset pager off
+Pager usage is off.
+\set VERBOSITY verbose
+SELECT current_database(), session_user, current_user;
+ current_database |   session_user    |   current_user    
+------------------+-------------------+-------------------
+ ojt_managementdb | grp03_ojt_auditor | grp03_ojt_auditor
+(1 row)
+
+\echo R01: approved reads
+R01: approved reads
+SELECT user_id,username,role,is_active FROM users;
+ user_id |         username         |        role         | is_active 
+---------+--------------------------+---------------------+-----------
+       1 | demo_admin               | ADMIN               | t
+       2 | demo_student             | STUDENT             | t
+       3 | demo_academic_supervisor | ACADEMIC_SUPERVISOR | t
+       4 | demo_company_supervisor  | COMPANY_SUPERVISOR  | t
+       5 | demo_ojt_coordinator     | OJT_COORDINATOR     | t
+(5 rows)
+
+SELECT audit_id,table_name,action,row_id,action_time FROM audit_log LIMIT 0;
+ audit_id | table_name | action | row_id | action_time 
+----------+------------+--------+--------+-------------
+(0 rows)
+
+SELECT count(*) FROM companies;
+ count 
+-------
+     1
+(1 row)
+
+SELECT count(*) FROM students;
+ count 
+-------
+     1
+(1 row)
+
+SELECT count(*) FROM attendance;
+ count 
+-------
+     0
+(1 row)
+
+\echo R02: expected denial
+R02: expected denial
+BEGIN;
+BEGIN
+SELECT password_hash FROM users LIMIT 0;
+psql:grp03-Project-OJT-RMA-System/sql/06_test_auditor.sql:12: ERROR:  42501: permission denied for table users
+LOCATION:  aclcheck_error, aclchk.c:2793
+ROLLBACK;
+ROLLBACK
+\echo R03: expected denial
+R03: expected denial
+BEGIN;
+BEGIN
+SELECT details FROM audit_log LIMIT 0;
+psql:grp03-Project-OJT-RMA-System/sql/06_test_auditor.sql:16: ERROR:  42501: permission denied for table audit_log
+LOCATION:  aclcheck_error, aclchk.c:2793
+ROLLBACK;
+ROLLBACK
+\echo R04: expected denial
+R04: expected denial
+BEGIN;
+BEGIN
+UPDATE companies SET company_name=company_name WHERE false;
+psql:grp03-Project-OJT-RMA-System/sql/06_test_auditor.sql:20: ERROR:  42501: permission denied for table companies
+LOCATION:  aclcheck_error, aclchk.c:2793
+ROLLBACK;
+ROLLBACK
+\echo R05: expected denial
+R05: expected denial
+BEGIN;
+BEGIN
+INSERT INTO requirements(title) VALUES ('Activity4 denied');
+psql:grp03-Project-OJT-RMA-System/sql/06_test_auditor.sql:24: ERROR:  42501: permission denied for table requirements
+LOCATION:  aclcheck_error, aclchk.c:2793
+ROLLBACK;
+ROLLBACK
+\echo R06: expected denial
+R06: expected denial
+BEGIN;
+BEGIN
+DELETE FROM attendance WHERE false;
+psql:grp03-Project-OJT-RMA-System/sql/06_test_auditor.sql:28: ERROR:  42501: permission denied for table attendance
+LOCATION:  aclcheck_error, aclchk.c:2793
+ROLLBACK;
+ROLLBACK
+\echo R07: expected denial
+R07: expected denial
+BEGIN;
+BEGIN
+SELECT nextval('requirements_req_id_seq');
+psql:grp03-Project-OJT-RMA-System/sql/06_test_auditor.sql:32: ERROR:  42501: permission denied for sequence requirements_req_id_seq
+LOCATION:  nextval_internal, sequence.c:652
+ROLLBACK;
+ROLLBACK
+\echo R08: expected denial
+R08: expected denial
+BEGIN;
+BEGIN
+CREATE TABLE public.a4_forbidden(id int);
+psql:grp03-Project-OJT-RMA-System/sql/06_test_auditor.sql:36: ERROR:  42501: permission denied for schema public
+LINE 1: CREATE TABLE public.a4_forbidden(id int);
+                     ^
+LOCATION:  aclcheck_error, aclchk.c:2793
+ROLLBACK;
+ROLLBACK
+\echo R09: expected denial
+R09: expected denial
+BEGIN;
+BEGIN
+SET ROLE grp03_ojt_runtime_grp;
+psql:grp03-Project-OJT-RMA-System/sql/06_test_auditor.sql:40: ERROR:  42501: permission denied to set role "grp03_ojt_runtime_grp"
+LOCATION:  call_string_check_hook, guc.c:6936
+ROLLBACK;
+ROLLBACK
+\echo R10: expected cluster privilege denials
+R10: expected cluster privilege denials
+CREATE DATABASE grp03_a4_forbidden;
+psql:grp03-Project-OJT-RMA-System/sql/06_test_auditor.sql:43: ERROR:  42501: permission denied to create database
+LOCATION:  createdb, dbcommands.c:977
+CREATE ROLE grp03_a4_forbidden NOLOGIN;
+psql:grp03-Project-OJT-RMA-System/sql/06_test_auditor.sql:44: ERROR:  42501: permission denied to create role
+DETAIL:  Only roles with the CREATEROLE attribute may create roles.
+LOCATION:  CreateRole, user.c:316

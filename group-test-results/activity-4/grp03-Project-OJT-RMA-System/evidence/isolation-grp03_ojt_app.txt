@@ -1,0 +1,5 @@
+ current_database | session_user  | current_user  
+------------------+---------------+---------------
+ grp_parkitdb     | grp03_ojt_app | grp03_ojt_app
+(1 row)
+
