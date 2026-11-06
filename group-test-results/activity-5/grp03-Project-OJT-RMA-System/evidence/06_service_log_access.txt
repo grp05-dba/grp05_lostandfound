@@ -1,0 +1,6 @@
+Captured: 2026-11-06T18:00:02.984846+08:00
+OS reader: existing workspace user me; no sudo or database superuser.
+Server SQL log-function limitations: see evidence/02_logging_access.txt.
+/var/log/postgresql: FileNotFoundError; errno=2
+/var/lib/postgres/data/log: PermissionError; errno=13
+Existing OS service-journal read access was used separately; filtered evidence and exact window are in 07_service_log_review.txt.

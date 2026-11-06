@@ -1,0 +1,54 @@
+-- Run directly as grp03_ojt_auditor. Metadata and aggregate counts only; no credentials or profile values.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),version();
+          captured_at          |   session_user    |   current_user    | current_database |                                        version
+-------------------------------+-------------------+-------------------+------------------+---------------------------------------------------------------------------------------
+ 2026-11-06 17:59:36.462676+08 | grp03_ojt_auditor | grp03_ojt_auditor | ojt_managementdb | PostgreSQL 18.6 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 16.2.1 20260810, 64-bit
+(1 row)
+
+SELECT relname,n_live_tup,n_dead_tup,n_mod_since_analyze,last_vacuum,last_analyze,vacuum_count,analyze_count FROM pg_stat_user_tables ORDER BY relname;
+       relname        | n_live_tup | n_dead_tup | n_mod_since_analyze |          last_vacuum          |         last_analyze          | vacuum_count | analyze_count
+----------------------+------------+------------+---------------------+-------------------------------+-------------------------------+--------------+---------------
+ academic_supervisors |          1 |          0 |                   0 | 2026-11-06 17:59:34.807116+08 | 2026-11-06 17:59:34.807494+08 |            1 |             2
+ attendance           |          0 |          0 |                   0 | 2026-11-06 17:59:34.8097+08   | 2026-11-06 17:59:34.810373+08 |            1 |             2
+ audit_log            |          0 |          0 |                   0 | 2026-11-06 17:59:34.810724+08 | 2026-11-06 17:59:34.81132+08  |            1 |             2
+ companies            |          1 |          0 |                   0 | 2026-11-06 17:59:34.812094+08 | 2026-11-06 17:59:34.81302+08  |            1 |             2
+ company_supervisors  |          1 |          0 |                   0 | 2026-11-06 17:59:34.814502+08 | 2026-11-06 17:59:34.814835+08 |            1 |             2
+ evaluations          |          0 |          0 |                   0 | 2026-11-06 17:59:34.816959+08 | 2026-11-06 17:59:34.818055+08 |            1 |             2
+ ojt_applications     |          0 |          0 |                   0 | 2026-11-06 17:59:34.819661+08 | 2026-11-06 17:59:34.821109+08 |            1 |             2
+ ojt_placements       |          0 |          0 |                   0 | 2026-11-06 17:59:34.822894+08 | 2026-11-06 17:59:34.823763+08 |            1 |             2
+ requirements         |          3 |          0 |                   0 | 2026-11-06 17:59:34.825194+08 | 2026-11-06 17:59:34.826152+08 |            1 |             2
+ student_requirements |          0 |          0 |                   0 | 2026-11-06 17:59:34.828597+08 | 2026-11-06 17:59:34.829829+08 |            1 |             2
+ students             |          1 |          0 |                   0 | 2026-11-06 17:59:34.830695+08 | 2026-11-06 17:59:34.831113+08 |            1 |             2
+ users                |          5 |          0 |                   0 | 2026-11-06 17:59:34.832482+08 | 2026-11-06 17:59:34.833175+08 |            1 |             2
+(12 rows)
+
+SELECT 'academic_supervisors' AS table_name,count(*) AS rows FROM public.academic_supervisors
+UNION ALL SELECT 'attendance' AS table_name,count(*) AS rows FROM public.attendance
+UNION ALL SELECT 'audit_log' AS table_name,count(audit_id) AS rows FROM public.audit_log
+UNION ALL SELECT 'companies' AS table_name,count(*) AS rows FROM public.companies
+UNION ALL SELECT 'company_supervisors' AS table_name,count(*) AS rows FROM public.company_supervisors
+UNION ALL SELECT 'evaluations' AS table_name,count(*) AS rows FROM public.evaluations
+UNION ALL SELECT 'ojt_applications' AS table_name,count(*) AS rows FROM public.ojt_applications
+UNION ALL SELECT 'ojt_placements' AS table_name,count(*) AS rows FROM public.ojt_placements
+UNION ALL SELECT 'requirements' AS table_name,count(*) AS rows FROM public.requirements
+UNION ALL SELECT 'student_requirements' AS table_name,count(*) AS rows FROM public.student_requirements
+UNION ALL SELECT 'students' AS table_name,count(*) AS rows FROM public.students
+UNION ALL SELECT 'users' AS table_name,count(user_id) AS rows FROM public.users ORDER BY table_name;
+      table_name      | rows
+----------------------+------
+ academic_supervisors |    1
+ attendance           |    0
+ audit_log            |    0
+ companies            |    1
+ company_supervisors  |    1
+ evaluations          |    0
+ ojt_applications     |    0
+ ojt_placements       |    0
+ requirements         |    3
+ student_requirements |    0
+ students             |    1
+ users                |    5
+(12 rows)

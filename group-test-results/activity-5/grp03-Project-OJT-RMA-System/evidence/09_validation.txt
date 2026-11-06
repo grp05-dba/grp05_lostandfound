@@ -1,0 +1,10 @@
+Validated: 2026-11-06T18:04:24.047499+08:00
+Scope: grp03 Activity 5 package; documentation/evidence checks, not application workflow tests.
+PASS | All local Markdown links resolve
+PASS | Exact before/after counts match all 12 tables; 12 live rows retained
+PASS | 12 ANALYZE and 12 VACUUM command completions
+PASS | Verbose vacuum reports 18 removed dead tuples (zero extra TOAST removals)
+PASS | No unexpected ERROR/FATAL/WARNING in health, maintenance, query or verification
+PASS | Exactly two expected SQLSTATE 42501 log-function denials
+PASS | Query estimates and actual output both 3; actual measured time retained
+PASS | Credential/hash pattern scan; captures also reviewed for sensitive values

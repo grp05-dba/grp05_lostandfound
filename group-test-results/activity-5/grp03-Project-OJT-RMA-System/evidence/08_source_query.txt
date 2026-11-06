@@ -1,0 +1,13 @@
+Repository: https://github.com/swvenz/Project-OJT-RMA-System
+Branch: main
+Reviewed commit: 6a899fbc5882c2916be0af3a91457b1c0c54084b
+Refreshed origin/main: 6a899fbc5882c2916be0af3a91457b1c0c54084b
+Working tree status: clean
+Source file: system/Roles.java
+Git blob SHA: ba55d1a70a7c239cb39d05f64c5cacd50e20ef3f
+Verification date: 2026-11-06 (successful git fetch origin during Activity 5)
+
+Source excerpts (query and STUDENT tab call only):
+22:     static final String MY_REQS = "select r.req_id, r.title, r.is_mandatory, coalesce(sr.status,'Not submitted') status, sr.remarks "
+23:             + "from requirements r left join student_requirements sr on sr.req_id=r.req_id and sr.student_id=? order by r.req_id";
+80:                 add(t, "My requirements", () -> Db.rows(MY_REQS, pid), Btn.row("Submit selected requirement", r -> {

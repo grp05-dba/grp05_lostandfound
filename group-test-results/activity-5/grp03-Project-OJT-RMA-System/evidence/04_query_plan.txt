@@ -1,0 +1,67 @@
+-- Actual STUDENT My requirements query: system/Roles.java MY_REQS and STUDENT tab.
+-- Commit 6a899fbc5882c2916be0af3a91457b1c0c54084b. Substitute an existing profile ID, not a fabricated one.
+-- Only SELECT plans are executed. Java Db.init()/seed() are not called.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database();
+          captured_at          | session_user  | current_user  | current_database
+-------------------------------+---------------+---------------+------------------
+ 2026-11-06 17:59:35.621716+08 | grp03_ojt_app | grp03_ojt_app | ojt_managementdb
+(1 row)
+
+BEGIN READ ONLY;
+BEGIN
+SET LOCAL statement_timeout='30s';
+SET
+SET LOCAL search_path=public,pg_catalog;
+SET
+SELECT student_id FROM public.students WHERE deleted_at IS NULL ORDER BY student_id LIMIT 1
+\gset
+\echo Selected existing student profile ID: :student_id
+Selected existing student profile ID: 1
+EXPLAIN
+SELECT r.req_id, r.title, r.is_mandatory,
+       coalesce(sr.status,'Not submitted') status, sr.remarks
+FROM requirements r
+LEFT JOIN student_requirements sr ON sr.req_id=r.req_id AND sr.student_id=:student_id
+ORDER BY r.req_id;
+                                        QUERY PLAN
+------------------------------------------------------------------------------------------
+ Sort  (cost=1.07..1.08 rows=3 width=83)
+   Sort Key: r.req_id
+   ->  Hash Left Join  (cost=0.01..1.05 rows=3 width=83)
+         Hash Cond: (r.req_id = sr.req_id)
+         ->  Seq Scan on requirements r  (cost=0.00..1.03 rows=3 width=19)
+         ->  Hash  (cost=0.00..0.00 rows=1 width=94)
+               ->  Seq Scan on student_requirements sr  (cost=0.00..0.00 rows=1 width=94)
+                     Filter: (student_id = 1)
+(8 rows)
+
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT r.req_id, r.title, r.is_mandatory,
+       coalesce(sr.status,'Not submitted') status, sr.remarks
+FROM requirements r
+LEFT JOIN student_requirements sr ON sr.req_id=r.req_id AND sr.student_id=:student_id
+ORDER BY r.req_id;
+                                                              QUERY PLAN
+---------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=1.07..1.08 rows=3 width=83) (actual time=0.071..0.074 rows=3.00 loops=1)
+   Sort Key: r.req_id
+   Sort Method: quicksort  Memory: 25kB
+   Buffers: shared hit=1
+   ->  Hash Left Join  (cost=0.01..1.05 rows=3 width=83) (actual time=0.045..0.049 rows=3.00 loops=1)
+         Hash Cond: (r.req_id = sr.req_id)
+         Buffers: shared hit=1
+         ->  Seq Scan on requirements r  (cost=0.00..1.03 rows=3 width=19) (actual time=0.010..0.011 rows=3.00 loops=1)
+               Buffers: shared hit=1
+         ->  Hash  (cost=0.00..0.00 rows=1 width=94) (actual time=0.007..0.008 rows=0.00 loops=1)
+               Buckets: 1024  Batches: 1  Memory Usage: 8kB
+               ->  Seq Scan on student_requirements sr  (cost=0.00..0.00 rows=1 width=94) (actual time=0.006..0.006 rows=0.00 loops=1)
+                     Filter: (student_id = 1)
+ Planning Time: 0.158 ms
+ Execution Time: 0.110 ms
+(15 rows)
+
+ROLLBACK;
+ROLLBACK

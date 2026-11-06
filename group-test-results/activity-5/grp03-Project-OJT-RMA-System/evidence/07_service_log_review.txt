@@ -1,0 +1,46 @@
+Captured: 2026-11-06T17:59:36+08:00
+Reader: existing workspace OS user me; no sudo or database impersonation.
+Command: journalctl -u postgresql --since 2026-11-06 00:00:00 --until 2026-11-06T17:59:36+08:00 --no-pager -o json
+Exit status: 0
+Readable service entries: 1456
+
+Connection authorizations (exact database/account match; not application_name):
+grp03_ojt_app | grp_parkitdb | 1
+grp03_ojt_app | ojt_managementdb | 5
+grp03_ojt_auditor | grp_parkitdb | 1
+grp03_ojt_auditor | ojt_managementdb | 3
+grp03_ojt_dba | grp_parkitdb | 1
+grp03_ojt_dba | ojt_managementdb | 4
+postgres | ojt_managementdb | 6
+
+Project session diagnostics (UTC timestamps; PID correlated with preceding authorization):
+2026-11-06T09:01:45.681136+00:00 | 28802 | grp03_ojt_app | ojt_managementdb | ERROR | permission denied for table users
+2026-11-06T09:01:45.681654+00:00 | 28802 | grp03_ojt_app | ojt_managementdb | ERROR | permission denied for table attendance
+2026-11-06T09:01:45.682014+00:00 | 28802 | grp03_ojt_app | ojt_managementdb | ERROR | permission denied for table audit_log
+2026-11-06T09:01:45.682432+00:00 | 28802 | grp03_ojt_app | ojt_managementdb | ERROR | permission denied for table companies
+2026-11-06T09:01:45.683178+00:00 | 28802 | grp03_ojt_app | ojt_managementdb | ERROR | permission denied for table audit_log
+2026-11-06T09:01:45.684235+00:00 | 28802 | grp03_ojt_app | ojt_managementdb | ERROR | permission denied for sequence audit_log_audit_id_seq
+2026-11-06T09:01:45.684845+00:00 | 28802 | grp03_ojt_app | ojt_managementdb | ERROR | permission denied for schema public at character 14
+2026-11-06T09:01:45.686033+00:00 | 28802 | grp03_ojt_app | ojt_managementdb | ERROR | permission denied to set role "grp03_ojt_admin_grp"
+2026-11-06T09:01:45.686685+00:00 | 28802 | grp03_ojt_app | ojt_managementdb | ERROR | permission denied to create database
+2026-11-06T09:01:45.687392+00:00 | 28802 | grp03_ojt_app | ojt_managementdb | ERROR | permission denied to create role
+2026-11-06T09:01:48.187522+00:00 | 28823 | grp03_ojt_auditor | ojt_managementdb | ERROR | permission denied for table users
+2026-11-06T09:01:48.188215+00:00 | 28823 | grp03_ojt_auditor | ojt_managementdb | ERROR | permission denied for table audit_log
+2026-11-06T09:01:48.188836+00:00 | 28823 | grp03_ojt_auditor | ojt_managementdb | ERROR | permission denied for table companies
+2026-11-06T09:01:48.189491+00:00 | 28823 | grp03_ojt_auditor | ojt_managementdb | ERROR | permission denied for table requirements
+2026-11-06T09:01:48.190176+00:00 | 28823 | grp03_ojt_auditor | ojt_managementdb | ERROR | permission denied for table attendance
+2026-11-06T09:01:48.190677+00:00 | 28823 | grp03_ojt_auditor | ojt_managementdb | ERROR | permission denied for sequence requirements_req_id_seq
+2026-11-06T09:01:48.191088+00:00 | 28823 | grp03_ojt_auditor | ojt_managementdb | ERROR | permission denied for schema public at character 14
+2026-11-06T09:01:48.191239+00:00 | 28823 | grp03_ojt_auditor | ojt_managementdb | ERROR | permission denied to set role "grp03_ojt_runtime_grp"
+2026-11-06T09:01:48.191498+00:00 | 28823 | grp03_ojt_auditor | ojt_managementdb | ERROR | permission denied to create database
+2026-11-06T09:01:48.191752+00:00 | 28823 | grp03_ojt_auditor | ojt_managementdb | ERROR | permission denied to create role
+2026-11-06T09:01:49.779475+00:00 | 28833 | grp03_ojt_dba | ojt_managementdb | ERROR | permission denied to create database
+2026-11-06T09:01:49.779475+00:00 | 28833 | grp03_ojt_dba | ojt_managementdb | ERROR | permission denied to create role
+2026-11-06T09:59:14.796495+00:00 | 44880 | grp03_ojt_dba | ojt_managementdb | ERROR | permission denied for function pg_current_logfile
+2026-11-06T09:59:14.797123+00:00 | 44880 | grp03_ojt_dba | ojt_managementdb | ERROR | permission denied for function pg_ls_logdir
+
+Severity counts: {'ERROR': 24}
+No raw SQL, DETAIL/HINT, password values, or other projects' session diagnostics copied.
+Limitations: current user's readable service window only; PID correlation needs an authorization
+inside the window. Pre-authorization failures, rotated history, other sinks and unlogged durations
+are not covered. No observed diagnostic is not proof of no incident.

@@ -1,0 +1,479 @@
+-- Run directly as grp03_ojt_auditor. Metadata and aggregate counts only; no credentials or profile values.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),version();
+          captured_at          |   session_user    |   current_user    | current_database |                                        version
+-------------------------------+-------------------+-------------------+------------------+---------------------------------------------------------------------------------------
+ 2026-11-06 17:59:10.221503+08 | grp03_ojt_auditor | grp03_ojt_auditor | ojt_managementdb | PostgreSQL 18.6 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 16.2.1 20260810, 64-bit
+(1 row)
+
+SELECT pg_size_pretty(pg_database_size(current_database())) AS database_size,pg_database_size(current_database()) AS database_bytes;
+ database_size | database_bytes
+---------------+----------------
+ 8990 kB       |        9205439
+(1 row)
+
+SELECT c.relkind,count(*) AS object_count FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' GROUP BY c.relkind ORDER BY c.relkind;
+ relkind | object_count
+---------+--------------
+ S       |           12
+ i       |           24
+ r       |           12
+(3 rows)
+
+SELECT tablename,tableowner FROM pg_tables WHERE schemaname='public' ORDER BY tablename;
+      tablename       |     tableowner
+----------------------+---------------------
+ academic_supervisors | grp03_ojt_admin_grp
+ attendance           | grp03_ojt_admin_grp
+ audit_log            | grp03_ojt_admin_grp
+ companies            | grp03_ojt_admin_grp
+ company_supervisors  | grp03_ojt_admin_grp
+ evaluations          | grp03_ojt_admin_grp
+ ojt_applications     | grp03_ojt_admin_grp
+ ojt_placements       | grp03_ojt_admin_grp
+ requirements         | grp03_ojt_admin_grp
+ student_requirements | grp03_ojt_admin_grp
+ students             | grp03_ojt_admin_grp
+ users                | grp03_ojt_admin_grp
+(12 rows)
+
+SELECT 'academic_supervisors' AS table_name,count(*) AS rows FROM public.academic_supervisors
+UNION ALL SELECT 'attendance' AS table_name,count(*) AS rows FROM public.attendance
+UNION ALL SELECT 'audit_log' AS table_name,count(audit_id) AS rows FROM public.audit_log
+UNION ALL SELECT 'companies' AS table_name,count(*) AS rows FROM public.companies
+UNION ALL SELECT 'company_supervisors' AS table_name,count(*) AS rows FROM public.company_supervisors
+UNION ALL SELECT 'evaluations' AS table_name,count(*) AS rows FROM public.evaluations
+UNION ALL SELECT 'ojt_applications' AS table_name,count(*) AS rows FROM public.ojt_applications
+UNION ALL SELECT 'ojt_placements' AS table_name,count(*) AS rows FROM public.ojt_placements
+UNION ALL SELECT 'requirements' AS table_name,count(*) AS rows FROM public.requirements
+UNION ALL SELECT 'student_requirements' AS table_name,count(*) AS rows FROM public.student_requirements
+UNION ALL SELECT 'students' AS table_name,count(*) AS rows FROM public.students
+UNION ALL SELECT 'users' AS table_name,count(user_id) AS rows FROM public.users ORDER BY table_name;
+      table_name      | rows
+----------------------+------
+ academic_supervisors |    1
+ attendance           |    0
+ audit_log            |    0
+ companies            |    1
+ company_supervisors  |    1
+ evaluations          |    0
+ ojt_applications     |    0
+ ojt_placements       |    0
+ requirements         |    3
+ student_requirements |    0
+ students             |    1
+ users                |    5
+(12 rows)
+
+SELECT datname,numbackends,xact_commit,xact_rollback,deadlocks,conflicts,sessions,sessions_abandoned,sessions_fatal,sessions_killed,stats_reset FROM pg_stat_database WHERE datname=current_database();
+     datname      | numbackends | xact_commit | xact_rollback | deadlocks | conflicts | sessions | sessions_abandoned | sessions_fatal | sessions_killed | stats_reset
+------------------+-------------+-------------+---------------+-----------+-----------+----------+--------------------+----------------+-----------------+-------------
+ ojt_managementdb |           1 |         321 |            26 |         0 |         0 |       15 |                  0 |              0 |               0 |
+(1 row)
+
+-- Other accounts' SQL is omitted to avoid credentials and personal data. Privileges may also hide fields.
+SELECT pid,usename,application_name,state,wait_event_type,wait_event,query_start,
+ CASE WHEN state='active' THEN clock_timestamp()-query_start END AS active_duration,
+ CASE WHEN usename=current_user THEN query ELSE '[other-account SQL omitted; visibility may be restricted]' END AS query
+FROM pg_stat_activity WHERE datname=current_database() ORDER BY query_start NULLS LAST;
+  pid  |      usename      | application_name | state  | wait_event_type | wait_event |          query_start          | active_duration |                                                          query
+-------+-------------------+------------------+--------+-----------------+------------+-------------------------------+-----------------+--------------------------------------------------------------------------------------------------------------------------
+ 44835 | grp03_ojt_auditor | psql             | active |                 |            | 2026-11-06 17:59:10.244447+08 | 00:00:00.002609 | SELECT pid,usename,application_name,state,wait_event_type,wait_event,query_start,                                       +
+       |                   |                  |        |                 |            |                               |                 |  CASE WHEN state='active' THEN clock_timestamp()-query_start END AS active_duration,                                    +
+       |                   |                  |        |                 |            |                               |                 |  CASE WHEN usename=current_user THEN query ELSE '[other-account SQL omitted; visibility may be restricted]' END AS query+
+       |                   |                  |        |                 |            |                               |                 | FROM pg_stat_activity WHERE datname=current_database() ORDER BY query_start NULLS LAST;
+(1 row)
+
+SELECT pid,usename,state,pg_blocking_pids(pid) AS blocking_pids FROM pg_stat_activity WHERE datname=current_database();
+  pid  |      usename      | state  | blocking_pids
+-------+-------------------+--------+---------------
+ 44835 | grp03_ojt_auditor | active | {}
+(1 row)
+
+SELECT rolname,rolcanlogin,rolsuper,rolcreatedb,rolcreaterole,rolinherit,rolbypassrls,rolreplication FROM pg_roles WHERE rolname LIKE 'grp03_ojt_%' ORDER BY rolname;
+        rolname         | rolcanlogin | rolsuper | rolcreatedb | rolcreaterole | rolinherit | rolbypassrls | rolreplication
+------------------------+-------------+----------+-------------+---------------+------------+--------------+----------------
+ grp03_ojt_admin_grp    | f           | f        | f           | f             | t          | f            | f
+ grp03_ojt_app          | t           | f        | f           | f             | t          | f            | f
+ grp03_ojt_auditor      | t           | f        | f           | f             | t          | f            | f
+ grp03_ojt_dba          | t           | f        | f           | f             | t          | f            | f
+ grp03_ojt_readonly_grp | f           | f        | f           | f             | t          | f            | f
+ grp03_ojt_runtime_grp  | f           | f        | f           | f             | t          | f            | f
+(6 rows)
+
+SELECT member.rolname AS login,parent.rolname AS group_role,m.admin_option,m.inherit_option,m.set_option
+FROM pg_auth_members m JOIN pg_roles member ON member.oid=m.member JOIN pg_roles parent ON parent.oid=m.roleid WHERE member.rolname LIKE 'grp03_ojt_%' ORDER BY login,group_role;
+       login       |       group_role       | admin_option | inherit_option | set_option
+-------------------+------------------------+--------------+----------------+------------
+ grp03_ojt_app     | grp03_ojt_runtime_grp  | f            | t              | t
+ grp03_ojt_auditor | grp03_ojt_readonly_grp | f            | t              | t
+ grp03_ojt_dba     | grp03_ojt_admin_grp    | f            | t              | t
+(3 rows)
+
+SELECT datname,pg_get_userbyid(datdba) AS owner,datacl FROM pg_database WHERE datname IN (current_database(),'grp_parkitdb','postgres') ORDER BY datname;
+     datname      |        owner        |                                                                 datacl
+------------------+---------------------+----------------------------------------------------------------------------------------------------------------------------------------
+ grp_parkitdb     | postgres            | {=Tc/postgres,postgres=CTc/postgres,park_it_admin_grp=CTc/postgres,park_it_runtime_grp=c/postgres,park_it_readonly_grp=c/postgres}
+ ojt_managementdb | grp03_ojt_admin_grp | {grp03_ojt_admin_grp=CTc/grp03_ojt_admin_grp,grp03_ojt_runtime_grp=c/grp03_ojt_admin_grp,grp03_ojt_readonly_grp=c/grp03_ojt_admin_grp}
+ postgres         | postgres            |
+(3 rows)
+
+SELECT nspname,nspacl FROM pg_namespace WHERE nspname='public';
+ nspname |                                                            nspacl
+---------+-------------------------------------------------------------------------------------------------------------------------------
+ public  | {pg_database_owner=UC/pg_database_owner,grp03_ojt_runtime_grp=U/pg_database_owner,grp03_ojt_readonly_grp=U/pg_database_owner}
+(1 row)
+
+SELECT r.rolname,c.relname,p.privilege,has_table_privilege(r.oid,c.oid,p.privilege) AS allowed
+FROM pg_roles r CROSS JOIN pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace
+CROSS JOIN (VALUES ('SELECT'),('INSERT'),('UPDATE'),('DELETE'),('TRUNCATE'),('MAINTAIN')) p(privilege)
+WHERE r.rolname IN ('grp03_ojt_app','grp03_ojt_auditor','grp03_ojt_dba') AND n.nspname='public' AND c.relkind='r' ORDER BY r.rolname,c.relname,p.privilege;
+      rolname      |       relname        | privilege | allowed
+-------------------+----------------------+-----------+---------
+ grp03_ojt_app     | academic_supervisors | DELETE    | f
+ grp03_ojt_app     | academic_supervisors | INSERT    | t
+ grp03_ojt_app     | academic_supervisors | MAINTAIN  | f
+ grp03_ojt_app     | academic_supervisors | SELECT    | t
+ grp03_ojt_app     | academic_supervisors | TRUNCATE  | f
+ grp03_ojt_app     | academic_supervisors | UPDATE    | f
+ grp03_ojt_app     | attendance           | DELETE    | f
+ grp03_ojt_app     | attendance           | INSERT    | t
+ grp03_ojt_app     | attendance           | MAINTAIN  | f
+ grp03_ojt_app     | attendance           | SELECT    | t
+ grp03_ojt_app     | attendance           | TRUNCATE  | f
+ grp03_ojt_app     | attendance           | UPDATE    | f
+ grp03_ojt_app     | audit_log            | DELETE    | f
+ grp03_ojt_app     | audit_log            | INSERT    | f
+ grp03_ojt_app     | audit_log            | MAINTAIN  | f
+ grp03_ojt_app     | audit_log            | SELECT    | t
+ grp03_ojt_app     | audit_log            | TRUNCATE  | f
+ grp03_ojt_app     | audit_log            | UPDATE    | f
+ grp03_ojt_app     | companies            | DELETE    | f
+ grp03_ojt_app     | companies            | INSERT    | t
+ grp03_ojt_app     | companies            | MAINTAIN  | f
+ grp03_ojt_app     | companies            | SELECT    | t
+ grp03_ojt_app     | companies            | TRUNCATE  | f
+ grp03_ojt_app     | companies            | UPDATE    | f
+ grp03_ojt_app     | company_supervisors  | DELETE    | f
+ grp03_ojt_app     | company_supervisors  | INSERT    | t
+ grp03_ojt_app     | company_supervisors  | MAINTAIN  | f
+ grp03_ojt_app     | company_supervisors  | SELECT    | t
+ grp03_ojt_app     | company_supervisors  | TRUNCATE  | f
+ grp03_ojt_app     | company_supervisors  | UPDATE    | f
+ grp03_ojt_app     | evaluations          | DELETE    | f
+ grp03_ojt_app     | evaluations          | INSERT    | t
+ grp03_ojt_app     | evaluations          | MAINTAIN  | f
+ grp03_ojt_app     | evaluations          | SELECT    | t
+ grp03_ojt_app     | evaluations          | TRUNCATE  | f
+ grp03_ojt_app     | evaluations          | UPDATE    | f
+ grp03_ojt_app     | ojt_applications     | DELETE    | f
+ grp03_ojt_app     | ojt_applications     | INSERT    | t
+ grp03_ojt_app     | ojt_applications     | MAINTAIN  | f
+ grp03_ojt_app     | ojt_applications     | SELECT    | t
+ grp03_ojt_app     | ojt_applications     | TRUNCATE  | f
+ grp03_ojt_app     | ojt_applications     | UPDATE    | f
+ grp03_ojt_app     | ojt_placements       | DELETE    | f
+ grp03_ojt_app     | ojt_placements       | INSERT    | t
+ grp03_ojt_app     | ojt_placements       | MAINTAIN  | f
+ grp03_ojt_app     | ojt_placements       | SELECT    | t
+ grp03_ojt_app     | ojt_placements       | TRUNCATE  | f
+ grp03_ojt_app     | ojt_placements       | UPDATE    | f
+ grp03_ojt_app     | requirements         | DELETE    | f
+ grp03_ojt_app     | requirements         | INSERT    | t
+ grp03_ojt_app     | requirements         | MAINTAIN  | f
+ grp03_ojt_app     | requirements         | SELECT    | t
+ grp03_ojt_app     | requirements         | TRUNCATE  | f
+ grp03_ojt_app     | requirements         | UPDATE    | f
+ grp03_ojt_app     | student_requirements | DELETE    | f
+ grp03_ojt_app     | student_requirements | INSERT    | t
+ grp03_ojt_app     | student_requirements | MAINTAIN  | f
+ grp03_ojt_app     | student_requirements | SELECT    | t
+ grp03_ojt_app     | student_requirements | TRUNCATE  | f
+ grp03_ojt_app     | student_requirements | UPDATE    | f
+ grp03_ojt_app     | students             | DELETE    | f
+ grp03_ojt_app     | students             | INSERT    | t
+ grp03_ojt_app     | students             | MAINTAIN  | f
+ grp03_ojt_app     | students             | SELECT    | t
+ grp03_ojt_app     | students             | TRUNCATE  | f
+ grp03_ojt_app     | students             | UPDATE    | f
+ grp03_ojt_app     | users                | DELETE    | f
+ grp03_ojt_app     | users                | INSERT    | t
+ grp03_ojt_app     | users                | MAINTAIN  | f
+ grp03_ojt_app     | users                | SELECT    | t
+ grp03_ojt_app     | users                | TRUNCATE  | f
+ grp03_ojt_app     | users                | UPDATE    | f
+ grp03_ojt_auditor | academic_supervisors | DELETE    | f
+ grp03_ojt_auditor | academic_supervisors | INSERT    | f
+ grp03_ojt_auditor | academic_supervisors | MAINTAIN  | f
+ grp03_ojt_auditor | academic_supervisors | SELECT    | t
+ grp03_ojt_auditor | academic_supervisors | TRUNCATE  | f
+ grp03_ojt_auditor | academic_supervisors | UPDATE    | f
+ grp03_ojt_auditor | attendance           | DELETE    | f
+ grp03_ojt_auditor | attendance           | INSERT    | f
+ grp03_ojt_auditor | attendance           | MAINTAIN  | f
+ grp03_ojt_auditor | attendance           | SELECT    | t
+ grp03_ojt_auditor | attendance           | TRUNCATE  | f
+ grp03_ojt_auditor | attendance           | UPDATE    | f
+ grp03_ojt_auditor | audit_log            | DELETE    | f
+ grp03_ojt_auditor | audit_log            | INSERT    | f
+ grp03_ojt_auditor | audit_log            | MAINTAIN  | f
+ grp03_ojt_auditor | audit_log            | SELECT    | f
+ grp03_ojt_auditor | audit_log            | TRUNCATE  | f
+ grp03_ojt_auditor | audit_log            | UPDATE    | f
+ grp03_ojt_auditor | companies            | DELETE    | f
+ grp03_ojt_auditor | companies            | INSERT    | f
+ grp03_ojt_auditor | companies            | MAINTAIN  | f
+ grp03_ojt_auditor | companies            | SELECT    | t
+ grp03_ojt_auditor | companies            | TRUNCATE  | f
+ grp03_ojt_auditor | companies            | UPDATE    | f
+ grp03_ojt_auditor | company_supervisors  | DELETE    | f
+ grp03_ojt_auditor | company_supervisors  | INSERT    | f
+ grp03_ojt_auditor | company_supervisors  | MAINTAIN  | f
+ grp03_ojt_auditor | company_supervisors  | SELECT    | t
+ grp03_ojt_auditor | company_supervisors  | TRUNCATE  | f
+ grp03_ojt_auditor | company_supervisors  | UPDATE    | f
+ grp03_ojt_auditor | evaluations          | DELETE    | f
+ grp03_ojt_auditor | evaluations          | INSERT    | f
+ grp03_ojt_auditor | evaluations          | MAINTAIN  | f
+ grp03_ojt_auditor | evaluations          | SELECT    | t
+ grp03_ojt_auditor | evaluations          | TRUNCATE  | f
+ grp03_ojt_auditor | evaluations          | UPDATE    | f
+ grp03_ojt_auditor | ojt_applications     | DELETE    | f
+ grp03_ojt_auditor | ojt_applications     | INSERT    | f
+ grp03_ojt_auditor | ojt_applications     | MAINTAIN  | f
+ grp03_ojt_auditor | ojt_applications     | SELECT    | t
+ grp03_ojt_auditor | ojt_applications     | TRUNCATE  | f
+ grp03_ojt_auditor | ojt_applications     | UPDATE    | f
+ grp03_ojt_auditor | ojt_placements       | DELETE    | f
+ grp03_ojt_auditor | ojt_placements       | INSERT    | f
+ grp03_ojt_auditor | ojt_placements       | MAINTAIN  | f
+ grp03_ojt_auditor | ojt_placements       | SELECT    | t
+ grp03_ojt_auditor | ojt_placements       | TRUNCATE  | f
+ grp03_ojt_auditor | ojt_placements       | UPDATE    | f
+ grp03_ojt_auditor | requirements         | DELETE    | f
+ grp03_ojt_auditor | requirements         | INSERT    | f
+ grp03_ojt_auditor | requirements         | MAINTAIN  | f
+ grp03_ojt_auditor | requirements         | SELECT    | t
+ grp03_ojt_auditor | requirements         | TRUNCATE  | f
+ grp03_ojt_auditor | requirements         | UPDATE    | f
+ grp03_ojt_auditor | student_requirements | DELETE    | f
+ grp03_ojt_auditor | student_requirements | INSERT    | f
+ grp03_ojt_auditor | student_requirements | MAINTAIN  | f
+ grp03_ojt_auditor | student_requirements | SELECT    | t
+ grp03_ojt_auditor | student_requirements | TRUNCATE  | f
+ grp03_ojt_auditor | student_requirements | UPDATE    | f
+ grp03_ojt_auditor | students             | DELETE    | f
+ grp03_ojt_auditor | students             | INSERT    | f
+ grp03_ojt_auditor | students             | MAINTAIN  | f
+ grp03_ojt_auditor | students             | SELECT    | t
+ grp03_ojt_auditor | students             | TRUNCATE  | f
+ grp03_ojt_auditor | students             | UPDATE    | f
+ grp03_ojt_auditor | users                | DELETE    | f
+ grp03_ojt_auditor | users                | INSERT    | f
+ grp03_ojt_auditor | users                | MAINTAIN  | f
+ grp03_ojt_auditor | users                | SELECT    | f
+ grp03_ojt_auditor | users                | TRUNCATE  | f
+ grp03_ojt_auditor | users                | UPDATE    | f
+ grp03_ojt_dba     | academic_supervisors | DELETE    | t
+ grp03_ojt_dba     | academic_supervisors | INSERT    | t
+ grp03_ojt_dba     | academic_supervisors | MAINTAIN  | t
+ grp03_ojt_dba     | academic_supervisors | SELECT    | t
+ grp03_ojt_dba     | academic_supervisors | TRUNCATE  | t
+ grp03_ojt_dba     | academic_supervisors | UPDATE    | t
+ grp03_ojt_dba     | attendance           | DELETE    | t
+ grp03_ojt_dba     | attendance           | INSERT    | t
+ grp03_ojt_dba     | attendance           | MAINTAIN  | t
+ grp03_ojt_dba     | attendance           | SELECT    | t
+ grp03_ojt_dba     | attendance           | TRUNCATE  | t
+ grp03_ojt_dba     | attendance           | UPDATE    | t
+ grp03_ojt_dba     | audit_log            | DELETE    | t
+ grp03_ojt_dba     | audit_log            | INSERT    | t
+ grp03_ojt_dba     | audit_log            | MAINTAIN  | t
+ grp03_ojt_dba     | audit_log            | SELECT    | t
+ grp03_ojt_dba     | audit_log            | TRUNCATE  | t
+ grp03_ojt_dba     | audit_log            | UPDATE    | t
+ grp03_ojt_dba     | companies            | DELETE    | t
+ grp03_ojt_dba     | companies            | INSERT    | t
+ grp03_ojt_dba     | companies            | MAINTAIN  | t
+ grp03_ojt_dba     | companies            | SELECT    | t
+ grp03_ojt_dba     | companies            | TRUNCATE  | t
+ grp03_ojt_dba     | companies            | UPDATE    | t
+ grp03_ojt_dba     | company_supervisors  | DELETE    | t
+ grp03_ojt_dba     | company_supervisors  | INSERT    | t
+ grp03_ojt_dba     | company_supervisors  | MAINTAIN  | t
+ grp03_ojt_dba     | company_supervisors  | SELECT    | t
+ grp03_ojt_dba     | company_supervisors  | TRUNCATE  | t
+ grp03_ojt_dba     | company_supervisors  | UPDATE    | t
+ grp03_ojt_dba     | evaluations          | DELETE    | t
+ grp03_ojt_dba     | evaluations          | INSERT    | t
+ grp03_ojt_dba     | evaluations          | MAINTAIN  | t
+ grp03_ojt_dba     | evaluations          | SELECT    | t
+ grp03_ojt_dba     | evaluations          | TRUNCATE  | t
+ grp03_ojt_dba     | evaluations          | UPDATE    | t
+ grp03_ojt_dba     | ojt_applications     | DELETE    | t
+ grp03_ojt_dba     | ojt_applications     | INSERT    | t
+ grp03_ojt_dba     | ojt_applications     | MAINTAIN  | t
+ grp03_ojt_dba     | ojt_applications     | SELECT    | t
+ grp03_ojt_dba     | ojt_applications     | TRUNCATE  | t
+ grp03_ojt_dba     | ojt_applications     | UPDATE    | t
+ grp03_ojt_dba     | ojt_placements       | DELETE    | t
+ grp03_ojt_dba     | ojt_placements       | INSERT    | t
+ grp03_ojt_dba     | ojt_placements       | MAINTAIN  | t
+ grp03_ojt_dba     | ojt_placements       | SELECT    | t
+ grp03_ojt_dba     | ojt_placements       | TRUNCATE  | t
+ grp03_ojt_dba     | ojt_placements       | UPDATE    | t
+ grp03_ojt_dba     | requirements         | DELETE    | t
+ grp03_ojt_dba     | requirements         | INSERT    | t
+ grp03_ojt_dba     | requirements         | MAINTAIN  | t
+ grp03_ojt_dba     | requirements         | SELECT    | t
+ grp03_ojt_dba     | requirements         | TRUNCATE  | t
+ grp03_ojt_dba     | requirements         | UPDATE    | t
+ grp03_ojt_dba     | student_requirements | DELETE    | t
+ grp03_ojt_dba     | student_requirements | INSERT    | t
+ grp03_ojt_dba     | student_requirements | MAINTAIN  | t
+ grp03_ojt_dba     | student_requirements | SELECT    | t
+ grp03_ojt_dba     | student_requirements | TRUNCATE  | t
+ grp03_ojt_dba     | student_requirements | UPDATE    | t
+ grp03_ojt_dba     | students             | DELETE    | t
+ grp03_ojt_dba     | students             | INSERT    | t
+ grp03_ojt_dba     | students             | MAINTAIN  | t
+ grp03_ojt_dba     | students             | SELECT    | t
+ grp03_ojt_dba     | students             | TRUNCATE  | t
+ grp03_ojt_dba     | students             | UPDATE    | t
+ grp03_ojt_dba     | users                | DELETE    | t
+ grp03_ojt_dba     | users                | INSERT    | t
+ grp03_ojt_dba     | users                | MAINTAIN  | t
+ grp03_ojt_dba     | users                | SELECT    | t
+ grp03_ojt_dba     | users                | TRUNCATE  | t
+ grp03_ojt_dba     | users                | UPDATE    | t
+(216 rows)
+
+SELECT grantee,table_name,column_name,privilege_type FROM information_schema.column_privileges
+WHERE table_schema='public' AND grantee IN ('grp03_ojt_readonly_grp','grp03_ojt_runtime_grp')
+AND (table_name IN ('users','audit_log') OR privilege_type='UPDATE') ORDER BY grantee,table_name,column_name,privilege_type;
+        grantee         | table_name | column_name | privilege_type
+------------------------+------------+-------------+----------------
+ grp03_ojt_readonly_grp | audit_log  | action      | SELECT
+ grp03_ojt_readonly_grp | audit_log  | action_time | SELECT
+ grp03_ojt_readonly_grp | audit_log  | audit_id    | SELECT
+ grp03_ojt_readonly_grp | audit_log  | row_id      | SELECT
+ grp03_ojt_readonly_grp | audit_log  | table_name  | SELECT
+ grp03_ojt_readonly_grp | users      | created_at  | SELECT
+ grp03_ojt_readonly_grp | users      | deleted_at  | SELECT
+ grp03_ojt_readonly_grp | users      | is_active   | SELECT
+ grp03_ojt_readonly_grp | users      | role        | SELECT
+ grp03_ojt_readonly_grp | users      | updated_at  | SELECT
+ grp03_ojt_readonly_grp | users      | user_id     | SELECT
+ grp03_ojt_readonly_grp | users      | username    | SELECT
+(12 rows)
+
+SELECT has_column_privilege('grp03_ojt_auditor','public.users','user_id','SELECT') AS auditor_id,
+ has_column_privilege('grp03_ojt_auditor','public.users','email','SELECT') AS auditor_email,
+ has_column_privilege('grp03_ojt_auditor','public.users','password_hash','SELECT') AS auditor_hash,
+ has_column_privilege('grp03_ojt_auditor','public.audit_log','details','SELECT') AS auditor_audit_details,
+ has_column_privilege('grp03_ojt_app','public.users','is_active','UPDATE') AS runtime_activation_update,
+ has_column_privilege('grp03_ojt_app','public.users','role','UPDATE') AS runtime_role_update,
+ has_column_privilege('grp03_ojt_app','public.attendance','is_verified','UPDATE') AS runtime_verify_update,
+ has_column_privilege('grp03_ojt_app','public.attendance','hours_rendered','UPDATE') AS runtime_hours_update;
+ auditor_id | auditor_email | auditor_hash | auditor_audit_details | runtime_activation_update | runtime_role_update | runtime_verify_update | runtime_hours_update
+------------+---------------+--------------+-----------------------+---------------------------+---------------------+-----------------------+----------------------
+ t          | f             | f            | f                     | t                         | f                   | t                     | f
+(1 row)
+
+SELECT r.rolname,d.datname,has_database_privilege(r.oid,d.oid,'CONNECT') AS can_connect
+FROM pg_roles r CROSS JOIN pg_database d WHERE r.rolname IN ('grp03_ojt_app','grp03_ojt_auditor','grp03_ojt_dba') AND d.datname IN ('grp_parkitdb','postgres') ORDER BY r.rolname,d.datname;
+      rolname      |   datname    | can_connect
+-------------------+--------------+-------------
+ grp03_ojt_app     | grp_parkitdb | t
+ grp03_ojt_app     | postgres     | t
+ grp03_ojt_auditor | grp_parkitdb | t
+ grp03_ojt_auditor | postgres     | t
+ grp03_ojt_dba     | grp_parkitdb | t
+ grp03_ojt_dba     | postgres     | t
+(6 rows)
+
+SELECT relname,n_live_tup,n_dead_tup,n_mod_since_analyze,last_vacuum,last_autovacuum,last_analyze,last_autoanalyze,vacuum_count,analyze_count FROM pg_stat_user_tables ORDER BY relname;
+       relname        | n_live_tup | n_dead_tup | n_mod_since_analyze | last_vacuum | last_autovacuum | last_analyze | last_autoanalyze | vacuum_count | analyze_count
+----------------------+------------+------------+---------------------+-------------+-----------------+--------------+------------------+--------------+---------------
+ academic_supervisors |          1 |          1 |                   1 |             |                 |              |                  |            0 |             0
+ attendance           |          0 |          2 |                   0 |             |                 |              |                  |            0 |             0
+ audit_log            |          0 |          0 |                   0 |             |                 |              |                  |            0 |             0
+ companies            |          1 |          1 |                   1 |             |                 |              |                  |            0 |             0
+ company_supervisors  |          1 |          1 |                   1 |             |                 |              |                  |            0 |             0
+ evaluations          |          0 |          1 |                   0 |             |                 |              |                  |            0 |             0
+ ojt_applications     |          0 |          2 |                   0 |             |                 |              |                  |            0 |             0
+ ojt_placements       |          0 |          2 |                   0 |             |                 |              |                  |            0 |             0
+ requirements         |          3 |          1 |                   3 |             |                 |              |                  |            0 |             0
+ student_requirements |          0 |          2 |                   0 |             |                 |              |                  |            0 |             0
+ students             |          1 |          1 |                   1 |             |                 |              |                  |            0 |             0
+ users                |          5 |          4 |                   5 |             |                 |              |                  |            0 |             0
+(12 rows)
+
+SELECT schemaname,tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' ORDER BY tablename,indexname;
+ schemaname |      tablename       |                         indexname                         |                                                                           indexdef
+------------+----------------------+-----------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+ public     | academic_supervisors | academic_supervisors_pkey                                 | CREATE UNIQUE INDEX academic_supervisors_pkey ON public.academic_supervisors USING btree (academic_sup_id)
+ public     | academic_supervisors | academic_supervisors_user_id_key                          | CREATE UNIQUE INDEX academic_supervisors_user_id_key ON public.academic_supervisors USING btree (user_id)
+ public     | attendance           | attendance_pkey                                           | CREATE UNIQUE INDEX attendance_pkey ON public.attendance USING btree (attendance_id)
+ public     | attendance           | attendance_placement_id_attendance_date_key               | CREATE UNIQUE INDEX attendance_placement_id_attendance_date_key ON public.attendance USING btree (placement_id, attendance_date)
+ public     | audit_log            | audit_log_pkey                                            | CREATE UNIQUE INDEX audit_log_pkey ON public.audit_log USING btree (audit_id)
+ public     | companies            | companies_company_name_key                                | CREATE UNIQUE INDEX companies_company_name_key ON public.companies USING btree (company_name)
+ public     | companies            | companies_pkey                                            | CREATE UNIQUE INDEX companies_pkey ON public.companies USING btree (company_id)
+ public     | company_supervisors  | company_supervisors_pkey                                  | CREATE UNIQUE INDEX company_supervisors_pkey ON public.company_supervisors USING btree (company_sup_id)
+ public     | company_supervisors  | company_supervisors_user_id_key                           | CREATE UNIQUE INDEX company_supervisors_user_id_key ON public.company_supervisors USING btree (user_id)
+ public     | evaluations          | evaluations_pkey                                          | CREATE UNIQUE INDEX evaluations_pkey ON public.evaluations USING btree (evaluation_id)
+ public     | ojt_applications     | ojt_applications_application_id_student_id_company_id_key | CREATE UNIQUE INDEX ojt_applications_application_id_student_id_company_id_key ON public.ojt_applications USING btree (application_id, student_id, company_id)
+ public     | ojt_applications     | ojt_applications_pkey                                     | CREATE UNIQUE INDEX ojt_applications_pkey ON public.ojt_applications USING btree (application_id)
+ public     | ojt_placements       | ojt_placements_application_id_key                         | CREATE UNIQUE INDEX ojt_placements_application_id_key ON public.ojt_placements USING btree (application_id)
+ public     | ojt_placements       | ojt_placements_pkey                                       | CREATE UNIQUE INDEX ojt_placements_pkey ON public.ojt_placements USING btree (placement_id)
+ public     | requirements         | requirements_pkey                                         | CREATE UNIQUE INDEX requirements_pkey ON public.requirements USING btree (req_id)
+ public     | requirements         | requirements_title_key                                    | CREATE UNIQUE INDEX requirements_title_key ON public.requirements USING btree (title)
+ public     | student_requirements | student_requirements_pkey                                 | CREATE UNIQUE INDEX student_requirements_pkey ON public.student_requirements USING btree (student_req_id)
+ public     | student_requirements | student_requirements_student_id_req_id_key                | CREATE UNIQUE INDEX student_requirements_student_id_req_id_key ON public.student_requirements USING btree (student_id, req_id)
+ public     | students             | students_pkey                                             | CREATE UNIQUE INDEX students_pkey ON public.students USING btree (student_id)
+ public     | students             | students_student_number_key                               | CREATE UNIQUE INDEX students_student_number_key ON public.students USING btree (student_number)
+ public     | students             | students_user_id_key                                      | CREATE UNIQUE INDEX students_user_id_key ON public.students USING btree (user_id)
+ public     | users                | users_email_key                                           | CREATE UNIQUE INDEX users_email_key ON public.users USING btree (email)
+ public     | users                | users_pkey                                                | CREATE UNIQUE INDEX users_pkey ON public.users USING btree (user_id)
+ public     | users                | users_username_key                                        | CREATE UNIQUE INDEX users_username_key ON public.users USING btree (username)
+(24 rows)
+
+SELECT c.relname,c.reltuples,c.relpages,c.reloptions,age(c.relfrozenxid) AS xid_age,pg_size_pretty(pg_total_relation_size(c.oid)) AS total_size
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r' ORDER BY c.relname;
+       relname        | reltuples | relpages | reloptions | xid_age | total_size
+----------------------+-----------+----------+------------+---------+------------
+ academic_supervisors |        -1 |        0 |            |      26 | 40 kB
+ attendance           |        -1 |        0 |            |      26 | 40 kB
+ audit_log            |        -1 |        0 |            |      26 | 16 kB
+ companies            |        -1 |        0 |            |      26 | 48 kB
+ company_supervisors  |        -1 |        0 |            |      26 | 40 kB
+ evaluations          |        -1 |        0 |            |      26 | 32 kB
+ ojt_applications     |        -1 |        0 |            |      26 | 48 kB
+ ojt_placements       |        -1 |        0 |            |      26 | 40 kB
+ requirements         |        -1 |        0 |            |      26 | 48 kB
+ student_requirements |        -1 |        0 |            |      26 | 48 kB
+ students             |        -1 |        0 |            |      26 | 56 kB
+ users                |        -1 |        0 |            |      26 | 64 kB
+(12 rows)
+
+SELECT name,setting,unit FROM pg_settings WHERE name IN ('autovacuum','track_activities','track_counts') ORDER BY name;
+       name       | setting | unit
+------------------+---------+------
+ autovacuum       | on      |
+ track_activities | on      |
+ track_counts     | on      |
+(3 rows)
+
+SELECT count(*) AS user_defined_triggers FROM pg_trigger WHERE NOT tgisinternal AND tgrelid IN (SELECT oid FROM pg_class WHERE relnamespace='public'::regnamespace);
+ user_defined_triggers
+-----------------------
+                     0
+(1 row)
+
+SELECT count(*) AS rls_policies FROM pg_policies WHERE schemaname='public';
+ rls_policies
+--------------
+            0
+(1 row)

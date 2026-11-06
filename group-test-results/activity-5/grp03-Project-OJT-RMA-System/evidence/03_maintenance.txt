@@ -1,0 +1,526 @@
+-- Existing local Activity 4 database only. Run directly as grp03_ojt_dba.
+-- Ownership through the inherited admin group permits maintenance without superuser access.
+-- ANALYZE refreshes planner statistics; ordinary VACUUM removes reusable dead space.
+-- Baseline all 12 small tables; do not run with --single-transaction or use VACUUM FULL.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database();
+          captured_at          | session_user  | current_user  | current_database
+-------------------------------+---------------+---------------+------------------
+ 2026-11-06 17:59:34.789911+08 | grp03_ojt_dba | grp03_ojt_dba | ojt_managementdb
+(1 row)
+
+SET lock_timeout='3s';
+SET
+SET statement_timeout='30s';
+SET
+SELECT c.relname,pg_get_userbyid(c.relowner) AS owner,has_table_privilege(current_user,c.oid,'MAINTAIN') AS can_maintain
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r' ORDER BY c.relname;
+       relname        |        owner        | can_maintain
+----------------------+---------------------+--------------
+ academic_supervisors | grp03_ojt_admin_grp | t
+ attendance           | grp03_ojt_admin_grp | t
+ audit_log            | grp03_ojt_admin_grp | t
+ companies            | grp03_ojt_admin_grp | t
+ company_supervisors  | grp03_ojt_admin_grp | t
+ evaluations          | grp03_ojt_admin_grp | t
+ ojt_applications     | grp03_ojt_admin_grp | t
+ ojt_placements       | grp03_ojt_admin_grp | t
+ requirements         | grp03_ojt_admin_grp | t
+ student_requirements | grp03_ojt_admin_grp | t
+ students             | grp03_ojt_admin_grp | t
+ users                | grp03_ojt_admin_grp | t
+(12 rows)
+
+ANALYZE VERBOSE public.academic_supervisors;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:12: INFO:  analyzing "public.academic_supervisors"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:12: INFO:  "academic_supervisors": scanned 1 of 1 pages, containing 1 live rows and 1 dead rows; 1 rows in sample, 1 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:12: INFO:  finished analyzing table "ojt_managementdb.public.academic_supervisors"
+avg read rate: 0.000 MB/s, avg write rate: 27.344 MB/s
+buffer usage: 349 hits, 0 reads, 7 dirtied
+WAL usage: 22 records, 7 full page images, 40680 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.attendance;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:13: INFO:  analyzing "public.attendance"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:13: INFO:  "attendance": scanned 1 of 1 pages, containing 0 live rows and 2 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:13: INFO:  finished analyzing table "ojt_managementdb.public.attendance"
+avg read rate: 0.000 MB/s, avg write rate: 7.812 MB/s
+buffer usage: 279 hits, 0 reads, 1 dirtied
+WAL usage: 3 records, 1 full page images, 4408 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.audit_log;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:14: INFO:  analyzing "public.audit_log"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:14: INFO:  "audit_log": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:14: INFO:  finished analyzing table "ojt_managementdb.public.audit_log"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 103 hits, 0 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 311 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.companies;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:15: INFO:  analyzing "public.companies"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:15: INFO:  "companies": scanned 1 of 1 pages, containing 1 live rows and 1 dead rows; 1 rows in sample, 1 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:15: INFO:  finished analyzing table "ojt_managementdb.public.companies"
+avg read rate: 0.000 MB/s, avg write rate: 7.812 MB/s
+buffer usage: 142 hits, 0 reads, 1 dirtied
+WAL usage: 22 records, 1 full page images, 2923 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.company_supervisors;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:16: INFO:  analyzing "public.company_supervisors"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:16: INFO:  "company_supervisors": scanned 1 of 1 pages, containing 1 live rows and 1 dead rows; 1 rows in sample, 1 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:16: INFO:  finished analyzing table "ojt_managementdb.public.company_supervisors"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 143 hits, 0 reads, 0 dirtied
+WAL usage: 23 records, 0 full page images, 2833 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.evaluations;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:17: INFO:  analyzing "public.evaluations"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:17: INFO:  "evaluations": scanned 1 of 1 pages, containing 0 live rows and 1 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:17: INFO:  finished analyzing table "ojt_managementdb.public.evaluations"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 102 hits, 0 reads, 0 dirtied
+WAL usage: 2 records, 0 full page images, 585 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.ojt_applications;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:18: INFO:  analyzing "public.ojt_applications"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:18: INFO:  "ojt_applications": scanned 1 of 1 pages, containing 0 live rows and 2 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:18: INFO:  finished analyzing table "ojt_managementdb.public.ojt_applications"
+avg read rate: 0.000 MB/s, avg write rate: 7.812 MB/s
+buffer usage: 90 hits, 0 reads, 1 dirtied
+WAL usage: 3 records, 1 full page images, 7128 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.ojt_placements;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:19: INFO:  analyzing "public.ojt_placements"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:19: INFO:  "ojt_placements": scanned 1 of 1 pages, containing 0 live rows and 2 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:19: INFO:  finished analyzing table "ojt_managementdb.public.ojt_placements"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 94 hits, 0 reads, 0 dirtied
+WAL usage: 3 records, 0 full page images, 843 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.requirements;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:20: INFO:  analyzing "public.requirements"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:20: INFO:  "requirements": scanned 1 of 1 pages, containing 3 live rows and 1 dead rows; 3 rows in sample, 3 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:20: INFO:  finished analyzing table "ojt_managementdb.public.requirements"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 101 hits, 0 reads, 0 dirtied
+WAL usage: 13 records, 0 full page images, 2140 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.student_requirements;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:21: INFO:  analyzing "public.student_requirements"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:21: INFO:  "student_requirements": scanned 1 of 1 pages, containing 0 live rows and 2 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:21: INFO:  finished analyzing table "ojt_managementdb.public.student_requirements"
+avg read rate: 0.000 MB/s, avg write rate: 7.812 MB/s
+buffer usage: 87 hits, 0 reads, 1 dirtied
+WAL usage: 3 records, 1 full page images, 8116 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.students;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:22: INFO:  analyzing "public.students"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:22: INFO:  "students": scanned 1 of 1 pages, containing 1 live rows and 1 dead rows; 1 rows in sample, 1 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:22: INFO:  finished analyzing table "ojt_managementdb.public.students"
+avg read rate: 0.000 MB/s, avg write rate: 7.812 MB/s
+buffer usage: 169 hits, 0 reads, 1 dirtied
+WAL usage: 26 records, 1 full page images, 10105 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+ANALYZE VERBOSE public.users;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:23: INFO:  analyzing "public.users"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:23: INFO:  "users": scanned 1 of 1 pages, containing 5 live rows and 4 dead rows; 5 rows in sample, 5 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:23: INFO:  finished analyzing table "ojt_managementdb.public.users"
+avg read rate: 0.000 MB/s, avg write rate: 23.438 MB/s
+buffer usage: 152 hits, 0 reads, 3 dirtied
+WAL usage: 23 records, 3 full page images, 9532 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+ANALYZE
+VACUUM (VERBOSE, ANALYZE) public.academic_supervisors;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:24: INFO:  vacuuming "ojt_managementdb.public.academic_supervisors"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:24: INFO:  finished vacuuming "ojt_managementdb.public.academic_supervisors": index scans: 1
+pages: 0 removed, 1 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 1 removed, 1 remain, 0 are dead but not yet removable
+removable cutoff: 1201, which was 0 XIDs old when operation ended
+new relfrozenxid: 1184, which is 15 XIDs ahead of previous value
+frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+visibility map: 1 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 1 dead item identifiers removed
+index "academic_supervisors_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "academic_supervisors_user_id_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 87.453 MB/s
+buffer usage: 48 hits, 0 reads, 6 dirtied
+WAL usage: 9 records, 6 full page images, 33640 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:24: INFO:  analyzing "public.academic_supervisors"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:24: INFO:  "academic_supervisors": scanned 1 of 1 pages, containing 1 live rows and 0 dead rows; 1 rows in sample, 1 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:24: INFO:  finished analyzing table "ojt_managementdb.public.academic_supervisors"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 89 hits, 0 reads, 0 dirtied
+WAL usage: 27 records, 0 full page images, 2448 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.attendance;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:25: INFO:  vacuuming "ojt_managementdb.public.attendance"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:25: INFO:  table "attendance": truncated 1 to 0 pages
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:25: INFO:  finished vacuuming "ojt_managementdb.public.attendance": index scans: 1
+pages: 1 removed, 0 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 2 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1202, which was 1 XIDs old when operation ended
+new relfrozenxid: 1202, which is 33 XIDs ahead of previous value
+frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+visibility map: 1 pages set all-visible, 1 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 1 dead item identifiers removed
+index "attendance_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "attendance_placement_id_attendance_date_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 39.372 MB/s
+buffer usage: 59 hits, 0 reads, 7 dirtied
+WAL usage: 11 records, 7 full page images, 33717 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:25: INFO:  analyzing "public.attendance"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:25: INFO:  "attendance": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:25: INFO:  finished analyzing table "ojt_managementdb.public.attendance"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 13 hits, 0 reads, 0 dirtied
+WAL usage: 0 records, 0 full page images, 0 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.audit_log;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:26: INFO:  vacuuming "ojt_managementdb.public.audit_log"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:26: INFO:  finished vacuuming "ojt_managementdb.public.audit_log": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1203, which was 0 XIDs old when operation ended
+new relfrozenxid: 1203, which is 34 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 19 hits, 0 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 311 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:26: INFO:  vacuuming "ojt_managementdb.pg_toast.pg_toast_17471"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:26: INFO:  finished vacuuming "ojt_managementdb.pg_toast.pg_toast_17471": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1203, which was 0 XIDs old when operation ended
+new relfrozenxid: 1203, which is 34 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 27.033 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 27 hits, 1 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 258 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:26: INFO:  analyzing "public.audit_log"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:26: INFO:  "audit_log": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:26: INFO:  finished analyzing table "ojt_managementdb.public.audit_log"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 10 hits, 0 reads, 0 dirtied
+WAL usage: 0 records, 0 full page images, 0 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.companies;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:27: INFO:  vacuuming "ojt_managementdb.public.companies"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:27: INFO:  finished vacuuming "ojt_managementdb.public.companies": index scans: 1
+pages: 0 removed, 1 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 1 removed, 1 remain, 0 are dead but not yet removable
+removable cutoff: 1203, which was 0 XIDs old when operation ended
+new relfrozenxid: 1181, which is 12 XIDs ahead of previous value
+frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+visibility map: 1 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 1 dead item identifiers removed
+index "companies_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "companies_company_name_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 93.563 MB/s
+buffer usage: 47 hits, 0 reads, 6 dirtied
+WAL usage: 9 records, 6 full page images, 33648 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:27: INFO:  vacuuming "ojt_managementdb.pg_toast.pg_toast_17513"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:27: INFO:  finished vacuuming "ojt_managementdb.pg_toast.pg_toast_17513": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1203, which was 0 XIDs old when operation ended
+new relfrozenxid: 1203, which is 34 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 21.884 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 25 hits, 1 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 258 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:27: INFO:  analyzing "public.companies"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:27: INFO:  "companies": scanned 1 of 1 pages, containing 1 live rows and 0 dead rows; 1 rows in sample, 1 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:27: INFO:  finished analyzing table "ojt_managementdb.public.companies"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 69 hits, 0 reads, 0 dirtied
+WAL usage: 18 records, 0 full page images, 1534 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.company_supervisors;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:28: INFO:  vacuuming "ojt_managementdb.public.company_supervisors"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:28: INFO:  finished vacuuming "ojt_managementdb.public.company_supervisors": index scans: 1
+pages: 0 removed, 1 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 1 removed, 1 remain, 0 are dead but not yet removable
+removable cutoff: 1204, which was 0 XIDs old when operation ended
+new relfrozenxid: 1185, which is 16 XIDs ahead of previous value
+frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+visibility map: 1 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 1 dead item identifiers removed
+index "company_supervisors_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "company_supervisors_user_id_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 81.806 MB/s
+buffer usage: 53 hits, 0 reads, 6 dirtied
+WAL usage: 9 records, 6 full page images, 33640 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:28: INFO:  analyzing "public.company_supervisors"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:28: INFO:  "company_supervisors": scanned 1 of 1 pages, containing 1 live rows and 0 dead rows; 1 rows in sample, 1 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:28: INFO:  finished analyzing table "ojt_managementdb.public.company_supervisors"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 61 hits, 0 reads, 0 dirtied
+WAL usage: 13 records, 0 full page images, 1040 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.evaluations;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:29: INFO:  vacuuming "ojt_managementdb.public.evaluations"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:29: INFO:  table "evaluations": truncated 1 to 0 pages
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:29: INFO:  finished vacuuming "ojt_managementdb.public.evaluations": index scans: 1
+pages: 1 removed, 0 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 1 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1205, which was 1 XIDs old when operation ended
+new relfrozenxid: 1205, which is 36 XIDs ahead of previous value
+frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+visibility map: 1 pages set all-visible, 1 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 1 dead item identifiers removed
+index "evaluations_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 35.565 MB/s
+buffer usage: 38 hits, 0 reads, 6 dirtied
+WAL usage: 10 records, 6 full page images, 33622 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:29: INFO:  vacuuming "ojt_managementdb.pg_toast.pg_toast_17727"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:29: INFO:  finished vacuuming "ojt_managementdb.pg_toast.pg_toast_17727": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1206, which was 0 XIDs old when operation ended
+new relfrozenxid: 1206, which is 37 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 33.820 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 25 hits, 1 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 258 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:29: INFO:  analyzing "public.evaluations"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:29: INFO:  "evaluations": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:29: INFO:  finished analyzing table "ojt_managementdb.public.evaluations"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 10 hits, 0 reads, 0 dirtied
+WAL usage: 0 records, 0 full page images, 0 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.ojt_applications;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:30: INFO:  vacuuming "ojt_managementdb.public.ojt_applications"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:30: INFO:  table "ojt_applications": truncated 1 to 0 pages
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:30: INFO:  finished vacuuming "ojt_managementdb.public.ojt_applications": index scans: 1
+pages: 1 removed, 0 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 2 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1206, which was 1 XIDs old when operation ended
+new relfrozenxid: 1206, which is 37 XIDs ahead of previous value
+frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+visibility map: 1 pages set all-visible, 1 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 1 dead item identifiers removed
+index "ojt_applications_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "ojt_applications_application_id_student_id_company_id_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 42.758 MB/s
+buffer usage: 54 hits, 0 reads, 7 dirtied
+WAL usage: 11 records, 7 full page images, 33717 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:30: INFO:  vacuuming "ojt_managementdb.pg_toast.pg_toast_17599"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:30: INFO:  finished vacuuming "ojt_managementdb.pg_toast.pg_toast_17599": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1207, which was 0 XIDs old when operation ended
+new relfrozenxid: 1207, which is 38 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 17.208 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 25 hits, 1 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 258 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:30: INFO:  analyzing "public.ojt_applications"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:30: INFO:  "ojt_applications": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:30: INFO:  finished analyzing table "ojt_managementdb.public.ojt_applications"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 13 hits, 0 reads, 0 dirtied
+WAL usage: 0 records, 0 full page images, 0 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.ojt_placements;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:31: INFO:  vacuuming "ojt_managementdb.public.ojt_placements"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:31: INFO:  table "ojt_placements": truncated 1 to 0 pages
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:31: INFO:  finished vacuuming "ojt_managementdb.public.ojt_placements": index scans: 1
+pages: 1 removed, 0 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 2 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1207, which was 1 XIDs old when operation ended
+new relfrozenxid: 1207, which is 38 XIDs ahead of previous value
+frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+visibility map: 1 pages set all-visible, 1 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 1 dead item identifiers removed
+index "ojt_placements_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "ojt_placements_application_id_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 38.083 MB/s
+buffer usage: 52 hits, 0 reads, 7 dirtied
+WAL usage: 11 records, 7 full page images, 33717 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:31: INFO:  analyzing "public.ojt_placements"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:31: INFO:  "ojt_placements": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:31: INFO:  finished analyzing table "ojt_managementdb.public.ojt_placements"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 13 hits, 0 reads, 0 dirtied
+WAL usage: 0 records, 0 full page images, 0 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.requirements;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:32: INFO:  vacuuming "ojt_managementdb.public.requirements"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:32: INFO:  finished vacuuming "ojt_managementdb.public.requirements": index scans: 1
+pages: 0 removed, 1 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 1 removed, 3 remain, 0 are dead but not yet removable
+removable cutoff: 1208, which was 0 XIDs old when operation ended
+new relfrozenxid: 1208, which is 39 XIDs ahead of previous value
+frozen: 1 pages from table (100.00% of total) had 3 tuples frozen
+visibility map: 1 pages set all-visible, 1 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 1 dead item identifiers removed
+index "requirements_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "requirements_title_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 67.019 MB/s
+buffer usage: 51 hits, 0 reads, 7 dirtied
+WAL usage: 9 records, 7 full page images, 33957 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:32: INFO:  vacuuming "ojt_managementdb.pg_toast.pg_toast_17582"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:32: INFO:  finished vacuuming "ojt_managementdb.pg_toast.pg_toast_17582": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1208, which was 0 XIDs old when operation ended
+new relfrozenxid: 1208, which is 39 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 19.829 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 25 hits, 1 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 258 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:32: INFO:  analyzing "public.requirements"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:32: INFO:  "requirements": scanned 1 of 1 pages, containing 3 live rows and 0 dead rows; 3 rows in sample, 3 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:32: INFO:  finished analyzing table "ojt_managementdb.public.requirements"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 37 hits, 0 reads, 0 dirtied
+WAL usage: 6 records, 0 full page images, 474 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.student_requirements;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:33: INFO:  vacuuming "ojt_managementdb.public.student_requirements"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:33: INFO:  table "student_requirements": truncated 1 to 0 pages
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:33: INFO:  finished vacuuming "ojt_managementdb.public.student_requirements": index scans: 1
+pages: 1 removed, 0 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 2 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1209, which was 1 XIDs old when operation ended
+new relfrozenxid: 1209, which is 40 XIDs ahead of previous value
+frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+visibility map: 1 pages set all-visible, 1 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 1 dead item identifiers removed
+index "student_requirements_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "student_requirements_student_id_req_id_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 36.728 MB/s
+buffer usage: 51 hits, 0 reads, 7 dirtied
+WAL usage: 11 records, 7 full page images, 33717 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:33: INFO:  vacuuming "ojt_managementdb.pg_toast.pg_toast_17630"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:33: INFO:  finished vacuuming "ojt_managementdb.pg_toast.pg_toast_17630": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1210, which was 0 XIDs old when operation ended
+new relfrozenxid: 1210, which is 41 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 28.409 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 25 hits, 1 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 258 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:33: INFO:  analyzing "public.student_requirements"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:33: INFO:  "student_requirements": scanned 0 of 0 pages, containing 0 live rows and 0 dead rows; 0 rows in sample, 0 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:33: INFO:  finished analyzing table "ojt_managementdb.public.student_requirements"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 13 hits, 0 reads, 0 dirtied
+WAL usage: 0 records, 0 full page images, 0 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.students;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:34: INFO:  vacuuming "ojt_managementdb.public.students"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:34: INFO:  finished vacuuming "ojt_managementdb.public.students": index scans: 1
+pages: 0 removed, 1 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 1 removed, 1 remain, 0 are dead but not yet removable
+removable cutoff: 1210, which was 0 XIDs old when operation ended
+new relfrozenxid: 1210, which is 41 XIDs ahead of previous value
+frozen: 1 pages from table (100.00% of total) had 1 tuples frozen
+visibility map: 1 pages set all-visible, 1 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 1 dead item identifiers removed
+index "students_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "students_user_id_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "students_student_number_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 110.619 MB/s
+buffer usage: 62 hits, 0 reads, 8 dirtied
+WAL usage: 10 records, 8 full page images, 33896 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:34: INFO:  analyzing "public.students"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:34: INFO:  "students": scanned 1 of 1 pages, containing 1 live rows and 0 dead rows; 1 rows in sample, 1 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:34: INFO:  finished analyzing table "ojt_managementdb.public.students"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 64 hits, 0 reads, 0 dirtied
+WAL usage: 12 records, 0 full page images, 910 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
+VACUUM (VERBOSE, ANALYZE) public.users;
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:35: INFO:  vacuuming "ojt_managementdb.public.users"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:35: INFO:  finished vacuuming "ojt_managementdb.public.users": index scans: 1
+pages: 0 removed, 1 remain, 1 scanned (100.00% of total), 0 eagerly scanned
+tuples: 4 removed, 5 remain, 0 are dead but not yet removable
+removable cutoff: 1211, which was 0 XIDs old when operation ended
+new relfrozenxid: 1182, which is 13 XIDs ahead of previous value
+frozen: 0 pages from table (0.00% of total) had 0 tuples frozen
+visibility map: 1 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan needed: 1 pages from table (100.00% of total) had 3 dead item identifiers removed
+index "users_pkey": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "users_username_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+index "users_email_key": pages: 2 in total, 0 newly deleted, 0 currently deleted, 0 reusable
+avg read rate: 0.000 MB/s, avg write rate: 100.160 MB/s
+buffer usage: 62 hits, 0 reads, 7 dirtied
+WAL usage: 10 records, 7 full page images, 34143 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:35: INFO:  vacuuming "ojt_managementdb.pg_toast.pg_toast_17446"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:35: INFO:  finished vacuuming "ojt_managementdb.pg_toast.pg_toast_17446": index scans: 0
+pages: 0 removed, 0 remain, 0 scanned (100.00% of total), 0 eagerly scanned
+tuples: 0 removed, 0 remain, 0 are dead but not yet removable
+removable cutoff: 1211, which was 0 XIDs old when operation ended
+new relfrozenxid: 1211, which is 42 XIDs ahead of previous value
+frozen: 0 pages from table (100.00% of total) had 0 tuples frozen
+visibility map: 0 pages set all-visible, 0 pages set all-frozen (0 were all-visible)
+index scan not needed: 0 pages from table (100.00% of total) had 0 dead item identifiers removed
+avg read rate: 34.877 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 25 hits, 1 reads, 0 dirtied
+WAL usage: 1 records, 0 full page images, 258 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:35: INFO:  analyzing "public.users"
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:35: INFO:  "users": scanned 1 of 1 pages, containing 5 live rows and 0 dead rows; 5 rows in sample, 5 estimated total rows
+psql:activity-5/grp03-Project-OJT-RMA-System/sql/03_maintenance.sql:35: INFO:  finished analyzing table "ojt_managementdb.public.users"
+avg read rate: 0.000 MB/s, avg write rate: 0.000 MB/s
+buffer usage: 62 hits, 0 reads, 0 dirtied
+WAL usage: 13 records, 0 full page images, 1176 bytes, 0 buffers full
+system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+VACUUM
