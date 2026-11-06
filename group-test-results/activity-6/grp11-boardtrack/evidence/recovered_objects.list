@@ -1,0 +1,93 @@
+5460; 0 0 ACL - SCHEMA public pg_database_owner
+2; 3079 17351 EXTENSION - btree_gist
+5461; 0 0 COMMENT - EXTENSION btree_gist
+3; 3079 18077 EXTENSION - pgcrypto
+5462; 0 0 COMMENT - EXTENSION pgcrypto
+266; 1255 18115 FUNCTION public guard_room_status() boardtrack_owner_grp
+5682; 0 0 ACL public FUNCTION guard_room_status() boardtrack_owner_grp
+268; 1255 18116 FUNCTION public sync_room_status() boardtrack_owner_grp
+5710; 0 0 ACL public FUNCTION sync_room_status() boardtrack_owner_grp
+221; 1259 18117 TABLE public app_user boardtrack_owner_grp
+5714; 0 0 ACL public TABLE app_user boardtrack_owner_grp
+222; 1259 18130 SEQUENCE public app_user_user_id_seq boardtrack_owner_grp
+5715; 0 0 SEQUENCE OWNED BY public app_user_user_id_seq boardtrack_owner_grp
+223; 1259 18131 TABLE public lease boardtrack_owner_grp
+5716; 0 0 ACL public TABLE lease boardtrack_owner_grp
+224; 1259 18146 SEQUENCE public lease_lease_id_seq boardtrack_owner_grp
+5717; 0 0 SEQUENCE OWNED BY public lease_lease_id_seq boardtrack_owner_grp
+5718; 0 0 ACL public SEQUENCE lease_lease_id_seq boardtrack_owner_grp
+225; 1259 18147 TABLE public payment boardtrack_owner_grp
+5719; 0 0 ACL public TABLE payment boardtrack_owner_grp
+226; 1259 18161 SEQUENCE public payment_payment_id_seq boardtrack_owner_grp
+5720; 0 0 SEQUENCE OWNED BY public payment_payment_id_seq boardtrack_owner_grp
+5721; 0 0 ACL public SEQUENCE payment_payment_id_seq boardtrack_owner_grp
+227; 1259 18162 TABLE public property boardtrack_owner_grp
+5722; 0 0 ACL public TABLE property boardtrack_owner_grp
+228; 1259 18168 SEQUENCE public property_property_id_seq boardtrack_owner_grp
+5723; 0 0 SEQUENCE OWNED BY public property_property_id_seq boardtrack_owner_grp
+5724; 0 0 ACL public SEQUENCE property_property_id_seq boardtrack_owner_grp
+229; 1259 18169 TABLE public room boardtrack_owner_grp
+5725; 0 0 ACL public TABLE room boardtrack_owner_grp
+230; 1259 18180 SEQUENCE public room_room_id_seq boardtrack_owner_grp
+5726; 0 0 SEQUENCE OWNED BY public room_room_id_seq boardtrack_owner_grp
+5727; 0 0 ACL public SEQUENCE room_room_id_seq boardtrack_owner_grp
+231; 1259 18181 TABLE public schema_migrations boardtrack_owner_grp
+232; 1259 18188 TABLE public tenant boardtrack_owner_grp
+5728; 0 0 ACL public TABLE tenant boardtrack_owner_grp
+233; 1259 18194 SEQUENCE public tenant_tenant_id_seq boardtrack_owner_grp
+5729; 0 0 SEQUENCE OWNED BY public tenant_tenant_id_seq boardtrack_owner_grp
+5730; 0 0 ACL public SEQUENCE tenant_tenant_id_seq boardtrack_owner_grp
+234; 1259 18195 TABLE public utility_bill boardtrack_owner_grp
+5731; 0 0 ACL public TABLE utility_bill boardtrack_owner_grp
+235; 1259 18209 SEQUENCE public utility_bill_utility_bill_id_seq boardtrack_owner_grp
+5732; 0 0 SEQUENCE OWNED BY public utility_bill_utility_bill_id_seq boardtrack_owner_grp
+5733; 0 0 ACL public SEQUENCE utility_bill_utility_bill_id_seq boardtrack_owner_grp
+236; 1259 18210 VIEW public v_lease_summary boardtrack_owner_grp
+5734; 0 0 ACL public TABLE v_lease_summary boardtrack_owner_grp
+5225; 2604 18215 DEFAULT public app_user user_id boardtrack_owner_grp
+5227; 2604 18216 DEFAULT public lease lease_id boardtrack_owner_grp
+5229; 2604 18217 DEFAULT public payment payment_id boardtrack_owner_grp
+5232; 2604 18218 DEFAULT public property property_id boardtrack_owner_grp
+5233; 2604 18219 DEFAULT public room room_id boardtrack_owner_grp
+5236; 2604 18220 DEFAULT public tenant tenant_id boardtrack_owner_grp
+5237; 2604 18221 DEFAULT public utility_bill utility_bill_id boardtrack_owner_grp
+5438; 0 18117 TABLE DATA public app_user boardtrack_owner_grp
+5440; 0 18131 TABLE DATA public lease boardtrack_owner_grp
+5442; 0 18147 TABLE DATA public payment boardtrack_owner_grp
+5444; 0 18162 TABLE DATA public property boardtrack_owner_grp
+5446; 0 18169 TABLE DATA public room boardtrack_owner_grp
+5448; 0 18181 TABLE DATA public schema_migrations boardtrack_owner_grp
+5449; 0 18188 TABLE DATA public tenant boardtrack_owner_grp
+5451; 0 18195 TABLE DATA public utility_bill boardtrack_owner_grp
+5735; 0 0 SEQUENCE SET public app_user_user_id_seq boardtrack_owner_grp
+5736; 0 0 SEQUENCE SET public lease_lease_id_seq boardtrack_owner_grp
+5737; 0 0 SEQUENCE SET public payment_payment_id_seq boardtrack_owner_grp
+5738; 0 0 SEQUENCE SET public property_property_id_seq boardtrack_owner_grp
+5739; 0 0 SEQUENCE SET public room_room_id_seq boardtrack_owner_grp
+5740; 0 0 SEQUENCE SET public tenant_tenant_id_seq boardtrack_owner_grp
+5741; 0 0 SEQUENCE SET public utility_bill_utility_bill_id_seq boardtrack_owner_grp
+5255; 2606 18223 CONSTRAINT public app_user app_user_pkey boardtrack_owner_grp
+5257; 2606 18225 CONSTRAINT public app_user app_user_username_key boardtrack_owner_grp
+5259; 2606 18227 CONSTRAINT public lease ex_lease_no_overlap boardtrack_owner_grp
+5263; 2606 18229 CONSTRAINT public lease lease_pkey boardtrack_owner_grp
+5266; 2606 18231 CONSTRAINT public payment payment_pkey boardtrack_owner_grp
+5268; 2606 18233 CONSTRAINT public property property_pkey boardtrack_owner_grp
+5270; 2606 18235 CONSTRAINT public room room_pkey boardtrack_owner_grp
+5274; 2606 18237 CONSTRAINT public schema_migrations schema_migrations_pkey boardtrack_owner_grp
+5276; 2606 18239 CONSTRAINT public tenant tenant_email_key boardtrack_owner_grp
+5278; 2606 18241 CONSTRAINT public tenant tenant_pkey boardtrack_owner_grp
+5272; 2606 18243 CONSTRAINT public room uq_room_per_property boardtrack_owner_grp
+5281; 2606 18245 CONSTRAINT public utility_bill utility_bill_pkey boardtrack_owner_grp
+5260; 1259 18246 INDEX public idx_lease_room boardtrack_owner_grp
+5261; 1259 18247 INDEX public idx_lease_tenant boardtrack_owner_grp
+5264; 1259 18248 INDEX public idx_payment_lease boardtrack_owner_grp
+5279; 1259 18249 INDEX public idx_utility_lease boardtrack_owner_grp
+5288; 2620 18250 TRIGGER public lease trg_lease_sync_room boardtrack_owner_grp
+5289; 2620 18251 TRIGGER public room trg_room_status_guard boardtrack_owner_grp
+5282; 2606 18252 FK CONSTRAINT public app_user app_user_tenant_id_fkey boardtrack_owner_grp
+5283; 2606 18257 FK CONSTRAINT public lease lease_room_id_fkey boardtrack_owner_grp
+5284; 2606 18262 FK CONSTRAINT public lease lease_tenant_id_fkey boardtrack_owner_grp
+5285; 2606 18267 FK CONSTRAINT public payment payment_lease_id_fkey boardtrack_owner_grp
+5286; 2606 18272 FK CONSTRAINT public room room_property_id_fkey boardtrack_owner_grp
+5287; 2606 18277 FK CONSTRAINT public utility_bill utility_bill_lease_id_fkey boardtrack_owner_grp
+2419; 826 18282 DEFAULT ACL - DEFAULT PRIVILEGES FOR FUNCTIONS boardtrack_owner_grp

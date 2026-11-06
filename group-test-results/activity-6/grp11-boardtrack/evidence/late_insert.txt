@@ -1,0 +1,10 @@
+Database: g05_a6_g11_restore
+Account: boardtrack_dba (owner role)
+SQL:
+INSERT INTO property(property_name,address) VALUES('G05-A6-LATE-11','Activity6 disposable local record') RETURNING property_id,property_name;
+SET
+SET
+SET
+SET
+6|G05-A6-LATE-11
+INSERT 0 1

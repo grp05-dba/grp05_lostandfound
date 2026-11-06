@@ -1,0 +1,11 @@
+[
+  {
+    "phase": "objects",
+    "account": "habalgo_dba",
+    "role": "habalgo_owner_grp",
+    "entries": 88,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55406 -U habalgo_dba --role=habalgo_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g06\\restore_objects.list\" -d g05_a6_g06_restore \"D:\\Data Administration\\course-review\\activity6-private\\g06\\original.dump\"",
+    "exit_code": 0,
+    "stderr": ""
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "table": "orders",
+    "column": "order_status",
+    "sql": "BEGIN; UPDATE public.orders SET order_status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"orders\" violates check constraint \"chk_orders_status\"\nSCHEMA NAME:  public\nTABLE NAME:  orders\nCONSTRAINT NAME:  chk_orders_status\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "payment",
+    "column": "payment_method",
+    "sql": "BEGIN; UPDATE public.payment SET payment_method='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"payment\" violates check constraint \"chk_payment_method\"\nSCHEMA NAME:  public\nTABLE NAME:  payment\nCONSTRAINT NAME:  chk_payment_method\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "payment",
+    "column": "payment_status",
+    "sql": "BEGIN; UPDATE public.payment SET payment_status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"payment\" violates check constraint \"chk_payment_status\"\nSCHEMA NAME:  public\nTABLE NAME:  payment\nCONSTRAINT NAME:  chk_payment_status\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "reservation",
+    "column": "reservation_status",
+    "sql": "BEGIN; UPDATE public.reservation SET reservation_status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"reservation\" violates check constraint \"chk_reservation_status\"\nSCHEMA NAME:  public\nTABLE NAME:  reservation\nCONSTRAINT NAME:  chk_reservation_status\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "restaurant_table",
+    "column": "status",
+    "sql": "BEGIN; UPDATE public.restaurant_table SET status='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"restaurant_table\" violates check constraint \"chk_restaurant_table_status\"\nSCHEMA NAME:  public\nTABLE NAME:  restaurant_table\nCONSTRAINT NAME:  chk_restaurant_table_status\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  },
+  {
+    "table": "staff",
+    "column": "role",
+    "sql": "BEGIN; UPDATE public.staff SET role='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"staff\" violates check constraint \"chk_staff_role\"\nSCHEMA NAME:  public\nTABLE NAME:  staff\nCONSTRAINT NAME:  chk_staff_role\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  }
+]

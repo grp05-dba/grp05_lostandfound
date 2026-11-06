@@ -1,0 +1,22 @@
+[
+  {
+    "target": "restore",
+    "method": "Unchanged application database/configuration component via PHP PDO CLI",
+    "result": {
+      "database": "g05_a6_g07_restore",
+      "account": "campussafe_app",
+      "records": 7
+    },
+    "exit_code": 0
+  },
+  {
+    "target": "recovered",
+    "method": "Unchanged application database/configuration component via PHP PDO CLI",
+    "result": {
+      "database": "g05_a6_g07_recovered",
+      "account": "campussafe_app",
+      "records": 7
+    },
+    "exit_code": 0
+  }
+]

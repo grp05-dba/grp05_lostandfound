@@ -1,0 +1,50 @@
+5; 2615 2200 SCHEMA - public brewpos_owner_grp
+5071; 0 0 ACL - SCHEMA public brewpos_owner_grp
+222; 1259 16407 TABLE public menu_category brewpos_owner_grp
+5072; 0 0 ACL public TABLE menu_category brewpos_owner_grp
+221; 1259 16406 SEQUENCE public menu_category_category_id_seq brewpos_owner_grp
+5073; 0 0 SEQUENCE OWNED BY public menu_category_category_id_seq brewpos_owner_grp
+5074; 0 0 ACL public SEQUENCE menu_category_category_id_seq brewpos_owner_grp
+224; 1259 16418 TABLE public menu_item brewpos_owner_grp
+5075; 0 0 ACL public TABLE menu_item brewpos_owner_grp
+223; 1259 16417 SEQUENCE public menu_item_item_id_seq brewpos_owner_grp
+5076; 0 0 SEQUENCE OWNED BY public menu_item_item_id_seq brewpos_owner_grp
+5077; 0 0 ACL public SEQUENCE menu_item_item_id_seq brewpos_owner_grp
+227; 1259 16456 TABLE public order_line_item brewpos_owner_grp
+5078; 0 0 ACL public TABLE order_line_item brewpos_owner_grp
+226; 1259 16439 TABLE public order_ticket brewpos_owner_grp
+5079; 0 0 ACL public TABLE order_ticket brewpos_owner_grp
+225; 1259 16438 SEQUENCE public order_ticket_order_id_seq brewpos_owner_grp
+5080; 0 0 SEQUENCE OWNED BY public order_ticket_order_id_seq brewpos_owner_grp
+5081; 0 0 ACL public SEQUENCE order_ticket_order_id_seq brewpos_owner_grp
+220; 1259 16396 TABLE public staff brewpos_owner_grp
+5082; 0 0 ACL public TABLE staff brewpos_owner_grp
+219; 1259 16395 SEQUENCE public staff_staff_id_seq brewpos_owner_grp
+5083; 0 0 SEQUENCE OWNED BY public staff_staff_id_seq brewpos_owner_grp
+4877; 2604 16410 DEFAULT public menu_category category_id brewpos_owner_grp
+4878; 2604 16421 DEFAULT public menu_item item_id brewpos_owner_grp
+4880; 2604 16442 DEFAULT public order_ticket order_id brewpos_owner_grp
+4876; 2604 16399 DEFAULT public staff staff_id brewpos_owner_grp
+5057; 0 16407 TABLE DATA public menu_category brewpos_owner_grp
+5059; 0 16418 TABLE DATA public menu_item brewpos_owner_grp
+5062; 0 16456 TABLE DATA public order_line_item brewpos_owner_grp
+5061; 0 16439 TABLE DATA public order_ticket brewpos_owner_grp
+5055; 0 16396 TABLE DATA public staff brewpos_owner_grp
+5084; 0 0 SEQUENCE SET public menu_category_category_id_seq brewpos_owner_grp
+5085; 0 0 SEQUENCE SET public menu_item_item_id_seq brewpos_owner_grp
+5086; 0 0 SEQUENCE SET public order_ticket_order_id_seq brewpos_owner_grp
+5087; 0 0 SEQUENCE SET public staff_staff_id_seq brewpos_owner_grp
+4890; 2606 16414 CONSTRAINT public menu_category menu_category_pkey brewpos_owner_grp
+4894; 2606 16430 CONSTRAINT public menu_item menu_item_pkey brewpos_owner_grp
+4899; 2606 16450 CONSTRAINT public order_ticket order_ticket_pkey brewpos_owner_grp
+4902; 2606 16466 CONSTRAINT public order_line_item pk_order_line_item brewpos_owner_grp
+4888; 2606 16405 CONSTRAINT public staff staff_pkey brewpos_owner_grp
+4892; 2606 16416 CONSTRAINT public menu_category uq_menu_category_name brewpos_owner_grp
+4896; 2606 16432 CONSTRAINT public menu_item uq_menu_item_category_name brewpos_owner_grp
+4900; 1259 16478 INDEX public idx_order_line_item_item_id brewpos_owner_grp
+4897; 1259 16477 INDEX public idx_order_ticket_timestamp brewpos_owner_grp
+4903; 2606 16433 FK CONSTRAINT public menu_item fk_menu_item_category brewpos_owner_grp
+4905; 2606 16472 FK CONSTRAINT public order_line_item fk_order_line_item brewpos_owner_grp
+4906; 2606 16467 FK CONSTRAINT public order_line_item fk_order_line_order brewpos_owner_grp
+4904; 2606 16451 FK CONSTRAINT public order_ticket fk_order_ticket_staff brewpos_owner_grp
+2071; 826 16479 DEFAULT ACL - DEFAULT PRIVILEGES FOR FUNCTIONS brewpos_owner_grp

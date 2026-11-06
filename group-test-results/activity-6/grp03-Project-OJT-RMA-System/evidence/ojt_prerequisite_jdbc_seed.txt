@@ -1,0 +1,7 @@
+JDBC session: {current_user=grp03_ojt_app, current_database=ojt_managementdb}
+PASS ADMIN: login and 2 tabs constructed
+PASS STUDENT: login and 6 tabs constructed
+PASS ACADEMIC_SUPERVISOR: login and 4 tabs constructed
+PASS COMPANY_SUPERVISOR: login and 3 tabs constructed
+PASS OJT_COORDINATOR: login and 3 tabs constructed
+PASS application startup, authentication and initial tab queries; interactive actions not exercised

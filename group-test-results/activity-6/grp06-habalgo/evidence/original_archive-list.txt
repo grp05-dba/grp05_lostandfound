@@ -1,0 +1,103 @@
+;
+; Archive created at 2026-11-06 23:03:12
+;     dbname: grp00_habalgodb
+;     TOC Entries: 94
+;     Compression: gzip
+;     Dump Version: 1.16-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 18.3
+;     Dumped by pg_dump version: 18.3
+;
+;
+; Selected TOC Entries:
+;
+6; 2615 16395 SCHEMA - habalgo habalgo_owner_grp
+5114; 0 0 ACL - SCHEMA habalgo habalgo_owner_grp
+5115; 0 0 ACL - SCHEMA public pg_database_owner
+230; 1259 16465 TABLE habalgo booking habalgo_owner_grp
+5116; 0 0 ACL habalgo TABLE booking habalgo_owner_grp
+229; 1259 16464 SEQUENCE habalgo booking_booking_id_seq habalgo_owner_grp
+5117; 0 0 SEQUENCE OWNED BY habalgo booking_booking_id_seq habalgo_owner_grp
+5118; 0 0 ACL habalgo SEQUENCE booking_booking_id_seq habalgo_owner_grp
+221; 1259 16397 TABLE habalgo customer habalgo_owner_grp
+5119; 0 0 ACL habalgo TABLE customer habalgo_owner_grp
+220; 1259 16396 SEQUENCE habalgo customer_customer_id_seq habalgo_owner_grp
+5120; 0 0 SEQUENCE OWNED BY habalgo customer_customer_id_seq habalgo_owner_grp
+5121; 0 0 ACL habalgo SEQUENCE customer_customer_id_seq habalgo_owner_grp
+223; 1259 16410 TABLE habalgo driver habalgo_owner_grp
+5122; 0 0 ACL habalgo TABLE driver habalgo_owner_grp
+222; 1259 16409 SEQUENCE habalgo driver_driver_id_seq habalgo_owner_grp
+5123; 0 0 SEQUENCE OWNED BY habalgo driver_driver_id_seq habalgo_owner_grp
+226; 1259 16435 TABLE habalgo driver_vehicle habalgo_owner_grp
+5124; 0 0 ACL habalgo TABLE driver_vehicle habalgo_owner_grp
+228; 1259 16455 TABLE habalgo location habalgo_owner_grp
+5125; 0 0 ACL habalgo TABLE location habalgo_owner_grp
+227; 1259 16454 SEQUENCE habalgo location_location_id_seq habalgo_owner_grp
+5126; 0 0 SEQUENCE OWNED BY habalgo location_location_id_seq habalgo_owner_grp
+5127; 0 0 ACL habalgo SEQUENCE location_location_id_seq habalgo_owner_grp
+232; 1259 16501 TABLE habalgo payment habalgo_owner_grp
+5128; 0 0 ACL habalgo TABLE payment habalgo_owner_grp
+231; 1259 16500 SEQUENCE habalgo payment_payment_id_seq habalgo_owner_grp
+5129; 0 0 SEQUENCE OWNED BY habalgo payment_payment_id_seq habalgo_owner_grp
+5130; 0 0 ACL habalgo SEQUENCE payment_payment_id_seq habalgo_owner_grp
+234; 1259 16520 TABLE habalgo rating_feedback habalgo_owner_grp
+5131; 0 0 ACL habalgo TABLE rating_feedback habalgo_owner_grp
+233; 1259 16519 SEQUENCE habalgo rating_feedback_rating_id_seq habalgo_owner_grp
+5132; 0 0 SEQUENCE OWNED BY habalgo rating_feedback_rating_id_seq habalgo_owner_grp
+5133; 0 0 ACL habalgo SEQUENCE rating_feedback_rating_id_seq habalgo_owner_grp
+225; 1259 16423 TABLE habalgo vehicle habalgo_owner_grp
+5134; 0 0 ACL habalgo TABLE vehicle habalgo_owner_grp
+224; 1259 16422 SEQUENCE habalgo vehicle_vehicle_id_seq habalgo_owner_grp
+5135; 0 0 SEQUENCE OWNED BY habalgo vehicle_vehicle_id_seq habalgo_owner_grp
+5136; 0 0 ACL habalgo SEQUENCE vehicle_vehicle_id_seq habalgo_owner_grp
+4896; 2604 16468 DEFAULT habalgo booking booking_id habalgo_owner_grp
+4892; 2604 16400 DEFAULT habalgo customer customer_id habalgo_owner_grp
+4893; 2604 16413 DEFAULT habalgo driver driver_id habalgo_owner_grp
+4895; 2604 16458 DEFAULT habalgo location location_id habalgo_owner_grp
+4899; 2604 16504 DEFAULT habalgo payment payment_id habalgo_owner_grp
+4901; 2604 16523 DEFAULT habalgo rating_feedback rating_id habalgo_owner_grp
+4894; 2604 16426 DEFAULT habalgo vehicle vehicle_id habalgo_owner_grp
+5101; 0 16465 TABLE DATA habalgo booking habalgo_owner_grp
+5092; 0 16397 TABLE DATA habalgo customer habalgo_owner_grp
+5094; 0 16410 TABLE DATA habalgo driver habalgo_owner_grp
+5097; 0 16435 TABLE DATA habalgo driver_vehicle habalgo_owner_grp
+5099; 0 16455 TABLE DATA habalgo location habalgo_owner_grp
+5103; 0 16501 TABLE DATA habalgo payment habalgo_owner_grp
+5105; 0 16520 TABLE DATA habalgo rating_feedback habalgo_owner_grp
+5096; 0 16423 TABLE DATA habalgo vehicle habalgo_owner_grp
+5137; 0 0 SEQUENCE SET habalgo booking_booking_id_seq habalgo_owner_grp
+5138; 0 0 SEQUENCE SET habalgo customer_customer_id_seq habalgo_owner_grp
+5139; 0 0 SEQUENCE SET habalgo driver_driver_id_seq habalgo_owner_grp
+5140; 0 0 SEQUENCE SET habalgo location_location_id_seq habalgo_owner_grp
+5141; 0 0 SEQUENCE SET habalgo payment_payment_id_seq habalgo_owner_grp
+5142; 0 0 SEQUENCE SET habalgo rating_feedback_rating_id_seq habalgo_owner_grp
+5143; 0 0 SEQUENCE SET habalgo vehicle_vehicle_id_seq habalgo_owner_grp
+4923; 2606 16479 CONSTRAINT habalgo booking booking_pkey habalgo_owner_grp
+4907; 2606 16408 CONSTRAINT habalgo customer customer_email_key habalgo_owner_grp
+4909; 2606 16406 CONSTRAINT habalgo customer customer_pkey habalgo_owner_grp
+4911; 2606 16421 CONSTRAINT habalgo driver driver_license_no_key habalgo_owner_grp
+4913; 2606 16419 CONSTRAINT habalgo driver driver_pkey habalgo_owner_grp
+4919; 2606 16443 CONSTRAINT habalgo driver_vehicle driver_vehicle_pkey habalgo_owner_grp
+4921; 2606 16463 CONSTRAINT habalgo location location_pkey habalgo_owner_grp
+4929; 2606 16513 CONSTRAINT habalgo payment payment_pkey habalgo_owner_grp
+4932; 2606 16532 CONSTRAINT habalgo rating_feedback rating_feedback_pkey habalgo_owner_grp
+4934; 2606 16534 CONSTRAINT habalgo rating_feedback uq_rating_booking_customer habalgo_owner_grp
+4915; 2606 16432 CONSTRAINT habalgo vehicle vehicle_pkey habalgo_owner_grp
+4917; 2606 16434 CONSTRAINT habalgo vehicle vehicle_plate_no_key habalgo_owner_grp
+4924; 1259 16545 INDEX habalgo idx_booking_customer habalgo_owner_grp
+4925; 1259 16547 INDEX habalgo idx_booking_date habalgo_owner_grp
+4926; 1259 16546 INDEX habalgo idx_booking_driver habalgo_owner_grp
+4927; 1259 16548 INDEX habalgo idx_payment_booking habalgo_owner_grp
+4930; 1259 16549 INDEX habalgo idx_rating_booking habalgo_owner_grp
+4937; 2606 16480 FK CONSTRAINT habalgo booking booking_customer_id_fkey habalgo_owner_grp
+4938; 2606 16485 FK CONSTRAINT habalgo booking booking_driver_id_fkey habalgo_owner_grp
+4939; 2606 16495 FK CONSTRAINT habalgo booking booking_dropoff_location_id_fkey habalgo_owner_grp
+4940; 2606 16490 FK CONSTRAINT habalgo booking booking_pickup_location_id_fkey habalgo_owner_grp
+4935; 2606 16444 FK CONSTRAINT habalgo driver_vehicle driver_vehicle_driver_id_fkey habalgo_owner_grp
+4936; 2606 16449 FK CONSTRAINT habalgo driver_vehicle driver_vehicle_vehicle_id_fkey habalgo_owner_grp
+4941; 2606 16514 FK CONSTRAINT habalgo payment payment_booking_id_fkey habalgo_owner_grp
+4942; 2606 16535 FK CONSTRAINT habalgo rating_feedback rating_feedback_booking_id_fkey habalgo_owner_grp
+4943; 2606 16540 FK CONSTRAINT habalgo rating_feedback rating_feedback_customer_id_fkey habalgo_owner_grp
+2087; 826 16550 DEFAULT ACL - DEFAULT PRIVILEGES FOR FUNCTIONS habalgo_owner_grp

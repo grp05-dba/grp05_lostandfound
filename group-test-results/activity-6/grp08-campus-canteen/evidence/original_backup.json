@@ -1,0 +1,12 @@
+{
+  "database": "canteen_g05_activity4",
+  "filename": "original.dump",
+  "path": "D:\\Data Administration\\course-review\\activity6-private\\g08\\original.dump",
+  "started": "2026-11-06T22:51:21.618288+08:00",
+  "completed": "2026-11-06T22:51:23.093968+08:00",
+  "bytes": 31226,
+  "sha256": "daefc61ad1f266fa3961eeef67390cc54a7a432cee4547257764a78cc56f4deb",
+  "exit_code": 0,
+  "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55408 -U canteen_admin --role=canteen_owner_grp -Fc -d canteen_g05_activity4 -f \"D:\\Data Administration\\course-review\\activity6-private\\g08\\original.dump\"",
+  "stderr": ""
+}

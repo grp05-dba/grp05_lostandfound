@@ -1,0 +1,243 @@
+{
+  "group": "11",
+  "source_database": "boardtrack_g05_activity4",
+  "source_port": "55411",
+  "backup_account": "boardtrack_dba",
+  "owner_role": "boardtrack_owner_grp",
+  "targets": {
+    "restore": "g05_a6_g11_restore",
+    "snapshot": "g05_a6_g11_snapshot",
+    "recovered": "g05_a6_g11_recovered"
+  },
+  "original_backup": {
+    "database": "boardtrack_g05_activity4",
+    "filename": "original.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g11\\original.dump",
+    "started": "2026-11-06T22:51:24.114503+08:00",
+    "completed": "2026-11-06T22:51:24.973005+08:00",
+    "bytes": 100082,
+    "sha256": "aaf0c05ce132c23d5164e8595c51f576fdf63b670f8bbabac73596ca73e71beb",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55411 -U boardtrack_dba --role=boardtrack_owner_grp -Fc -d boardtrack_g05_activity4 -f \"D:\\Data Administration\\course-review\\activity6-private\\g11\\original.dump\"",
+    "stderr": ""
+  },
+  "fixture_backup": {
+    "database": "g05_a6_g11_restore",
+    "filename": "fixture.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g11\\fixture.dump",
+    "started": "2026-11-06T22:56:17.452255+08:00",
+    "completed": "2026-11-06T22:56:18.139563+08:00",
+    "bytes": 100103,
+    "sha256": "cf2ff9f95130bd4f6c603f297a5b128ec6fbbcccb8a7d1db774153fe4e86ceae",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55411 -U boardtrack_dba --role=boardtrack_owner_grp -Fc -d g05_a6_g11_restore -f \"D:\\Data Administration\\course-review\\activity6-private\\g11\\fixture.dump\"",
+    "stderr": ""
+  },
+  "fixture": {
+    "marker": "G05-A6-RECOVER-11",
+    "table": "property",
+    "column": "property_name",
+    "key": "property_id",
+    "sql": "INSERT INTO property(property_name,address) VALUES('G05-A6-RECOVER-11','Activity6 disposable local record') RETURNING property_id,property_name;"
+  },
+  "late": {
+    "marker": "G05-A6-LATE-11",
+    "table": "property",
+    "column": "property_name",
+    "key": "property_id",
+    "sql": "INSERT INTO property(property_name,address) VALUES('G05-A6-LATE-11','Activity6 disposable local record') RETURNING property_id,property_name;"
+  },
+  "source_counts": {
+    "property": 2,
+    "room": 6,
+    "tenant": 4,
+    "lease": 4,
+    "payment": 6,
+    "utility_bill": 4,
+    "app_user": 3,
+    "schema_migrations": 1
+  },
+  "schema_object_counts": {
+    "columns": 52,
+    "relations": 16,
+    "constraints": 69,
+    "indexes": 16,
+    "views": 1,
+    "routines": 251,
+    "triggers": 2,
+    "extensions": 3,
+    "sequences": 7,
+    "roles": 6,
+    "memberships": 3,
+    "table_privileges": 288,
+    "column_privileges": 208,
+    "sequence_privileges": 84,
+    "function_privileges": 1004,
+    "default_acl": 2
+  },
+  "restore_verified": true,
+  "recovery_verified": true,
+  "original_preserved": true,
+  "checksums_rechecked": true,
+  "timeline": [
+    {
+      "event": "source inspection started",
+      "time": "2026-11-06T22:56:10.740269+08:00"
+    },
+    {
+      "event": "restore database provisioned",
+      "time": "2026-11-06T22:56:12.664493+08:00"
+    },
+    {
+      "event": "restore restore completed",
+      "time": "2026-11-06T22:56:13.627735+08:00"
+    },
+    {
+      "event": "recovery fixture inserted",
+      "time": "2026-11-06T22:56:16.182051+08:00"
+    },
+    {
+      "event": "fixture backup and listing completed",
+      "time": "2026-11-06T22:56:18.141567+08:00"
+    },
+    {
+      "event": "snapshot database provisioned",
+      "time": "2026-11-06T22:56:18.849409+08:00"
+    },
+    {
+      "event": "snapshot restore completed",
+      "time": "2026-11-06T22:56:19.534019+08:00"
+    },
+    {
+      "event": "fixture archive independently restored and verified before deletion",
+      "time": "2026-11-06T22:56:21.011873+08:00"
+    },
+    {
+      "event": "late fixture inserted",
+      "time": "2026-11-06T22:56:21.217099+08:00"
+    },
+    {
+      "event": "fixture deleted only in disposable restore database",
+      "time": "2026-11-06T22:56:21.333060+08:00"
+    },
+    {
+      "event": "recovered database provisioned",
+      "time": "2026-11-06T22:56:22.101328+08:00"
+    },
+    {
+      "event": "recovered restore completed",
+      "time": "2026-11-06T22:56:23.217954+08:00"
+    },
+    {
+      "event": "recovery, access, original preservation and archive checksums verified",
+      "time": "2026-11-06T22:56:27.243545+08:00"
+    }
+  ],
+  "restore_operations": [
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g11_restore",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55411 -U lab_admin -T template0 -O boardtrack_owner_grp --encoding=UTF8 --locale=C g05_a6_g11_restore",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g11_restore FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g11_restore TO boardtrack_dba,boardtrack_runtime_grp,boardtrack_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "boardtrack_dba",
+      "role": "boardtrack_owner_grp",
+      "entries": 93,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U boardtrack_dba --role=boardtrack_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\restore_objects.list\" -d g05_a6_g11_restore \"D:\\Data Administration\\course-review\\activity6-private\\g11\\original.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "phase": "login_defaults",
+      "account": "boardtrack_dba",
+      "role": null,
+      "entries": 1,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U boardtrack_dba \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\restore_login_defaults.list\" -d g05_a6_g11_restore \"D:\\Data Administration\\course-review\\activity6-private\\g11\\original.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "phase": "extension_acl",
+      "account": "lab_admin",
+      "role": null,
+      "entries": 249,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U lab_admin \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\restore_extension_acl.list\" -d g05_a6_g11_restore \"D:\\Data Administration\\course-review\\activity6-private\\g11\\original.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g11_snapshot",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55411 -U lab_admin -T template0 -O boardtrack_owner_grp --encoding=UTF8 --locale=C g05_a6_g11_snapshot",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g11_snapshot FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g11_snapshot TO boardtrack_dba,boardtrack_runtime_grp,boardtrack_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "boardtrack_dba",
+      "role": "boardtrack_owner_grp",
+      "entries": 93,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U boardtrack_dba --role=boardtrack_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\snapshot_objects.list\" -d g05_a6_g11_snapshot \"D:\\Data Administration\\course-review\\activity6-private\\g11\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "phase": "login_defaults",
+      "account": "boardtrack_dba",
+      "role": null,
+      "entries": 1,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U boardtrack_dba \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\snapshot_login_defaults.list\" -d g05_a6_g11_snapshot \"D:\\Data Administration\\course-review\\activity6-private\\g11\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "phase": "extension_acl",
+      "account": "lab_admin",
+      "role": null,
+      "entries": 249,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U lab_admin \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\snapshot_extension_acl.list\" -d g05_a6_g11_snapshot \"D:\\Data Administration\\course-review\\activity6-private\\g11\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g11_recovered",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55411 -U lab_admin -T template0 -O boardtrack_owner_grp --encoding=UTF8 --locale=C g05_a6_g11_recovered",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g11_recovered FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g11_recovered TO boardtrack_dba,boardtrack_runtime_grp,boardtrack_readonly_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "boardtrack_dba",
+      "role": "boardtrack_owner_grp",
+      "entries": 93,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U boardtrack_dba --role=boardtrack_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\recovered_objects.list\" -d g05_a6_g11_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g11\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "phase": "login_defaults",
+      "account": "boardtrack_dba",
+      "role": null,
+      "entries": 1,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U boardtrack_dba \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\recovered_login_defaults.list\" -d g05_a6_g11_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g11\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "phase": "extension_acl",
+      "account": "lab_admin",
+      "role": null,
+      "entries": 249,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U lab_admin \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\recovered_extension_acl.list\" -d g05_a6_g11_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g11\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ]
+}

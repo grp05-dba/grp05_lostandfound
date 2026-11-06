@@ -1,0 +1,25 @@
+{
+  "group": "07",
+  "restore_and_recovery_verified": true,
+  "application_connections_verified": true,
+  "marker_states_verified": true,
+  "source_counts_preserved": true,
+  "recovered_full_row_fingerprints_match_verified_snapshot": true,
+  "effective_schema_database_privileges_and_role_settings_preserved": true,
+  "all_toc_entries_routed_once": true,
+  "archives": [
+    {
+      "filename": "original.dump",
+      "checksum_verified": true,
+      "bytes": 49610
+    },
+    {
+      "filename": "fixture.dump",
+      "checksum_verified": true,
+      "bytes": 49704
+    }
+  ],
+  "files_scanned": 33,
+  "secrets_or_backup_payloads_in_submission": false,
+  "relative_links": "all resolve"
+}

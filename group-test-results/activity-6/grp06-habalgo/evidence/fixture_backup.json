@@ -1,0 +1,12 @@
+{
+  "database": "g05_a6_g06_restore",
+  "filename": "fixture.dump",
+  "path": "D:\\Data Administration\\course-review\\activity6-private\\g06\\fixture.dump",
+  "started": "2026-11-06T23:04:54.926014+08:00",
+  "completed": "2026-11-06T23:04:56.485549+08:00",
+  "bytes": 31184,
+  "sha256": "fe7df50cbccb60c809fb388ebc2ee85bebd0e1124d1c6341c82144efe81455eb",
+  "exit_code": 0,
+  "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55406 -U habalgo_dba --role=habalgo_owner_grp -Fc -d g05_a6_g06_restore -f \"D:\\Data Administration\\course-review\\activity6-private\\g06\\fixture.dump\"",
+  "stderr": ""
+}

@@ -1,0 +1,12 @@
+{
+  "database": "grp00_habalgodb",
+  "filename": "original.dump",
+  "path": "D:\\Data Administration\\course-review\\activity6-private\\g06\\original.dump",
+  "started": "2026-11-06T23:03:12.232118+08:00",
+  "completed": "2026-11-06T23:03:13.465408+08:00",
+  "bytes": 31120,
+  "sha256": "1d81457062867a9af5f1d32a17846b3e3335d4c05492035c4de887800b80a1fe",
+  "exit_code": 0,
+  "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55406 -U habalgo_dba --role=habalgo_owner_grp -Fc -d grp00_habalgodb -f \"D:\\Data Administration\\course-review\\activity6-private\\g06\\original.dump\"",
+  "stderr": ""
+}

@@ -1,0 +1,22 @@
+[
+  {
+    "target": "restore",
+    "method": "Unchanged application database/configuration component via PHP PDO CLI",
+    "result": {
+      "database": "g05_a6_g10_restore",
+      "account": "rors_app",
+      "records": 51
+    },
+    "exit_code": 0
+  },
+  {
+    "target": "recovered",
+    "method": "Unchanged application database/configuration component via PHP PDO CLI",
+    "result": {
+      "database": "g05_a6_g10_recovered",
+      "account": "rors_app",
+      "records": 51
+    },
+    "exit_code": 0
+  }
+]

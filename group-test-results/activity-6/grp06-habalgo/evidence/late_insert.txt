@@ -1,0 +1,10 @@
+Database: g05_a6_g06_restore
+Account: habalgo_dba (owner role)
+SQL:
+INSERT INTO habalgo.vehicle(plate_no,vehicle_type,model) VALUES('G05-A6-LATE-06','Motorcycle','Activity6 disposable') RETURNING vehicle_id,plate_no;
+SET
+SET
+SET
+SET
+2|G05-A6-LATE-06
+INSERT 0 1

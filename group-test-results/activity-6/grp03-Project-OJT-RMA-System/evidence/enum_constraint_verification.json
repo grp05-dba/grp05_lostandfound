@@ -1,0 +1,10 @@
+[
+  {
+    "table": "users",
+    "column": "role",
+    "sql": "BEGIN; UPDATE public.users SET role='ACT6_BAD'; ROLLBACK;",
+    "expected": "23514 CHECK violation",
+    "exit_code": 3,
+    "output": "SET\nSET\nSET\nSET\nBEGIN\npsql:<stdin>:3: ERROR:  23514: new row for relation \"users\" violates check constraint \"users_role_check\"\nSCHEMA NAME:  public\nTABLE NAME:  users\nCONSTRAINT NAME:  users_role_check\nLOCATION:  ExecConstraints, execMain.c:2081\n"
+  }
+]

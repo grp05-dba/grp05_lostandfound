@@ -1,0 +1,108 @@
+5485; 0 0 ACL - SCHEMA public pg_database_owner
+2; 3079 17398 EXTENSION - btree_gist
+5486; 0 0 COMMENT - EXTENSION btree_gist
+3; 3079 18124 EXTENSION - pgcrypto
+5487; 0 0 COMMENT - EXTENSION pgcrypto
+381; 1255 18162 FUNCTION public fn_check_reservation_capacity() rors_owner_grp
+5515; 0 0 ACL public FUNCTION fn_check_reservation_capacity() rors_owner_grp
+430; 1255 18163 FUNCTION public fn_refresh_order_total() rors_owner_grp
+5516; 0 0 ACL public FUNCTION fn_refresh_order_total() rors_owner_grp
+345; 1255 18164 FUNCTION public fn_require_order_items() rors_owner_grp
+5517; 0 0 ACL public FUNCTION fn_require_order_items() rors_owner_grp
+221; 1259 18165 TABLE public customer rors_owner_grp
+5740; 0 0 ACL public TABLE customer rors_owner_grp
+222; 1259 18177 SEQUENCE public customer_customer_id_seq rors_owner_grp
+5741; 0 0 SEQUENCE OWNED BY public customer_customer_id_seq rors_owner_grp
+5742; 0 0 ACL public SEQUENCE customer_customer_id_seq rors_owner_grp
+223; 1259 18178 TABLE public menu_item rors_owner_grp
+5743; 0 0 ACL public TABLE menu_item rors_owner_grp
+224; 1259 18190 SEQUENCE public menu_item_menu_item_id_seq rors_owner_grp
+5744; 0 0 SEQUENCE OWNED BY public menu_item_menu_item_id_seq rors_owner_grp
+5745; 0 0 ACL public SEQUENCE menu_item_menu_item_id_seq rors_owner_grp
+225; 1259 18191 TABLE public order_item rors_owner_grp
+5746; 0 0 ACL public TABLE order_item rors_owner_grp
+226; 1259 18203 TABLE public orders rors_owner_grp
+5747; 0 0 ACL public TABLE orders rors_owner_grp
+227; 1259 18216 SEQUENCE public orders_order_id_seq rors_owner_grp
+5748; 0 0 SEQUENCE OWNED BY public orders_order_id_seq rors_owner_grp
+5749; 0 0 ACL public SEQUENCE orders_order_id_seq rors_owner_grp
+228; 1259 18217 TABLE public payment rors_owner_grp
+5750; 0 0 ACL public TABLE payment rors_owner_grp
+229; 1259 18231 SEQUENCE public payment_payment_id_seq rors_owner_grp
+5751; 0 0 SEQUENCE OWNED BY public payment_payment_id_seq rors_owner_grp
+5752; 0 0 ACL public SEQUENCE payment_payment_id_seq rors_owner_grp
+230; 1259 18232 TABLE public reservation rors_owner_grp
+5753; 0 0 ACL public TABLE reservation rors_owner_grp
+231; 1259 18245 SEQUENCE public reservation_reservation_id_seq rors_owner_grp
+5754; 0 0 SEQUENCE OWNED BY public reservation_reservation_id_seq rors_owner_grp
+5755; 0 0 ACL public SEQUENCE reservation_reservation_id_seq rors_owner_grp
+232; 1259 18246 TABLE public restaurant_table rors_owner_grp
+5756; 0 0 ACL public TABLE restaurant_table rors_owner_grp
+233; 1259 18256 SEQUENCE public restaurant_table_table_id_seq rors_owner_grp
+5757; 0 0 SEQUENCE OWNED BY public restaurant_table_table_id_seq rors_owner_grp
+5758; 0 0 ACL public SEQUENCE restaurant_table_table_id_seq rors_owner_grp
+234; 1259 18257 TABLE public staff rors_owner_grp
+5759; 0 0 ACL public TABLE staff rors_owner_grp
+235; 1259 18267 SEQUENCE public staff_staff_id_seq rors_owner_grp
+5760; 0 0 SEQUENCE OWNED BY public staff_staff_id_seq rors_owner_grp
+5761; 0 0 ACL public SEQUENCE staff_staff_id_seq rors_owner_grp
+236; 1259 18268 VIEW public v_customer_directory rors_owner_grp
+5762; 0 0 ACL public TABLE v_customer_directory rors_owner_grp
+237; 1259 18272 VIEW public v_order_summary rors_owner_grp
+5763; 0 0 ACL public TABLE v_order_summary rors_owner_grp
+238; 1259 18277 VIEW public v_reservation_schedule rors_owner_grp
+5764; 0 0 ACL public TABLE v_reservation_schedule rors_owner_grp
+239; 1259 18282 VIEW public v_staff_directory rors_owner_grp
+5765; 0 0 ACL public TABLE v_staff_directory rors_owner_grp
+5238; 2604 18286 DEFAULT public customer customer_id rors_owner_grp
+5240; 2604 18287 DEFAULT public menu_item menu_item_id rors_owner_grp
+5242; 2604 18288 DEFAULT public orders order_id rors_owner_grp
+5246; 2604 18289 DEFAULT public payment payment_id rors_owner_grp
+5249; 2604 18290 DEFAULT public reservation reservation_id rors_owner_grp
+5251; 2604 18291 DEFAULT public restaurant_table table_id rors_owner_grp
+5253; 2604 18292 DEFAULT public staff staff_id rors_owner_grp
+5463; 0 18165 TABLE DATA public customer rors_owner_grp
+5465; 0 18178 TABLE DATA public menu_item rors_owner_grp
+5467; 0 18191 TABLE DATA public order_item rors_owner_grp
+5468; 0 18203 TABLE DATA public orders rors_owner_grp
+5470; 0 18217 TABLE DATA public payment rors_owner_grp
+5472; 0 18232 TABLE DATA public reservation rors_owner_grp
+5474; 0 18246 TABLE DATA public restaurant_table rors_owner_grp
+5476; 0 18257 TABLE DATA public staff rors_owner_grp
+5766; 0 0 SEQUENCE SET public customer_customer_id_seq rors_owner_grp
+5767; 0 0 SEQUENCE SET public menu_item_menu_item_id_seq rors_owner_grp
+5768; 0 0 SEQUENCE SET public orders_order_id_seq rors_owner_grp
+5769; 0 0 SEQUENCE SET public payment_payment_id_seq rors_owner_grp
+5770; 0 0 SEQUENCE SET public reservation_reservation_id_seq rors_owner_grp
+5771; 0 0 SEQUENCE SET public restaurant_table_table_id_seq rors_owner_grp
+5772; 0 0 SEQUENCE SET public staff_staff_id_seq rors_owner_grp
+5271; 2606 18294 CONSTRAINT public customer customer_pkey rors_owner_grp
+5289; 2606 18296 CONSTRAINT public reservation ex_reservation_no_overlap rors_owner_grp
+5276; 2606 18298 CONSTRAINT public menu_item menu_item_pkey rors_owner_grp
+5283; 2606 18300 CONSTRAINT public orders orders_pkey rors_owner_grp
+5285; 2606 18302 CONSTRAINT public payment payment_pkey rors_owner_grp
+5279; 2606 18304 CONSTRAINT public order_item pk_order_item rors_owner_grp
+5293; 2606 18306 CONSTRAINT public reservation reservation_pkey rors_owner_grp
+5295; 2606 18308 CONSTRAINT public restaurant_table restaurant_table_pkey rors_owner_grp
+5299; 2606 18310 CONSTRAINT public staff staff_pkey rors_owner_grp
+5273; 2606 18312 CONSTRAINT public customer uq_customer_email rors_owner_grp
+5287; 2606 18314 CONSTRAINT public payment uq_payment_order rors_owner_grp
+5297; 2606 18316 CONSTRAINT public restaurant_table uq_restaurant_table_number rors_owner_grp
+5301; 2606 18318 CONSTRAINT public staff uq_staff_email rors_owner_grp
+5274; 1259 18319 INDEX public idx_menu_item_category rors_owner_grp
+5277; 1259 18320 INDEX public idx_order_item_menu_item rors_owner_grp
+5280; 1259 18321 INDEX public idx_orders_customer_date rors_owner_grp
+5281; 1259 18322 INDEX public idx_orders_status rors_owner_grp
+5290; 1259 18323 INDEX public idx_reservation_customer rors_owner_grp
+5291; 1259 18324 INDEX public idx_reservation_date rors_owner_grp
+5308; 2620 18325 TRIGGER public order_item trg_order_item_keep_one rors_owner_grp
+5309; 2620 18327 TRIGGER public order_item trg_order_item_total rors_owner_grp
+5310; 2620 18328 TRIGGER public orders trg_orders_require_items rors_owner_grp
+5311; 2620 18330 TRIGGER public reservation trg_reservation_capacity rors_owner_grp
+5302; 2606 18331 FK CONSTRAINT public order_item fk_order_item_menu_item rors_owner_grp
+5303; 2606 18336 FK CONSTRAINT public order_item fk_order_item_order rors_owner_grp
+5304; 2606 18341 FK CONSTRAINT public orders fk_orders_customer rors_owner_grp
+5305; 2606 18346 FK CONSTRAINT public payment fk_payment_order rors_owner_grp
+5306; 2606 18351 FK CONSTRAINT public reservation fk_reservation_customer rors_owner_grp
+5307; 2606 18356 FK CONSTRAINT public reservation fk_reservation_table rors_owner_grp
+2432; 826 18361 DEFAULT ACL - DEFAULT PRIVILEGES FOR FUNCTIONS rors_owner_grp

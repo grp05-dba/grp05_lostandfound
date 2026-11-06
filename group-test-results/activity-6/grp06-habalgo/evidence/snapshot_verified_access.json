@@ -1,0 +1,26 @@
+[
+  {
+    "account": "habalgo_app",
+    "sql": "SELECT count(*) FROM habalgo.driver;",
+    "expected": "Allowed",
+    "exit_code": 0,
+    "passed": true,
+    "output": "SET\nSET\nSET\n10\n"
+  },
+  {
+    "account": "habalgo_auditor",
+    "sql": "SELECT count(*) FROM habalgo.driver;",
+    "expected": "Allowed",
+    "exit_code": 0,
+    "passed": true,
+    "output": "SET\nSET\nSET\n10\n"
+  },
+  {
+    "account": "habalgo_auditor",
+    "sql": "BEGIN; UPDATE habalgo.customer SET name=name WHERE false; ROLLBACK;",
+    "expected": "Denied 42501",
+    "exit_code": 3,
+    "passed": true,
+    "output": "SET\nSET\nSET\nBEGIN\npsql:<stdin>:2: ERROR:  42501: permission denied for table customer\nLOCATION:  aclcheck_error, aclchk.c:2795\n"
+  }
+]

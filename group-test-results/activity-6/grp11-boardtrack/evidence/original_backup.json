@@ -1,0 +1,12 @@
+{
+  "database": "boardtrack_g05_activity4",
+  "filename": "original.dump",
+  "path": "D:\\Data Administration\\course-review\\activity6-private\\g11\\original.dump",
+  "started": "2026-11-06T22:51:24.114503+08:00",
+  "completed": "2026-11-06T22:51:24.973005+08:00",
+  "bytes": 100082,
+  "sha256": "aaf0c05ce132c23d5164e8595c51f576fdf63b670f8bbabac73596ca73e71beb",
+  "exit_code": 0,
+  "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55411 -U boardtrack_dba --role=boardtrack_owner_grp -Fc -d boardtrack_g05_activity4 -f \"D:\\Data Administration\\course-review\\activity6-private\\g11\\original.dump\"",
+  "stderr": ""
+}

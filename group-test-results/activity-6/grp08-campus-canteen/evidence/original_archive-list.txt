@@ -1,0 +1,107 @@
+;
+; Archive created at 2026-11-06 22:51:21
+;     dbname: canteen_g05_activity4
+;     TOC Entries: 97
+;     Compression: gzip
+;     Dump Version: 1.16-0
+;     Format: CUSTOM
+;     Integer: 4 bytes
+;     Offset: 8 bytes
+;     Dumped from database version: 18.3
+;     Dumped by pg_dump version: 18.3
+;
+;
+; Selected TOC Entries:
+;
+5107; 0 0 ACL - SCHEMA public pg_database_owner
+226; 1259 16445 TABLE public customer_order canteen_owner_grp
+5108; 0 0 ACL public TABLE customer_order canteen_owner_grp
+5109; 0 0 ACL public COLUMN customer_order.order_id canteen_owner_grp
+5110; 0 0 ACL public COLUMN customer_order.vendor_id canteen_owner_grp
+5111; 0 0 ACL public COLUMN customer_order.order_date canteen_owner_grp
+5112; 0 0 ACL public COLUMN customer_order.status canteen_owner_grp
+225; 1259 16444 SEQUENCE public customer_order_order_id_seq canteen_owner_grp
+5113; 0 0 SEQUENCE OWNED BY public customer_order_order_id_seq canteen_owner_grp
+5114; 0 0 ACL public SEQUENCE customer_order_order_id_seq canteen_owner_grp
+224; 1259 16426 TABLE public menu_item canteen_owner_grp
+5115; 0 0 ACL public TABLE menu_item canteen_owner_grp
+5116; 0 0 ACL public COLUMN menu_item.item_id canteen_owner_grp
+5117; 0 0 ACL public COLUMN menu_item.vendor_id canteen_owner_grp
+5118; 0 0 ACL public COLUMN menu_item.item_name canteen_owner_grp
+5119; 0 0 ACL public COLUMN menu_item.price canteen_owner_grp
+5120; 0 0 ACL public COLUMN menu_item.is_available canteen_owner_grp
+223; 1259 16425 SEQUENCE public menu_item_item_id_seq canteen_owner_grp
+5121; 0 0 SEQUENCE OWNED BY public menu_item_item_id_seq canteen_owner_grp
+5122; 0 0 ACL public SEQUENCE menu_item_item_id_seq canteen_owner_grp
+232; 1259 16518 TABLE public notification canteen_owner_grp
+5123; 0 0 ACL public TABLE notification canteen_owner_grp
+231; 1259 16517 SEQUENCE public notification_notification_id_seq canteen_owner_grp
+5124; 0 0 SEQUENCE OWNED BY public notification_notification_id_seq canteen_owner_grp
+5125; 0 0 ACL public SEQUENCE notification_notification_id_seq canteen_owner_grp
+228; 1259 16471 TABLE public order_item canteen_owner_grp
+5126; 0 0 ACL public TABLE order_item canteen_owner_grp
+5127; 0 0 ACL public COLUMN order_item.order_id canteen_owner_grp
+5128; 0 0 ACL public COLUMN order_item.item_id canteen_owner_grp
+5129; 0 0 ACL public COLUMN order_item.quantity canteen_owner_grp
+5130; 0 0 ACL public COLUMN order_item.price_at_order canteen_owner_grp
+227; 1259 16470 SEQUENCE public order_item_order_item_id_seq canteen_owner_grp
+5131; 0 0 SEQUENCE OWNED BY public order_item_order_item_id_seq canteen_owner_grp
+5132; 0 0 ACL public SEQUENCE order_item_order_item_id_seq canteen_owner_grp
+230; 1259 16494 TABLE public queue_entry canteen_owner_grp
+5133; 0 0 ACL public TABLE queue_entry canteen_owner_grp
+229; 1259 16493 SEQUENCE public queue_entry_queue_id_seq canteen_owner_grp
+5134; 0 0 SEQUENCE OWNED BY public queue_entry_queue_id_seq canteen_owner_grp
+5135; 0 0 ACL public SEQUENCE queue_entry_queue_id_seq canteen_owner_grp
+220; 1259 16398 TABLE public student canteen_owner_grp
+5136; 0 0 ACL public TABLE student canteen_owner_grp
+219; 1259 16397 SEQUENCE public student_student_id_seq canteen_owner_grp
+5137; 0 0 SEQUENCE OWNED BY public student_student_id_seq canteen_owner_grp
+5138; 0 0 ACL public SEQUENCE student_student_id_seq canteen_owner_grp
+222; 1259 16415 TABLE public vendor canteen_owner_grp
+5139; 0 0 ACL public TABLE vendor canteen_owner_grp
+5140; 0 0 ACL public COLUMN vendor.vendor_id canteen_owner_grp
+5141; 0 0 ACL public COLUMN vendor.vendor_name canteen_owner_grp
+221; 1259 16414 SEQUENCE public vendor_vendor_id_seq canteen_owner_grp
+5142; 0 0 SEQUENCE OWNED BY public vendor_vendor_id_seq canteen_owner_grp
+5143; 0 0 ACL public SEQUENCE vendor_vendor_id_seq canteen_owner_grp
+4895; 2604 16448 DEFAULT public customer_order order_id canteen_owner_grp
+4893; 2604 16429 DEFAULT public menu_item item_id canteen_owner_grp
+4902; 2604 16521 DEFAULT public notification notification_id canteen_owner_grp
+4898; 2604 16474 DEFAULT public order_item order_item_id canteen_owner_grp
+4899; 2604 16497 DEFAULT public queue_entry queue_id canteen_owner_grp
+4888; 2604 16401 DEFAULT public student student_id canteen_owner_grp
+4891; 2604 16418 DEFAULT public vendor vendor_id canteen_owner_grp
+5093; 0 16445 TABLE DATA public customer_order canteen_owner_grp
+5091; 0 16426 TABLE DATA public menu_item canteen_owner_grp
+5099; 0 16518 TABLE DATA public notification canteen_owner_grp
+5095; 0 16471 TABLE DATA public order_item canteen_owner_grp
+5097; 0 16494 TABLE DATA public queue_entry canteen_owner_grp
+5087; 0 16398 TABLE DATA public student canteen_owner_grp
+5089; 0 16415 TABLE DATA public vendor canteen_owner_grp
+5144; 0 0 SEQUENCE SET public customer_order_order_id_seq canteen_owner_grp
+5145; 0 0 SEQUENCE SET public menu_item_item_id_seq canteen_owner_grp
+5146; 0 0 SEQUENCE SET public notification_notification_id_seq canteen_owner_grp
+5147; 0 0 SEQUENCE SET public order_item_order_item_id_seq canteen_owner_grp
+5148; 0 0 SEQUENCE SET public queue_entry_queue_id_seq canteen_owner_grp
+5149; 0 0 SEQUENCE SET public student_student_id_seq canteen_owner_grp
+5150; 0 0 SEQUENCE SET public vendor_vendor_id_seq canteen_owner_grp
+4921; 2606 16459 CONSTRAINT public customer_order customer_order_pkey canteen_owner_grp
+4919; 2606 16438 CONSTRAINT public menu_item menu_item_pkey canteen_owner_grp
+4931; 2606 16532 CONSTRAINT public notification notification_pkey canteen_owner_grp
+4923; 2606 16482 CONSTRAINT public order_item order_item_pkey canteen_owner_grp
+4925; 2606 16509 CONSTRAINT public queue_entry queue_entry_order_id_key canteen_owner_grp
+4927; 2606 16507 CONSTRAINT public queue_entry queue_entry_pkey canteen_owner_grp
+4929; 2606 16511 CONSTRAINT public queue_entry queue_entry_queue_number_queue_date_key canteen_owner_grp
+4911; 2606 16413 CONSTRAINT public student student_email_key canteen_owner_grp
+4913; 2606 16411 CONSTRAINT public student student_pkey canteen_owner_grp
+4915; 2606 16539 CONSTRAINT public vendor vendor_email_key canteen_owner_grp
+4917; 2606 16424 CONSTRAINT public vendor vendor_pkey canteen_owner_grp
+4933; 2606 16460 FK CONSTRAINT public customer_order customer_order_student_id_fkey canteen_owner_grp
+4934; 2606 16465 FK CONSTRAINT public customer_order customer_order_vendor_id_fkey canteen_owner_grp
+4932; 2606 16439 FK CONSTRAINT public menu_item menu_item_vendor_id_fkey canteen_owner_grp
+4938; 2606 16533 FK CONSTRAINT public notification notification_order_id_fkey canteen_owner_grp
+4935; 2606 16488 FK CONSTRAINT public order_item order_item_item_id_fkey canteen_owner_grp
+4936; 2606 16483 FK CONSTRAINT public order_item order_item_order_id_fkey canteen_owner_grp
+4937; 2606 16512 FK CONSTRAINT public queue_entry queue_entry_order_id_fkey canteen_owner_grp
+2083; 826 16546 DEFAULT ACL - DEFAULT PRIVILEGES FOR FUNCTIONS canteen_admin
+2082; 826 16545 DEFAULT ACL - DEFAULT PRIVILEGES FOR FUNCTIONS canteen_owner_grp

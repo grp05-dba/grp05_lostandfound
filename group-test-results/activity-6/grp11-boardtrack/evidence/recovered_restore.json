@@ -1,0 +1,29 @@
+[
+  {
+    "phase": "objects",
+    "account": "boardtrack_dba",
+    "role": "boardtrack_owner_grp",
+    "entries": 93,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U boardtrack_dba --role=boardtrack_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\recovered_objects.list\" -d g05_a6_g11_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g11\\fixture.dump\"",
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "phase": "login_defaults",
+    "account": "boardtrack_dba",
+    "role": null,
+    "entries": 1,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U boardtrack_dba \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\recovered_login_defaults.list\" -d g05_a6_g11_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g11\\fixture.dump\"",
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "phase": "extension_acl",
+    "account": "lab_admin",
+    "role": null,
+    "entries": 249,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55411 -U lab_admin \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g11\\recovered_extension_acl.list\" -d g05_a6_g11_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g11\\fixture.dump\"",
+    "exit_code": 0,
+    "stderr": ""
+  }
+]

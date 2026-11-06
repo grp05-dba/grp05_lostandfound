@@ -1,0 +1,32 @@
+{
+  "label": "recovered",
+  "counts_match": true,
+  "row_fingerprints_match": true,
+  "schema_and_access_checks": {
+    "columns": true,
+    "relations": true,
+    "constraints": true,
+    "indexes": true,
+    "views": true,
+    "routines": true,
+    "triggers": true,
+    "extensions": true,
+    "sequences": true,
+    "roles": true,
+    "memberships": true,
+    "table_privileges": true,
+    "column_privileges": true,
+    "sequence_privileges": true,
+    "function_privileges": true,
+    "default_acl": true
+  },
+  "counts": {
+    "student": 3,
+    "vendor": 4,
+    "menu_item": 11,
+    "customer_order": 2,
+    "order_item": 2,
+    "queue_entry": 2,
+    "notification": 3
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "account": "boardtrack_app",
+    "sql": "SELECT count(*) FROM v_lease_summary;",
+    "expected": "Allowed",
+    "exit_code": 0,
+    "passed": true,
+    "output": "SET\nSET\nSET\n4\n"
+  },
+  {
+    "account": "boardtrack_report",
+    "sql": "SELECT count(*) FROM v_lease_summary;",
+    "expected": "Allowed",
+    "exit_code": 0,
+    "passed": true,
+    "output": "SET\nSET\nSET\n4\n"
+  },
+  {
+    "account": "boardtrack_report",
+    "sql": "BEGIN; UPDATE property SET property_name=property_name WHERE false; ROLLBACK;",
+    "expected": "Denied 42501",
+    "exit_code": 3,
+    "passed": true,
+    "output": "SET\nSET\nSET\nBEGIN\npsql:<stdin>:2: ERROR:  42501: permission denied for table property\nLOCATION:  aclcheck_error, aclchk.c:2795\n"
+  }
+]

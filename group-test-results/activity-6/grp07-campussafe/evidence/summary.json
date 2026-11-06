@@ -1,0 +1,174 @@
+{
+  "group": "07",
+  "source_database": "grp07_campussafedb",
+  "source_port": "55407",
+  "backup_account": "campussafe_backup",
+  "owner_role": "campussafe_owner_grp",
+  "targets": {
+    "restore": "g05_a6_g07_restore",
+    "snapshot": "g05_a6_g07_snapshot",
+    "recovered": "g05_a6_g07_recovered"
+  },
+  "original_backup": {
+    "database": "grp07_campussafedb",
+    "filename": "original.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g07\\original.dump",
+    "started": "2026-11-06T23:05:13.824150+08:00",
+    "completed": "2026-11-06T23:05:15.389408+08:00",
+    "bytes": 49610,
+    "sha256": "938f85a9b89ff37ceadc01490a3a2163b4b23f4bfcc62955d17869595c492624",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55407 -U campussafe_backup -Fc -d grp07_campussafedb -f \"D:\\Data Administration\\course-review\\activity6-private\\g07\\original.dump\"",
+    "stderr": ""
+  },
+  "fixture_backup": {
+    "database": "g05_a6_g07_restore",
+    "filename": "fixture.dump",
+    "path": "D:\\Data Administration\\course-review\\activity6-private\\g07\\fixture.dump",
+    "started": "2026-11-06T23:06:04.372148+08:00",
+    "completed": "2026-11-06T23:06:05.179323+08:00",
+    "bytes": 49704,
+    "sha256": "a5f7d8a507b38eb17cc8c4625b718710107156c73a1068c617bc559f6d1fd37e",
+    "exit_code": 0,
+    "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_dump.exe\" -w -h 127.0.0.1 -p 55407 -U campussafe_backup -Fc -d g05_a6_g07_restore -f \"D:\\Data Administration\\course-review\\activity6-private\\g07\\fixture.dump\"",
+    "stderr": ""
+  },
+  "fixture": {
+    "marker": "G05-A6-RECOVER-07",
+    "table": "hazard_category",
+    "column": "category_name",
+    "key": "category_id",
+    "sql": "INSERT INTO hazard_category(category_name) VALUES('G05-A6-RECOVER-07') RETURNING category_id,category_name;"
+  },
+  "late": {
+    "marker": "G05-A6-LATE-07",
+    "table": "hazard_category",
+    "column": "category_name",
+    "key": "category_id",
+    "sql": "INSERT INTO hazard_category(category_name) VALUES('G05-A6-LATE-07') RETURNING category_id,category_name;"
+  },
+  "source_counts": {
+    "app_user": 6,
+    "assignment": 12,
+    "attachment": 5,
+    "campus_location": 10,
+    "hazard_category": 6,
+    "hazard_report": 16,
+    "maintenance_action": 9,
+    "report_status_history": 60,
+    "role": 5
+  },
+  "schema_object_counts": {
+    "columns": 58,
+    "relations": 18,
+    "constraints": 82,
+    "indexes": 24,
+    "views": 0,
+    "routines": 0,
+    "triggers": 0,
+    "extensions": 1,
+    "sequences": 9,
+    "roles": 8,
+    "memberships": 4,
+    "table_privileges": 360,
+    "column_privileges": 290,
+    "sequence_privileges": 135,
+    "function_privileges": 0,
+    "default_acl": 1
+  },
+  "restore_verified": true,
+  "recovery_verified": true,
+  "original_preserved": true,
+  "checksums_rechecked": true,
+  "timeline": [
+    {
+      "event": "source inspection started",
+      "time": "2026-11-06T23:05:57.652749+08:00"
+    },
+    {
+      "event": "recovery fixture inserted",
+      "time": "2026-11-06T23:06:02.257140+08:00"
+    },
+    {
+      "event": "fixture backup and listing completed",
+      "time": "2026-11-06T23:06:05.180320+08:00"
+    },
+    {
+      "event": "snapshot database provisioned",
+      "time": "2026-11-06T23:06:08.080771+08:00"
+    },
+    {
+      "event": "snapshot restore completed",
+      "time": "2026-11-06T23:06:09.664203+08:00"
+    },
+    {
+      "event": "fixture archive independently restored and verified before deletion",
+      "time": "2026-11-06T23:06:12.023259+08:00"
+    },
+    {
+      "event": "late fixture inserted",
+      "time": "2026-11-06T23:06:12.152414+08:00"
+    },
+    {
+      "event": "fixture deleted only in disposable restore database",
+      "time": "2026-11-06T23:06:12.885030+08:00"
+    },
+    {
+      "event": "recovered database provisioned",
+      "time": "2026-11-06T23:06:16.258850+08:00"
+    },
+    {
+      "event": "recovered restore completed",
+      "time": "2026-11-06T23:06:17.360531+08:00"
+    },
+    {
+      "event": "recovery, access, original preservation and archive checksums verified",
+      "time": "2026-11-06T23:06:21.346454+08:00"
+    }
+  ],
+  "restore_operations": [
+    {
+      "phase": "objects",
+      "account": "campussafe_dba",
+      "role": "campussafe_owner_grp",
+      "entries": 113,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55407 -U campussafe_dba --role=campussafe_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g07\\restore_objects.list\" -d g05_a6_g07_restore \"D:\\Data Administration\\course-review\\activity6-private\\g07\\original.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g07_snapshot",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55407 -U lab_admin -T template0 -O campussafe_owner_grp --encoding=UTF8 --locale=C g05_a6_g07_snapshot",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g07_snapshot FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g07_snapshot TO campussafe_dba,campussafe_runtime_grp,campussafe_readonly_grp,campussafe_backup_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "campussafe_dba",
+      "role": "campussafe_owner_grp",
+      "entries": 113,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55407 -U campussafe_dba --role=campussafe_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g07\\snapshot_objects.list\" -d g05_a6_g07_snapshot \"D:\\Data Administration\\course-review\\activity6-private\\g07\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "operation": "create_target",
+      "target": "g05_a6_g07_recovered",
+      "account": "lab_admin",
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\createdb.exe\" -w -h 127.0.0.1 -p 55407 -U lab_admin -T template0 -O campussafe_owner_grp --encoding=UTF8 --locale=C g05_a6_g07_recovered",
+      "database_acl_sql": "REVOKE ALL ON DATABASE g05_a6_g07_recovered FROM PUBLIC; GRANT CONNECT ON DATABASE g05_a6_g07_recovered TO campussafe_dba,campussafe_runtime_grp,campussafe_readonly_grp,campussafe_backup_grp;",
+      "exit_code": 0
+    },
+    {
+      "phase": "objects",
+      "account": "campussafe_dba",
+      "role": "campussafe_owner_grp",
+      "entries": 113,
+      "command": "\"C:\\Program Files\\PostgreSQL\\18\\bin\\pg_restore.exe\" -w --exit-on-error --single-transaction -h 127.0.0.1 -p 55407 -U campussafe_dba --role=campussafe_owner_grp \"--use-list=D:\\Data Administration\\course-review\\activity6-private\\g07\\recovered_objects.list\" -d g05_a6_g07_recovered \"D:\\Data Administration\\course-review\\activity6-private\\g07\\fixture.dump\"",
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ]
+}
