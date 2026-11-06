@@ -16,6 +16,8 @@ Install the following:
 
 TextBee and EmailJS are optional. They are only needed if you want the application to send SMS and email notifications about potential item matches and claim status updates.
 
+Although these integrations are optional, the system is designed to support both TextBee and EmailJS for SMS and email notifications. The core functionalities of the application will still work without them, but notification features that depend on these services will not be available until they are properly configured. You may also encounter some errors or warnings in console related to the missing configurations, but these should not affect the application's core functionality.
+
 ## 1. Clone the repository
 
 ~~~bash
@@ -142,6 +144,8 @@ EMAILJS_PUBLIC_KEY=your_emailjs_public_key
 ~~~
 
 See [TextBee](https://textbee.dev/) and [EmailJS](https://www.emailjs.com/) for provider account setup and credentials.
+
+If you don't want to set up TextBee and EmailJS yourself, you can message us privately to request our API keys and configuration details.
 
 **Never commit your .env file or share real credentials publicly.** The repository's .gitignore excludes .env.
 
