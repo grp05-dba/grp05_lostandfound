@@ -1,0 +1,7 @@
+{
+  "commit": "9e1141a51515fcede0fe176ee5f47cfb6c8abf9b",
+  "source_path": "app/src/controllers/menu.php",
+  "source_blob": "7a425d0ae15776b4e70b228b60fcd44c7398decb",
+  "query": "SELECT menu_item_id, item_name, description, category, price FROM menu_item WHERE availability = true ORDER BY category, item_name;",
+  "adaptation": "G10 menu query with empty search/category, verbatim assembled SQL"
+}

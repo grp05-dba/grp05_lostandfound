@@ -1,0 +1,14 @@
+Captured: 2026-11-06T21:08:36.170103+08:00
+Login: canteen_readonly
+SQL:
+SET statement_timeout='30s'; SET lock_timeout='3s'; SET timezone='Asia/Manila';
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),current_setting('server_version'),inet_server_addr(),inet_server_port();
+SELECT pg_current_logfile();
+Exit: 3
+
+SET
+SET
+SET
+2026-11-06 21:08:36.163278+08|canteen_readonly|canteen_readonly|canteen_g05_activity4|18.3|127.0.0.1|55408
+psql:<stdin>:3: ERROR:  42501: permission denied for function pg_current_logfile
+LOCATION:  aclcheck_error, aclchk.c:2795

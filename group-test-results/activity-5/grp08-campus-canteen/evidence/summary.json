@@ -1,0 +1,1491 @@
+{
+  "group": "08",
+  "started": "2026-11-06T21:08:31.717465+08:00",
+  "finished": "2026-11-06T21:08:36.445969+08:00",
+  "database": "canteen_g05_activity4",
+  "port": "55408",
+  "admin": "canteen_admin",
+  "owner": "canteen_owner_grp",
+  "runtime": "canteen_app",
+  "report": "canteen_readonly",
+  "target": "customer_order",
+  "analyze": [
+    "customer_order"
+  ],
+  "before": {
+    "captured_at": "2026-11-06T21:08:31.987781+08:00",
+    "session_user": "canteen_admin",
+    "current_user": "canteen_owner_grp",
+    "database": "canteen_g05_activity4",
+    "version": "18.3",
+    "size_bytes": 8746687,
+    "pretty_size": "8542 kB",
+    "counts": {
+      "student": 3,
+      "vendor": 4,
+      "menu_item": 10,
+      "customer_order": 2,
+      "order_item": 2,
+      "queue_entry": 2,
+      "notification": 3
+    },
+    "objects": {
+      "r": 7,
+      "i": 11,
+      "S": 7
+    },
+    "sessions": [
+      {
+        "pid": 24124,
+        "user": "canteen_admin",
+        "state": null,
+        "wait_type": null,
+        "wait_event": null,
+        "duration_seconds": null,
+        "query_visible": true,
+        "statement": "this inspection statement",
+        "blocking_pids": [],
+        "visibility_note": "State/duration unavailable in owner-switched health session; query_visible field was only a non-null check, not proof of actual text visibility. See separate activity_visibility evidence."
+      }
+    ],
+    "database_stats": {
+      "numbackends": 1,
+      "xact_commit": 309,
+      "xact_rollback": 73,
+      "deadlocks": 0,
+      "conflicts": 0,
+      "sessions": 106,
+      "sessions_abandoned": 20,
+      "sessions_fatal": 0,
+      "sessions_killed": 0,
+      "stats_reset": null
+    },
+    "tables": [
+      {
+        "relname": "customer_order",
+        "reltuples": -1,
+        "n_live_tup": 2,
+        "n_dead_tup": 6,
+        "n_mod_since_analyze": 7,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 24576,
+        "xid_age": 51,
+        "reloptions": null
+      },
+      {
+        "relname": "menu_item",
+        "reltuples": -1,
+        "n_live_tup": 10,
+        "n_dead_tup": 5,
+        "n_mod_since_analyze": 13,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 24576,
+        "xid_age": 52,
+        "reloptions": null
+      },
+      {
+        "relname": "notification",
+        "reltuples": -1,
+        "n_live_tup": 3,
+        "n_dead_tup": 6,
+        "n_mod_since_analyze": 11,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 32768,
+        "xid_age": 48,
+        "reloptions": null
+      },
+      {
+        "relname": "order_item",
+        "reltuples": -1,
+        "n_live_tup": 2,
+        "n_dead_tup": 2,
+        "n_mod_since_analyze": 4,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 24576,
+        "xid_age": 50,
+        "reloptions": null
+      },
+      {
+        "relname": "queue_entry",
+        "reltuples": -1,
+        "n_live_tup": 2,
+        "n_dead_tup": 5,
+        "n_mod_since_analyze": 6,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 57344,
+        "xid_age": 49,
+        "reloptions": null
+      },
+      {
+        "relname": "student",
+        "reltuples": -1,
+        "n_live_tup": 3,
+        "n_dead_tup": 3,
+        "n_mod_since_analyze": 3,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 49152,
+        "xid_age": 54,
+        "reloptions": null
+      },
+      {
+        "relname": "vendor",
+        "reltuples": -1,
+        "n_live_tup": 4,
+        "n_dead_tup": 2,
+        "n_mod_since_analyze": 4,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 49152,
+        "xid_age": 53,
+        "reloptions": null
+      }
+    ],
+    "indexes": [
+      {
+        "relname": "customer_order",
+        "indexrelname": "customer_order_pkey",
+        "idx_scan": 46,
+        "idx_tup_read": 46,
+        "idx_tup_fetch": 43,
+        "bytes": 16384
+      },
+      {
+        "relname": "menu_item",
+        "indexrelname": "menu_item_pkey",
+        "idx_scan": 19,
+        "idx_tup_read": 19,
+        "idx_tup_fetch": 17,
+        "bytes": 16384
+      },
+      {
+        "relname": "notification",
+        "indexrelname": "notification_pkey",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "order_item",
+        "indexrelname": "order_item_pkey",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "queue_entry",
+        "indexrelname": "queue_entry_order_id_key",
+        "idx_scan": 10,
+        "idx_tup_read": 10,
+        "idx_tup_fetch": 9,
+        "bytes": 16384
+      },
+      {
+        "relname": "queue_entry",
+        "indexrelname": "queue_entry_pkey",
+        "idx_scan": 2,
+        "idx_tup_read": 2,
+        "idx_tup_fetch": 2,
+        "bytes": 16384
+      },
+      {
+        "relname": "queue_entry",
+        "indexrelname": "queue_entry_queue_number_queue_date_key",
+        "idx_scan": 6,
+        "idx_tup_read": 8,
+        "idx_tup_fetch": 8,
+        "bytes": 16384
+      },
+      {
+        "relname": "student",
+        "indexrelname": "student_email_key",
+        "idx_scan": 21,
+        "idx_tup_read": 11,
+        "idx_tup_fetch": 9,
+        "bytes": 16384
+      },
+      {
+        "relname": "student",
+        "indexrelname": "student_pkey",
+        "idx_scan": 12,
+        "idx_tup_read": 12,
+        "idx_tup_fetch": 12,
+        "bytes": 16384
+      },
+      {
+        "relname": "vendor",
+        "indexrelname": "vendor_email_key",
+        "idx_scan": 7,
+        "idx_tup_read": 7,
+        "idx_tup_fetch": 7,
+        "bytes": 16384
+      },
+      {
+        "relname": "vendor",
+        "indexrelname": "vendor_pkey",
+        "idx_scan": 34,
+        "idx_tup_read": 34,
+        "idx_tup_fetch": 34,
+        "bytes": 16384
+      }
+    ],
+    "sequences": [
+      {
+        "sequencename": "customer_order_order_id_seq",
+        "last_value": 4,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "menu_item_item_id_seq",
+        "last_value": 13,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "notification_notification_id_seq",
+        "last_value": 8,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "order_item_order_item_id_seq",
+        "last_value": 4,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "queue_entry_queue_id_seq",
+        "last_value": 4,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "student_student_id_seq",
+        "last_value": 5,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "vendor_vendor_id_seq",
+        "last_value": 5,
+        "increment_by": 1
+      }
+    ],
+    "settings": {
+      "autovacuum": "on",
+      "log_connections": "",
+      "log_destination": "stderr",
+      "log_disconnections": "off",
+      "log_min_duration_statement": "-1",
+      "log_min_messages": "warning",
+      "log_statement": "none",
+      "logging_collector": "off",
+      "track_activities": "on",
+      "track_counts": "on"
+    }
+  },
+  "after": {
+    "captured_at": "2026-11-06T21:08:34.286396+08:00",
+    "session_user": "canteen_admin",
+    "current_user": "canteen_owner_grp",
+    "database": "canteen_g05_activity4",
+    "version": "18.3",
+    "size_bytes": 8787647,
+    "pretty_size": "8582 kB",
+    "counts": {
+      "student": 3,
+      "vendor": 4,
+      "menu_item": 10,
+      "customer_order": 2,
+      "order_item": 2,
+      "queue_entry": 2,
+      "notification": 3
+    },
+    "objects": {
+      "r": 7,
+      "i": 11,
+      "S": 7
+    },
+    "sessions": [
+      {
+        "pid": 3716,
+        "user": "canteen_admin",
+        "state": null,
+        "wait_type": null,
+        "wait_event": null,
+        "duration_seconds": null,
+        "query_visible": true,
+        "statement": "this inspection statement",
+        "blocking_pids": [],
+        "visibility_note": "State/duration unavailable in owner-switched health session; query_visible field was only a non-null check, not proof of actual text visibility. See separate activity_visibility evidence."
+      }
+    ],
+    "database_stats": {
+      "numbackends": 1,
+      "xact_commit": 349,
+      "xact_rollback": 75,
+      "deadlocks": 0,
+      "conflicts": 0,
+      "sessions": 112,
+      "sessions_abandoned": 20,
+      "sessions_fatal": 0,
+      "sessions_killed": 0,
+      "stats_reset": null
+    },
+    "tables": [
+      {
+        "relname": "customer_order",
+        "reltuples": 2,
+        "n_live_tup": 2,
+        "n_dead_tup": 0,
+        "n_mod_since_analyze": 0,
+        "last_vacuum": "2026-11-06T21:08:33.892375+08:00",
+        "last_autovacuum": null,
+        "last_analyze": "2026-11-06T21:08:33.895318+08:00",
+        "last_autoanalyze": null,
+        "vacuum_count": 1,
+        "autovacuum_count": 0,
+        "analyze_count": 2,
+        "autoanalyze_count": 0,
+        "total_bytes": 57344,
+        "xid_age": 43,
+        "reloptions": null
+      },
+      {
+        "relname": "menu_item",
+        "reltuples": -1,
+        "n_live_tup": 10,
+        "n_dead_tup": 5,
+        "n_mod_since_analyze": 13,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 24576,
+        "xid_age": 54,
+        "reloptions": null
+      },
+      {
+        "relname": "notification",
+        "reltuples": -1,
+        "n_live_tup": 3,
+        "n_dead_tup": 6,
+        "n_mod_since_analyze": 11,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 32768,
+        "xid_age": 50,
+        "reloptions": null
+      },
+      {
+        "relname": "order_item",
+        "reltuples": -1,
+        "n_live_tup": 2,
+        "n_dead_tup": 2,
+        "n_mod_since_analyze": 4,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 24576,
+        "xid_age": 52,
+        "reloptions": null
+      },
+      {
+        "relname": "queue_entry",
+        "reltuples": -1,
+        "n_live_tup": 2,
+        "n_dead_tup": 5,
+        "n_mod_since_analyze": 6,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 57344,
+        "xid_age": 51,
+        "reloptions": null
+      },
+      {
+        "relname": "student",
+        "reltuples": -1,
+        "n_live_tup": 3,
+        "n_dead_tup": 3,
+        "n_mod_since_analyze": 3,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 49152,
+        "xid_age": 56,
+        "reloptions": null
+      },
+      {
+        "relname": "vendor",
+        "reltuples": -1,
+        "n_live_tup": 4,
+        "n_dead_tup": 2,
+        "n_mod_since_analyze": 4,
+        "last_vacuum": null,
+        "last_autovacuum": null,
+        "last_analyze": null,
+        "last_autoanalyze": null,
+        "vacuum_count": 0,
+        "autovacuum_count": 0,
+        "analyze_count": 0,
+        "autoanalyze_count": 0,
+        "total_bytes": 49152,
+        "xid_age": 55,
+        "reloptions": null
+      }
+    ],
+    "indexes": [
+      {
+        "relname": "customer_order",
+        "indexrelname": "customer_order_pkey",
+        "idx_scan": 46,
+        "idx_tup_read": 46,
+        "idx_tup_fetch": 43,
+        "bytes": 16384
+      },
+      {
+        "relname": "menu_item",
+        "indexrelname": "menu_item_pkey",
+        "idx_scan": 19,
+        "idx_tup_read": 19,
+        "idx_tup_fetch": 17,
+        "bytes": 16384
+      },
+      {
+        "relname": "notification",
+        "indexrelname": "notification_pkey",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "order_item",
+        "indexrelname": "order_item_pkey",
+        "idx_scan": 0,
+        "idx_tup_read": 0,
+        "idx_tup_fetch": 0,
+        "bytes": 16384
+      },
+      {
+        "relname": "queue_entry",
+        "indexrelname": "queue_entry_order_id_key",
+        "idx_scan": 10,
+        "idx_tup_read": 10,
+        "idx_tup_fetch": 9,
+        "bytes": 16384
+      },
+      {
+        "relname": "queue_entry",
+        "indexrelname": "queue_entry_pkey",
+        "idx_scan": 2,
+        "idx_tup_read": 2,
+        "idx_tup_fetch": 2,
+        "bytes": 16384
+      },
+      {
+        "relname": "queue_entry",
+        "indexrelname": "queue_entry_queue_number_queue_date_key",
+        "idx_scan": 6,
+        "idx_tup_read": 8,
+        "idx_tup_fetch": 8,
+        "bytes": 16384
+      },
+      {
+        "relname": "student",
+        "indexrelname": "student_email_key",
+        "idx_scan": 21,
+        "idx_tup_read": 11,
+        "idx_tup_fetch": 9,
+        "bytes": 16384
+      },
+      {
+        "relname": "student",
+        "indexrelname": "student_pkey",
+        "idx_scan": 12,
+        "idx_tup_read": 12,
+        "idx_tup_fetch": 12,
+        "bytes": 16384
+      },
+      {
+        "relname": "vendor",
+        "indexrelname": "vendor_email_key",
+        "idx_scan": 7,
+        "idx_tup_read": 7,
+        "idx_tup_fetch": 7,
+        "bytes": 16384
+      },
+      {
+        "relname": "vendor",
+        "indexrelname": "vendor_pkey",
+        "idx_scan": 34,
+        "idx_tup_read": 34,
+        "idx_tup_fetch": 34,
+        "bytes": 16384
+      }
+    ],
+    "sequences": [
+      {
+        "sequencename": "customer_order_order_id_seq",
+        "last_value": 4,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "menu_item_item_id_seq",
+        "last_value": 13,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "notification_notification_id_seq",
+        "last_value": 8,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "order_item_order_item_id_seq",
+        "last_value": 4,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "queue_entry_queue_id_seq",
+        "last_value": 4,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "student_student_id_seq",
+        "last_value": 5,
+        "increment_by": 1
+      },
+      {
+        "sequencename": "vendor_vendor_id_seq",
+        "last_value": 5,
+        "increment_by": 1
+      }
+    ],
+    "settings": {
+      "autovacuum": "on",
+      "log_connections": "",
+      "log_destination": "stderr",
+      "log_disconnections": "off",
+      "log_min_duration_statement": "-1",
+      "log_min_messages": "warning",
+      "log_statement": "none",
+      "logging_collector": "off",
+      "track_activities": "on",
+      "track_counts": "on"
+    }
+  },
+  "roles": {
+    "roles": [
+      {
+        "rolname": "canteen_admin",
+        "rolcanlogin": true,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": false
+      },
+      {
+        "rolname": "canteen_app",
+        "rolcanlogin": true,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": true
+      },
+      {
+        "rolname": "canteen_app_grp",
+        "rolcanlogin": false,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": true
+      },
+      {
+        "rolname": "canteen_owner_grp",
+        "rolcanlogin": false,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": true
+      },
+      {
+        "rolname": "canteen_readonly",
+        "rolcanlogin": true,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": true
+      },
+      {
+        "rolname": "canteen_readonly_grp",
+        "rolcanlogin": false,
+        "rolsuper": false,
+        "rolcreatedb": false,
+        "rolcreaterole": false,
+        "rolreplication": false,
+        "rolbypassrls": false,
+        "rolinherit": true
+      }
+    ],
+    "memberships": [
+      {
+        "member": "canteen_admin",
+        "parent": "canteen_owner_grp",
+        "admin_option": false,
+        "inherit_option": false,
+        "set_option": true
+      },
+      {
+        "member": "canteen_app",
+        "parent": "canteen_app_grp",
+        "admin_option": false,
+        "inherit_option": true,
+        "set_option": true
+      },
+      {
+        "member": "canteen_readonly",
+        "parent": "canteen_readonly_grp",
+        "admin_option": false,
+        "inherit_option": true,
+        "set_option": true
+      }
+    ],
+    "objects": [
+      {
+        "relname": "customer_order",
+        "relkind": "r",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}"
+      },
+      {
+        "relname": "customer_order_order_id_seq",
+        "relkind": "S",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}"
+      },
+      {
+        "relname": "menu_item",
+        "relkind": "r",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arwd/canteen_owner_grp}"
+      },
+      {
+        "relname": "menu_item_item_id_seq",
+        "relkind": "S",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}"
+      },
+      {
+        "relname": "notification",
+        "relkind": "r",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}"
+      },
+      {
+        "relname": "notification_notification_id_seq",
+        "relkind": "S",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}"
+      },
+      {
+        "relname": "order_item",
+        "relkind": "r",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=ar/canteen_owner_grp}"
+      },
+      {
+        "relname": "order_item_order_item_id_seq",
+        "relkind": "S",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}"
+      },
+      {
+        "relname": "queue_entry",
+        "relkind": "r",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}"
+      },
+      {
+        "relname": "queue_entry_queue_id_seq",
+        "relkind": "S",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}"
+      },
+      {
+        "relname": "student",
+        "relkind": "r",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=ar/canteen_owner_grp}"
+      },
+      {
+        "relname": "student_student_id_seq",
+        "relkind": "S",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}"
+      },
+      {
+        "relname": "vendor",
+        "relkind": "r",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=arwdDxtm/canteen_owner_grp,canteen_app_grp=arw/canteen_owner_grp}"
+      },
+      {
+        "relname": "vendor_vendor_id_seq",
+        "relkind": "S",
+        "owner": "canteen_owner_grp",
+        "relacl": "{canteen_owner_grp=rwU/canteen_owner_grp,canteen_app_grp=U/canteen_owner_grp}"
+      }
+    ],
+    "defaults": [
+      {
+        "defaclrole": "canteen_admin",
+        "defaclnamespace": "0",
+        "defaclobjtype": "f",
+        "defaclacl": "{canteen_admin=X/canteen_admin}"
+      },
+      {
+        "defaclrole": "canteen_owner_grp",
+        "defaclnamespace": "0",
+        "defaclobjtype": "f",
+        "defaclacl": "{canteen_owner_grp=X/canteen_owner_grp}"
+      }
+    ],
+    "schema": "{pg_database_owner=UC/pg_database_owner,canteen_app_grp=U/pg_database_owner,canteen_readonly_grp=U/pg_database_owner,canteen_owner_grp=UC/pg_database_owner}",
+    "database_acl": "{canteen_owner_grp=CTc/canteen_owner_grp,canteen_admin=c/canteen_owner_grp,canteen_app_grp=c/canteen_owner_grp,canteen_readonly_grp=c/canteen_owner_grp}",
+    "owner_can_maintain": true,
+    "runtime_can_maintain": false
+  },
+  "query_provenance": {
+    "commit": "5056cb1c1cddca71c0641dd01fc7b82082f1c3ed",
+    "source_path": "src/main/java/com/bwisit/canteen/service/ReportService.java",
+    "source_blob": "7ec9e9ddac564f247d048ec90a0d22df4df6deb4",
+    "query": "SELECT count(*) FILTER (WHERE o.status = 'completed'), count(*) FILTER (WHERE o.status = 'cancelled'), count(*) FROM customer_order o WHERE o.order_date >= TIMESTAMP '2026-10-08 00:00:00' AND o.order_date < TIMESTAMP '2026-11-07 00:00:00';",
+    "adaptation": "G08 native administrator count query with concrete last-30-day timestamps"
+  },
+  "plan_before": {
+    "Plan": {
+      "Node Type": "Aggregate",
+      "Strategy": "Plain",
+      "Partial Mode": "Simple",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 20.7,
+      "Total Cost": 20.71,
+      "Plan Rows": 1,
+      "Plan Width": 24,
+      "Actual Startup Time": 0.11,
+      "Actual Total Time": 0.11,
+      "Actual Rows": 1.0,
+      "Actual Loops": 1,
+      "Disabled": false,
+      "Shared Hit Blocks": 1,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0,
+      "Plans": [
+        {
+          "Node Type": "Seq Scan",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Relation Name": "customer_order",
+          "Alias": "o",
+          "Startup Cost": 0.0,
+          "Total Cost": 20.65,
+          "Plan Rows": 4,
+          "Plan Width": 58,
+          "Actual Startup Time": 0.089,
+          "Actual Total Time": 0.09,
+          "Actual Rows": 2.0,
+          "Actual Loops": 1,
+          "Disabled": false,
+          "Filter": "((order_date >= '2026-10-08 00:00:00'::timestamp without time zone) AND (order_date < '2026-11-07 00:00:00'::timestamp without time zone))",
+          "Rows Removed by Filter": 0,
+          "Shared Hit Blocks": 1,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        }
+      ]
+    },
+    "Planning": {
+      "Shared Hit Blocks": 63,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0
+    },
+    "Planning Time": 3.688,
+    "Triggers": [],
+    "Execution Time": 0.424
+  },
+  "plan_after": {
+    "Plan": {
+      "Node Type": "Aggregate",
+      "Strategy": "Plain",
+      "Partial Mode": "Simple",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 1.05,
+      "Total Cost": 1.06,
+      "Plan Rows": 1,
+      "Plan Width": 24,
+      "Actual Startup Time": 0.111,
+      "Actual Total Time": 0.111,
+      "Actual Rows": 1.0,
+      "Actual Loops": 1,
+      "Disabled": false,
+      "Shared Hit Blocks": 1,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0,
+      "Plans": [
+        {
+          "Node Type": "Seq Scan",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Relation Name": "customer_order",
+          "Alias": "o",
+          "Startup Cost": 0.0,
+          "Total Cost": 1.03,
+          "Plan Rows": 2,
+          "Plan Width": 9,
+          "Actual Startup Time": 0.089,
+          "Actual Total Time": 0.09,
+          "Actual Rows": 2.0,
+          "Actual Loops": 1,
+          "Disabled": false,
+          "Filter": "((order_date >= '2026-10-08 00:00:00'::timestamp without time zone) AND (order_date < '2026-11-07 00:00:00'::timestamp without time zone))",
+          "Rows Removed by Filter": 0,
+          "Shared Hit Blocks": 1,
+          "Shared Read Blocks": 0,
+          "Shared Dirtied Blocks": 0,
+          "Shared Written Blocks": 0,
+          "Local Hit Blocks": 0,
+          "Local Read Blocks": 0,
+          "Local Dirtied Blocks": 0,
+          "Local Written Blocks": 0,
+          "Temp Read Blocks": 0,
+          "Temp Written Blocks": 0
+        }
+      ]
+    },
+    "Planning": {
+      "Shared Hit Blocks": 57,
+      "Shared Read Blocks": 0,
+      "Shared Dirtied Blocks": 0,
+      "Shared Written Blocks": 0,
+      "Local Hit Blocks": 0,
+      "Local Read Blocks": 0,
+      "Local Dirtied Blocks": 0,
+      "Local Written Blocks": 0,
+      "Temp Read Blocks": 0,
+      "Temp Written Blocks": 0
+    },
+    "Planning Time": 3.99,
+    "Triggers": [],
+    "Execution Time": 0.446
+  },
+  "log_review": {
+    "source": "Dedicated G08 PostgreSQL stderr log redirected by pg_ctl",
+    "reviewed_at": "2026-11-06T21:08:36.299009+08:00",
+    "first_diagnostic": "2026-11-06 20:19:03.363 +08",
+    "last_diagnostic": "2026-11-06 21:08:36.276 +08",
+    "total_file_lines": 212,
+    "retained_event_count": 75,
+    "counts": {
+      "ERROR": 66,
+      "WARNING": 0,
+      "FATAL": 9,
+      "PANIC": 0
+    },
+    "sql_log_access_probes": {
+      "current-logfile": {
+        "exit_code": 3,
+        "denied_42501": true
+      },
+      "list-logdir": {
+        "exit_code": 3,
+        "denied_42501": true
+      }
+    },
+    "events": [
+      {
+        "timestamp": "2026-11-06 20:19:03.363 +08",
+        "pid": 24980,
+        "level": "ERROR",
+        "message": "permission denied for table student"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:03.510 +08",
+        "pid": 22988,
+        "level": "ERROR",
+        "message": "permission denied for table student"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:03.628 +08",
+        "pid": 23180,
+        "level": "ERROR",
+        "message": "permission denied for table student"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:03.741 +08",
+        "pid": 25076,
+        "level": "ERROR",
+        "message": "permission denied for table student"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:03.895 +08",
+        "pid": 15236,
+        "level": "ERROR",
+        "message": "permission denied for table vendor"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:04.173 +08",
+        "pid": 23372,
+        "level": "ERROR",
+        "message": "permission denied for table vendor"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:04.350 +08",
+        "pid": 25000,
+        "level": "ERROR",
+        "message": "permission denied for table vendor"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:04.496 +08",
+        "pid": 22352,
+        "level": "ERROR",
+        "message": "permission denied for table vendor"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:04.711 +08",
+        "pid": 25340,
+        "level": "ERROR",
+        "message": "permission denied for table menu_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:04.814 +08",
+        "pid": 21744,
+        "level": "ERROR",
+        "message": "permission denied for table menu_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:04.936 +08",
+        "pid": 20536,
+        "level": "ERROR",
+        "message": "permission denied for table menu_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:05.074 +08",
+        "pid": 22292,
+        "level": "ERROR",
+        "message": "permission denied for table customer_order"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:05.220 +08",
+        "pid": 900,
+        "level": "ERROR",
+        "message": "permission denied for table customer_order"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:05.378 +08",
+        "pid": 20056,
+        "level": "ERROR",
+        "message": "permission denied for table customer_order"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:05.522 +08",
+        "pid": 19048,
+        "level": "ERROR",
+        "message": "permission denied for table customer_order"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:05.658 +08",
+        "pid": 24484,
+        "level": "ERROR",
+        "message": "permission denied for table order_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:05.765 +08",
+        "pid": 22828,
+        "level": "ERROR",
+        "message": "permission denied for table order_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:05.907 +08",
+        "pid": 9180,
+        "level": "ERROR",
+        "message": "permission denied for table order_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:06.117 +08",
+        "pid": 20796,
+        "level": "ERROR",
+        "message": "permission denied for table order_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:06.278 +08",
+        "pid": 14988,
+        "level": "ERROR",
+        "message": "permission denied for table queue_entry"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:06.378 +08",
+        "pid": 20712,
+        "level": "ERROR",
+        "message": "permission denied for table queue_entry"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:06.583 +08",
+        "pid": 13496,
+        "level": "ERROR",
+        "message": "permission denied for table queue_entry"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:06.694 +08",
+        "pid": 16192,
+        "level": "ERROR",
+        "message": "permission denied for table queue_entry"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:06.807 +08",
+        "pid": 19472,
+        "level": "ERROR",
+        "message": "permission denied for table notification"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:06.927 +08",
+        "pid": 20204,
+        "level": "ERROR",
+        "message": "permission denied for table notification"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:07.032 +08",
+        "pid": 19716,
+        "level": "ERROR",
+        "message": "permission denied for table notification"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:07.138 +08",
+        "pid": 24080,
+        "level": "ERROR",
+        "message": "permission denied for table notification"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:07.295 +08",
+        "pid": 21512,
+        "level": "ERROR",
+        "message": "permission denied for table student"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:07.445 +08",
+        "pid": 23852,
+        "level": "ERROR",
+        "message": "permission denied for table order_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:07.558 +08",
+        "pid": 9564,
+        "level": "ERROR",
+        "message": "permission denied for table student"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:07.680 +08",
+        "pid": 21528,
+        "level": "ERROR",
+        "message": "permission denied for table vendor"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:07.808 +08",
+        "pid": 22956,
+        "level": "ERROR",
+        "message": "permission denied for table vendor"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:07.925 +08",
+        "pid": 4092,
+        "level": "ERROR",
+        "message": "permission denied for table customer_order"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:08.048 +08",
+        "pid": 19528,
+        "level": "ERROR",
+        "message": "permission denied for table queue_entry"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:08.183 +08",
+        "pid": 20064,
+        "level": "ERROR",
+        "message": "permission denied for table notification"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:08.295 +08",
+        "pid": 16960,
+        "level": "ERROR",
+        "message": "permission denied for table vendor"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:08.422 +08",
+        "pid": 25504,
+        "level": "ERROR",
+        "message": "permission denied to create database"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:08.547 +08",
+        "pid": 22976,
+        "level": "ERROR",
+        "message": "permission denied to create role"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:08.712 +08",
+        "pid": 24028,
+        "level": "FATAL",
+        "message": "permission denied for database \"canteen_unrelated_lab\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:08.823 +08",
+        "pid": 23856,
+        "level": "FATAL",
+        "message": "permission denied for database \"postgres\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:08.934 +08",
+        "pid": 24364,
+        "level": "FATAL",
+        "message": "permission denied for database \"template1\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:09.062 +08",
+        "pid": 24964,
+        "level": "ERROR",
+        "message": "permission denied to create database"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:09.172 +08",
+        "pid": 19768,
+        "level": "ERROR",
+        "message": "permission denied to create role"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:09.284 +08",
+        "pid": 24852,
+        "level": "FATAL",
+        "message": "permission denied for database \"canteen_unrelated_lab\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:09.526 +08",
+        "pid": 20000,
+        "level": "FATAL",
+        "message": "permission denied for database \"postgres\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:09.705 +08",
+        "pid": 24228,
+        "level": "FATAL",
+        "message": "permission denied for database \"template1\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:09.942 +08",
+        "pid": 23240,
+        "level": "ERROR",
+        "message": "permission denied to create database"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:10.053 +08",
+        "pid": 17004,
+        "level": "ERROR",
+        "message": "permission denied to create role"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:10.173 +08",
+        "pid": 22968,
+        "level": "FATAL",
+        "message": "permission denied for database \"canteen_unrelated_lab\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:10.345 +08",
+        "pid": 22320,
+        "level": "FATAL",
+        "message": "permission denied for database \"postgres\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:10.464 +08",
+        "pid": 24644,
+        "level": "FATAL",
+        "message": "permission denied for database \"template1\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:10.579 +08",
+        "pid": 19340,
+        "level": "ERROR",
+        "message": "permission denied for database canteen_g05_activity4"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:10.767 +08",
+        "pid": 20572,
+        "level": "ERROR",
+        "message": "permission denied for schema public at character 14"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:10.955 +08",
+        "pid": 12780,
+        "level": "ERROR",
+        "message": "permission denied to set role \"canteen_owner_grp\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:11.181 +08",
+        "pid": 23644,
+        "level": "ERROR",
+        "message": "permission denied for table notification"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:11.328 +08",
+        "pid": 23120,
+        "level": "ERROR",
+        "message": "must be owner of table menu_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:11.468 +08",
+        "pid": 18588,
+        "level": "ERROR",
+        "message": "permission denied for sequence menu_item_item_id_seq"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:11.598 +08",
+        "pid": 24152,
+        "level": "ERROR",
+        "message": "permission denied for database canteen_g05_activity4"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:11.740 +08",
+        "pid": 22872,
+        "level": "ERROR",
+        "message": "permission denied for schema public at character 14"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:12.354 +08",
+        "pid": 8956,
+        "level": "ERROR",
+        "message": "permission denied to set role \"canteen_owner_grp\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:12.523 +08",
+        "pid": 24332,
+        "level": "ERROR",
+        "message": "permission denied for table notification"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:12.701 +08",
+        "pid": 7688,
+        "level": "ERROR",
+        "message": "must be owner of table menu_item"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:12.900 +08",
+        "pid": 23364,
+        "level": "ERROR",
+        "message": "permission denied for sequence menu_item_item_id_seq"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:13.022 +08",
+        "pid": 21884,
+        "level": "ERROR",
+        "message": "permission denied for sequence menu_item_item_id_seq"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:13.174 +08",
+        "pid": 6168,
+        "level": "ERROR",
+        "message": "permission denied for sequence menu_item_item_id_seq"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:13.308 +08",
+        "pid": 21224,
+        "level": "ERROR",
+        "message": "permission denied to grant role \"canteen_app_grp\""
+      },
+      {
+        "timestamp": "2026-11-06 20:19:13.651 +08",
+        "pid": 25232,
+        "level": "ERROR",
+        "message": "permission denied for schema public at character 14"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:14.460 +08",
+        "pid": 5428,
+        "level": "ERROR",
+        "message": "permission denied for table g05_future_probe"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:14.581 +08",
+        "pid": 20528,
+        "level": "ERROR",
+        "message": "permission denied for function g05_future_function"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:14.705 +08",
+        "pid": 24948,
+        "level": "ERROR",
+        "message": "permission denied for table g05_future_probe"
+      },
+      {
+        "timestamp": "2026-11-06 20:19:14.819 +08",
+        "pid": 22820,
+        "level": "ERROR",
+        "message": "permission denied for function g05_future_function"
+      },
+      {
+        "timestamp": "2026-11-06 20:25:22.228 +08",
+        "pid": 9168,
+        "level": "ERROR",
+        "message": "Connect to the dedicated canteen_g05_activity4 lab database"
+      },
+      {
+        "timestamp": "2026-11-06 20:25:55.956 +08",
+        "pid": 15204,
+        "level": "ERROR",
+        "message": "Connect to the dedicated canteen_g05_activity4 lab database"
+      },
+      {
+        "timestamp": "2026-11-06 21:08:36.164 +08",
+        "pid": 20200,
+        "level": "ERROR",
+        "message": "permission denied for function pg_current_logfile"
+      },
+      {
+        "timestamp": "2026-11-06 21:08:36.276 +08",
+        "pid": 19992,
+        "level": "ERROR",
+        "message": "permission denied for function pg_ls_logdir"
+      }
+    ]
+  },
+  "maintenance_verified": true,
+  "unchanged_counts": true,
+  "unchanged_sequences": true,
+  "unchanged_acls": true,
+  "activity_visibility": {
+    "captured_at": "2026-11-06T21:10:09.243298+08:00",
+    "session_user": "canteen_admin",
+    "current_user": "canteen_admin",
+    "sessions": [
+      {
+        "pid": 7716,
+        "user": "canteen_admin",
+        "state": "active",
+        "wait_type": null,
+        "wait_event": null,
+        "seconds_since_query_start": 0.015721,
+        "query_visible": true,
+        "query_label": "this inspection SQL (recorded in this evidence file)",
+        "blocking_pids": []
+      }
+    ]
+  }
+}

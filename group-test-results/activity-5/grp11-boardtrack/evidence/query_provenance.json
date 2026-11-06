@@ -1,0 +1,7 @@
+{
+  "commit": "242b366936f17324dca7e4435bc1d6abe59b27d7",
+  "source_path": "src/routes/leases.js",
+  "source_blob": "ac10193246493818cf61895e3a73fe14f5fe6c97",
+  "query": "SELECT lease_id, tenant_id, tenant, property_name, room_number, start_date, end_date, monthly_rent, status, total_paid, utilities_billed FROM v_lease_summary ORDER BY 1;",
+  "adaptation": "G11 landlord/staff lease-list query plus ORDER BY 1 added by rowsFor; no tenant filter"
+}

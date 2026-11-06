@@ -1,0 +1,13 @@
+Captured: 2026-11-06T21:08:33.354167+08:00
+Login: canteen_readonly
+SQL:
+SET statement_timeout='30s'; SET lock_timeout='3s'; SET timezone='Asia/Manila';
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),current_setting('server_version'),inet_server_addr(),inet_server_port();
+SELECT count(*) AS approved_reporting_rows FROM menu_item;
+Exit: 0
+
+SET
+SET
+SET
+2026-11-06 21:08:33.330858+08|canteen_readonly|canteen_readonly|canteen_g05_activity4|18.3|127.0.0.1|55408
+10

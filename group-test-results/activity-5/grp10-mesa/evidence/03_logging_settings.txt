@@ -1,0 +1,21 @@
+Captured: 2026-11-06T21:08:39.713562+08:00
+Login: rors_dba
+SQL:
+SET statement_timeout='30s'; SET lock_timeout='3s'; SET timezone='Asia/Manila';
+SET ROLE rors_owner_grp;
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),current_setting('server_version'),inet_server_addr(),inet_server_port();
+SELECT name,setting FROM pg_settings WHERE name IN('log_destination','logging_collector','log_statement','log_min_duration_statement','log_min_messages','log_connections','log_disconnections') ORDER BY name;
+Exit: 0
+
+SET
+SET
+SET
+SET
+2026-11-06 21:08:39.69996+08|rors_dba|rors_owner_grp|mesa_g05_activity4|18.3|127.0.0.1|55410
+log_connections|
+log_destination|stderr
+log_disconnections|off
+log_min_duration_statement|-1
+log_min_messages|warning
+log_statement|none
+logging_collector|off

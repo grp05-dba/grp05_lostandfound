@@ -1,0 +1,476 @@
+{
+  "source": "Dedicated G08 PostgreSQL stderr log redirected by pg_ctl",
+  "reviewed_at": "2026-11-06T21:08:36.299009+08:00",
+  "first_diagnostic": "2026-11-06 20:19:03.363 +08",
+  "last_diagnostic": "2026-11-06 21:08:36.276 +08",
+  "total_file_lines": 212,
+  "retained_event_count": 75,
+  "counts": {
+    "ERROR": 66,
+    "WARNING": 0,
+    "FATAL": 9,
+    "PANIC": 0
+  },
+  "sql_log_access_probes": {
+    "current-logfile": {
+      "exit_code": 3,
+      "denied_42501": true
+    },
+    "list-logdir": {
+      "exit_code": 3,
+      "denied_42501": true
+    }
+  },
+  "events": [
+    {
+      "timestamp": "2026-11-06 20:19:03.363 +08",
+      "pid": 24980,
+      "level": "ERROR",
+      "message": "permission denied for table student"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:03.510 +08",
+      "pid": 22988,
+      "level": "ERROR",
+      "message": "permission denied for table student"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:03.628 +08",
+      "pid": 23180,
+      "level": "ERROR",
+      "message": "permission denied for table student"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:03.741 +08",
+      "pid": 25076,
+      "level": "ERROR",
+      "message": "permission denied for table student"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:03.895 +08",
+      "pid": 15236,
+      "level": "ERROR",
+      "message": "permission denied for table vendor"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:04.173 +08",
+      "pid": 23372,
+      "level": "ERROR",
+      "message": "permission denied for table vendor"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:04.350 +08",
+      "pid": 25000,
+      "level": "ERROR",
+      "message": "permission denied for table vendor"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:04.496 +08",
+      "pid": 22352,
+      "level": "ERROR",
+      "message": "permission denied for table vendor"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:04.711 +08",
+      "pid": 25340,
+      "level": "ERROR",
+      "message": "permission denied for table menu_item"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:04.814 +08",
+      "pid": 21744,
+      "level": "ERROR",
+      "message": "permission denied for table menu_item"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:04.936 +08",
+      "pid": 20536,
+      "level": "ERROR",
+      "message": "permission denied for table menu_item"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:05.074 +08",
+      "pid": 22292,
+      "level": "ERROR",
+      "message": "permission denied for table customer_order"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:05.220 +08",
+      "pid": 900,
+      "level": "ERROR",
+      "message": "permission denied for table customer_order"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:05.378 +08",
+      "pid": 20056,
+      "level": "ERROR",
+      "message": "permission denied for table customer_order"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:05.522 +08",
+      "pid": 19048,
+      "level": "ERROR",
+      "message": "permission denied for table customer_order"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:05.658 +08",
+      "pid": 24484,
+      "level": "ERROR",
+      "message": "permission denied for table order_item"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:05.765 +08",
+      "pid": 22828,
+      "level": "ERROR",
+      "message": "permission denied for table order_item"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:05.907 +08",
+      "pid": 9180,
+      "level": "ERROR",
+      "message": "permission denied for table order_item"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:06.117 +08",
+      "pid": 20796,
+      "level": "ERROR",
+      "message": "permission denied for table order_item"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:06.278 +08",
+      "pid": 14988,
+      "level": "ERROR",
+      "message": "permission denied for table queue_entry"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:06.378 +08",
+      "pid": 20712,
+      "level": "ERROR",
+      "message": "permission denied for table queue_entry"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:06.583 +08",
+      "pid": 13496,
+      "level": "ERROR",
+      "message": "permission denied for table queue_entry"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:06.694 +08",
+      "pid": 16192,
+      "level": "ERROR",
+      "message": "permission denied for table queue_entry"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:06.807 +08",
+      "pid": 19472,
+      "level": "ERROR",
+      "message": "permission denied for table notification"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:06.927 +08",
+      "pid": 20204,
+      "level": "ERROR",
+      "message": "permission denied for table notification"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:07.032 +08",
+      "pid": 19716,
+      "level": "ERROR",
+      "message": "permission denied for table notification"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:07.138 +08",
+      "pid": 24080,
+      "level": "ERROR",
+      "message": "permission denied for table notification"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:07.295 +08",
+      "pid": 21512,
+      "level": "ERROR",
+      "message": "permission denied for table student"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:07.445 +08",
+      "pid": 23852,
+      "level": "ERROR",
+      "message": "permission denied for table order_item"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:07.558 +08",
+      "pid": 9564,
+      "level": "ERROR",
+      "message": "permission denied for table student"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:07.680 +08",
+      "pid": 21528,
+      "level": "ERROR",
+      "message": "permission denied for table vendor"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:07.808 +08",
+      "pid": 22956,
+      "level": "ERROR",
+      "message": "permission denied for table vendor"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:07.925 +08",
+      "pid": 4092,
+      "level": "ERROR",
+      "message": "permission denied for table customer_order"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:08.048 +08",
+      "pid": 19528,
+      "level": "ERROR",
+      "message": "permission denied for table queue_entry"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:08.183 +08",
+      "pid": 20064,
+      "level": "ERROR",
+      "message": "permission denied for table notification"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:08.295 +08",
+      "pid": 16960,
+      "level": "ERROR",
+      "message": "permission denied for table vendor"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:08.422 +08",
+      "pid": 25504,
+      "level": "ERROR",
+      "message": "permission denied to create database"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:08.547 +08",
+      "pid": 22976,
+      "level": "ERROR",
+      "message": "permission denied to create role"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:08.712 +08",
+      "pid": 24028,
+      "level": "FATAL",
+      "message": "permission denied for database \"canteen_unrelated_lab\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:08.823 +08",
+      "pid": 23856,
+      "level": "FATAL",
+      "message": "permission denied for database \"postgres\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:08.934 +08",
+      "pid": 24364,
+      "level": "FATAL",
+      "message": "permission denied for database \"template1\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:09.062 +08",
+      "pid": 24964,
+      "level": "ERROR",
+      "message": "permission denied to create database"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:09.172 +08",
+      "pid": 19768,
+      "level": "ERROR",
+      "message": "permission denied to create role"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:09.284 +08",
+      "pid": 24852,
+      "level": "FATAL",
+      "message": "permission denied for database \"canteen_unrelated_lab\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:09.526 +08",
+      "pid": 20000,
+      "level": "FATAL",
+      "message": "permission denied for database \"postgres\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:09.705 +08",
+      "pid": 24228,
+      "level": "FATAL",
+      "message": "permission denied for database \"template1\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:09.942 +08",
+      "pid": 23240,
+      "level": "ERROR",
+      "message": "permission denied to create database"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:10.053 +08",
+      "pid": 17004,
+      "level": "ERROR",
+      "message": "permission denied to create role"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:10.173 +08",
+      "pid": 22968,
+      "level": "FATAL",
+      "message": "permission denied for database \"canteen_unrelated_lab\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:10.345 +08",
+      "pid": 22320,
+      "level": "FATAL",
+      "message": "permission denied for database \"postgres\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:10.464 +08",
+      "pid": 24644,
+      "level": "FATAL",
+      "message": "permission denied for database \"template1\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:10.579 +08",
+      "pid": 19340,
+      "level": "ERROR",
+      "message": "permission denied for database canteen_g05_activity4"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:10.767 +08",
+      "pid": 20572,
+      "level": "ERROR",
+      "message": "permission denied for schema public at character 14"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:10.955 +08",
+      "pid": 12780,
+      "level": "ERROR",
+      "message": "permission denied to set role \"canteen_owner_grp\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:11.181 +08",
+      "pid": 23644,
+      "level": "ERROR",
+      "message": "permission denied for table notification"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:11.328 +08",
+      "pid": 23120,
+      "level": "ERROR",
+      "message": "must be owner of table menu_item"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:11.468 +08",
+      "pid": 18588,
+      "level": "ERROR",
+      "message": "permission denied for sequence menu_item_item_id_seq"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:11.598 +08",
+      "pid": 24152,
+      "level": "ERROR",
+      "message": "permission denied for database canteen_g05_activity4"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:11.740 +08",
+      "pid": 22872,
+      "level": "ERROR",
+      "message": "permission denied for schema public at character 14"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:12.354 +08",
+      "pid": 8956,
+      "level": "ERROR",
+      "message": "permission denied to set role \"canteen_owner_grp\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:12.523 +08",
+      "pid": 24332,
+      "level": "ERROR",
+      "message": "permission denied for table notification"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:12.701 +08",
+      "pid": 7688,
+      "level": "ERROR",
+      "message": "must be owner of table menu_item"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:12.900 +08",
+      "pid": 23364,
+      "level": "ERROR",
+      "message": "permission denied for sequence menu_item_item_id_seq"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:13.022 +08",
+      "pid": 21884,
+      "level": "ERROR",
+      "message": "permission denied for sequence menu_item_item_id_seq"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:13.174 +08",
+      "pid": 6168,
+      "level": "ERROR",
+      "message": "permission denied for sequence menu_item_item_id_seq"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:13.308 +08",
+      "pid": 21224,
+      "level": "ERROR",
+      "message": "permission denied to grant role \"canteen_app_grp\""
+    },
+    {
+      "timestamp": "2026-11-06 20:19:13.651 +08",
+      "pid": 25232,
+      "level": "ERROR",
+      "message": "permission denied for schema public at character 14"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:14.460 +08",
+      "pid": 5428,
+      "level": "ERROR",
+      "message": "permission denied for table g05_future_probe"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:14.581 +08",
+      "pid": 20528,
+      "level": "ERROR",
+      "message": "permission denied for function g05_future_function"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:14.705 +08",
+      "pid": 24948,
+      "level": "ERROR",
+      "message": "permission denied for table g05_future_probe"
+    },
+    {
+      "timestamp": "2026-11-06 20:19:14.819 +08",
+      "pid": 22820,
+      "level": "ERROR",
+      "message": "permission denied for function g05_future_function"
+    },
+    {
+      "timestamp": "2026-11-06 20:25:22.228 +08",
+      "pid": 9168,
+      "level": "ERROR",
+      "message": "Connect to the dedicated canteen_g05_activity4 lab database"
+    },
+    {
+      "timestamp": "2026-11-06 20:25:55.956 +08",
+      "pid": 15204,
+      "level": "ERROR",
+      "message": "Connect to the dedicated canteen_g05_activity4 lab database"
+    },
+    {
+      "timestamp": "2026-11-06 21:08:36.164 +08",
+      "pid": 20200,
+      "level": "ERROR",
+      "message": "permission denied for function pg_current_logfile"
+    },
+    {
+      "timestamp": "2026-11-06 21:08:36.276 +08",
+      "pid": 19992,
+      "level": "ERROR",
+      "message": "permission denied for function pg_ls_logdir"
+    }
+  ]
+}

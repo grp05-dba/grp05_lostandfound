@@ -1,0 +1,14 @@
+Captured: 2026-11-06T21:08:39.957590+08:00
+Login: rors_report
+SQL:
+SET statement_timeout='30s'; SET lock_timeout='3s'; SET timezone='Asia/Manila';
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),current_setting('server_version'),inet_server_addr(),inet_server_port();
+SELECT count(*) FROM pg_ls_logdir();
+Exit: 3
+
+SET
+SET
+SET
+2026-11-06 21:08:39.949825+08|rors_report|rors_report|mesa_g05_activity4|18.3|127.0.0.1|55410
+psql:<stdin>:3: ERROR:  42501: permission denied for function pg_ls_logdir
+LOCATION:  aclcheck_error, aclchk.c:2795

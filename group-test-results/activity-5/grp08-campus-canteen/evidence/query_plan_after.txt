@@ -1,0 +1,27 @@
+Captured: 2026-11-06T21:08:35.705141+08:00
+Login: canteen_app
+SQL:
+SET statement_timeout='30s'; SET lock_timeout='3s'; SET timezone='Asia/Manila';
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),current_setting('server_version'),inet_server_addr(),inet_server_port();
+BEGIN READ ONLY;
+EXPLAIN SELECT count(*) FILTER (WHERE o.status = 'completed'), count(*) FILTER (WHERE o.status = 'cancelled'), count(*) FROM customer_order o WHERE o.order_date >= TIMESTAMP '2026-10-08 00:00:00' AND o.order_date < TIMESTAMP '2026-11-07 00:00:00';
+EXPLAIN (ANALYZE,BUFFERS) SELECT count(*) FILTER (WHERE o.status = 'completed'), count(*) FILTER (WHERE o.status = 'cancelled'), count(*) FROM customer_order o WHERE o.order_date >= TIMESTAMP '2026-10-08 00:00:00' AND o.order_date < TIMESTAMP '2026-11-07 00:00:00';
+ROLLBACK;
+Exit: 0
+
+SET
+SET
+SET
+2026-11-06 21:08:35.688544+08|canteen_app|canteen_app|canteen_g05_activity4|18.3|127.0.0.1|55408
+BEGIN
+Aggregate  (cost=1.05..1.06 rows=1 width=24)
+  ->  Seq Scan on customer_order o  (cost=0.00..1.03 rows=2 width=9)
+        Filter: ((order_date >= '2026-10-08 00:00:00'::timestamp without time zone) AND (order_date < '2026-11-07 00:00:00'::timestamp without time zone))
+Aggregate  (cost=1.05..1.06 rows=1 width=24) (actual time=0.102..0.102 rows=1.00 loops=1)
+  Buffers: shared hit=1
+  ->  Seq Scan on customer_order o  (cost=0.00..1.03 rows=2 width=9) (actual time=0.076..0.077 rows=2.00 loops=1)
+        Filter: ((order_date >= '2026-10-08 00:00:00'::timestamp without time zone) AND (order_date < '2026-11-07 00:00:00'::timestamp without time zone))
+        Buffers: shared hit=1
+Planning Time: 0.306 ms
+Execution Time: 0.195 ms
+ROLLBACK

@@ -1,0 +1,31 @@
+Captured: 2026-11-06T21:08:37.945946+08:00
+Login: rors_app
+SQL:
+SET statement_timeout='30s'; SET lock_timeout='3s'; SET timezone='Asia/Manila';
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),current_setting('server_version'),inet_server_addr(),inet_server_port();
+BEGIN READ ONLY;
+EXPLAIN SELECT menu_item_id, item_name, description, category, price FROM menu_item WHERE availability = true ORDER BY category, item_name;
+EXPLAIN (ANALYZE,BUFFERS) SELECT menu_item_id, item_name, description, category, price FROM menu_item WHERE availability = true ORDER BY category, item_name;
+ROLLBACK;
+Exit: 0
+
+SET
+SET
+SET
+2026-11-06 21:08:37.931863+08|rors_app|rors_app|mesa_g05_activity4|18.3|127.0.0.1|55410
+BEGIN
+Sort  (cost=2.84..2.96 rows=48 width=73)
+  Sort Key: category, item_name
+  ->  Seq Scan on menu_item  (cost=0.00..1.50 rows=48 width=73)
+        Filter: availability
+Sort  (cost=2.84..2.96 rows=48 width=73) (actual time=0.282..0.285 rows=48.00 loops=1)
+  Sort Key: category, item_name
+  Sort Method: quicksort  Memory: 29kB
+  Buffers: shared hit=4
+  ->  Seq Scan on menu_item  (cost=0.00..1.50 rows=48 width=73) (actual time=0.078..0.091 rows=48.00 loops=1)
+        Filter: availability
+        Rows Removed by Filter: 2
+        Buffers: shared hit=1
+Planning Time: 0.160 ms
+Execution Time: 0.313 ms
+ROLLBACK

@@ -1,0 +1,88 @@
+Captured: 2026-11-06T21:08:43.099222+08:00
+Login: boardtrack_app
+SQL:
+SET statement_timeout='30s'; SET lock_timeout='3s'; SET timezone='Asia/Manila';
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),current_setting('server_version'),inet_server_addr(),inet_server_port();
+BEGIN READ ONLY;
+EXPLAIN SELECT lease_id, tenant_id, tenant, property_name, room_number, start_date, end_date, monthly_rent, status, total_paid, utilities_billed FROM v_lease_summary ORDER BY 1;
+EXPLAIN (ANALYZE,BUFFERS) SELECT lease_id, tenant_id, tenant, property_name, room_number, start_date, end_date, monthly_rent, status, total_paid, utilities_billed FROM v_lease_summary ORDER BY 1;
+ROLLBACK;
+Exit: 0
+
+SET
+SET
+SET
+2026-11-06 21:08:43.058069+08|boardtrack_app|boardtrack_app|boardtrack_g05_activity4|18.3|127.0.0.1|55411
+BEGIN
+Sort  (cost=13.11..13.12 rows=4 width=130)
+  Sort Key: l.lease_id
+  ->  Hash Join  (cost=3.27..13.07 rows=4 width=130)
+        Hash Cond: (l.tenant_id = t.tenant_id)
+        ->  Hash Join  (cost=2.18..3.27 rows=4 width=54)
+              Hash Cond: (r.property_id = p.property_id)
+              ->  Hash Join  (cost=1.14..2.20 rows=4 width=36)
+                    Hash Cond: (l.room_id = r.room_id)
+                    ->  Seq Scan on lease l  (cost=0.00..1.04 rows=4 width=33)
+                    ->  Hash  (cost=1.06..1.06 rows=6 width=11)
+                          ->  Seq Scan on room r  (cost=0.00..1.06 rows=6 width=11)
+              ->  Hash  (cost=1.02..1.02 rows=2 width=26)
+                    ->  Seq Scan on property p  (cost=0.00..1.02 rows=2 width=26)
+        ->  Hash  (cost=1.04..1.04 rows=4 width=16)
+              ->  Seq Scan on tenant t  (cost=0.00..1.04 rows=4 width=16)
+        SubPlan 1
+          ->  Aggregate  (cost=1.09..1.10 rows=1 width=32)
+                ->  Seq Scan on payment x  (cost=0.00..1.09 rows=1 width=5)
+                      Filter: ((lease_id = l.lease_id) AND ((status)::text = 'COMPLETED'::text))
+        SubPlan 2
+          ->  Aggregate  (cost=1.05..1.06 rows=1 width=32)
+                ->  Seq Scan on utility_bill u  (cost=0.00..1.05 rows=1 width=5)
+                      Filter: (lease_id = l.lease_id)
+Sort  (cost=13.11..13.12 rows=4 width=130) (actual time=0.459..0.461 rows=4.00 loops=1)
+  Sort Key: l.lease_id
+  Sort Method: quicksort  Memory: 25kB
+  Buffers: shared hit=15
+  ->  Hash Join  (cost=3.27..13.07 rows=4 width=130) (actual time=0.312..0.382 rows=4.00 loops=1)
+        Hash Cond: (l.tenant_id = t.tenant_id)
+        Buffers: shared hit=12
+        ->  Hash Join  (cost=2.18..3.27 rows=4 width=54) (actual time=0.171..0.177 rows=4.00 loops=1)
+              Hash Cond: (r.property_id = p.property_id)
+              Buffers: shared hit=3
+              ->  Hash Join  (cost=1.14..2.20 rows=4 width=36) (actual time=0.116..0.120 rows=4.00 loops=1)
+                    Hash Cond: (l.room_id = r.room_id)
+                    Buffers: shared hit=2
+                    ->  Seq Scan on lease l  (cost=0.00..1.04 rows=4 width=33) (actual time=0.026..0.027 rows=4.00 loops=1)
+                          Buffers: shared hit=1
+                    ->  Hash  (cost=1.06..1.06 rows=6 width=11) (actual time=0.022..0.022 rows=6.00 loops=1)
+                          Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                          Buffers: shared hit=1
+                          ->  Seq Scan on room r  (cost=0.00..1.06 rows=6 width=11) (actual time=0.011..0.012 rows=6.00 loops=1)
+                                Buffers: shared hit=1
+              ->  Hash  (cost=1.02..1.02 rows=2 width=26) (actual time=0.036..0.036 rows=2.00 loops=1)
+                    Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                    Buffers: shared hit=1
+                    ->  Seq Scan on property p  (cost=0.00..1.02 rows=2 width=26) (actual time=0.025..0.026 rows=2.00 loops=1)
+                          Buffers: shared hit=1
+        ->  Hash  (cost=1.04..1.04 rows=4 width=16) (actual time=0.026..0.026 rows=4.00 loops=1)
+              Buckets: 1024  Batches: 1  Memory Usage: 9kB
+              Buffers: shared hit=1
+              ->  Seq Scan on tenant t  (cost=0.00..1.04 rows=4 width=16) (actual time=0.022..0.023 rows=4.00 loops=1)
+                    Buffers: shared hit=1
+        SubPlan 1
+          ->  Aggregate  (cost=1.09..1.10 rows=1 width=32) (actual time=0.024..0.024 rows=1.00 loops=4)
+                Buffers: shared hit=4
+                ->  Seq Scan on payment x  (cost=0.00..1.09 rows=1 width=5) (actual time=0.008..0.008 rows=1.25 loops=4)
+                      Filter: ((lease_id = l.lease_id) AND ((status)::text = 'COMPLETED'::text))
+                      Rows Removed by Filter: 5
+                      Buffers: shared hit=4
+        SubPlan 2
+          ->  Aggregate  (cost=1.05..1.06 rows=1 width=32) (actual time=0.014..0.014 rows=1.00 loops=4)
+                Buffers: shared hit=4
+                ->  Seq Scan on utility_bill u  (cost=0.00..1.05 rows=1 width=5) (actual time=0.007..0.007 rows=1.00 loops=4)
+                      Filter: (lease_id = l.lease_id)
+                      Rows Removed by Filter: 3
+                      Buffers: shared hit=4
+Planning:
+  Buffers: shared hit=28
+Planning Time: 0.647 ms
+Execution Time: 0.582 ms
+ROLLBACK

@@ -1,0 +1,15 @@
+Captured: 2026-11-06T21:10:09.462692+08:00
+Login: rors_dba
+SQL:
+SET statement_timeout='30s'; SET lock_timeout='3s'; SET timezone='Asia/Manila';
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database(),current_setting('server_version'),inet_server_addr(),inet_server_port();
+SELECT json_build_object('captured_at',clock_timestamp(),'session_user',session_user,'current_user',current_user,
+ 'sessions',(SELECT json_agg(json_build_object('pid',pid,'user',usename,'state',state,'wait_type',wait_event_type,'wait_event',wait_event,'seconds_since_query_start',extract(epoch FROM(clock_timestamp()-query_start)),'query_visible',query IS NOT NULL AND query<>'<insufficient privilege>','query_label',CASE WHEN pid=pg_backend_pid() THEN 'this inspection SQL (recorded in this evidence file)' ELSE '[not copied / visibility may be restricted]' END,'blocking_pids',pg_blocking_pids(pid))) FROM pg_stat_activity WHERE datname=current_database()));
+
+Exit: 0
+
+SET
+SET
+SET
+2026-11-06 21:10:09.424423+08|rors_dba|rors_dba|mesa_g05_activity4|18.3|127.0.0.1|55410
+{"captured_at" : "2026-11-06T21:10:09.445156+08:00", "session_user" : "rors_dba", "current_user" : "rors_dba", "sessions" : [{"pid" : 8332, "user" : "rors_dba", "state" : "active", "wait_type" : null, "wait_event" : null, "seconds_since_query_start" : 0.020714, "query_visible" : true, "query_label" : "this inspection SQL (recorded in this evidence file)", "blocking_pids" : []}]}
