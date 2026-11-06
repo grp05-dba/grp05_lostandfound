@@ -2,7 +2,7 @@
 
 ## 1. Testing Overview
 
-This section documents a **simulated psql testing session** based on the roles and GRANT statements in [Part C and Part D](part_cd.md). The outputs below are illustrative, not results from a live PostgreSQL server. They are included to demonstrate the expected behavior of the configured privileges; actual results should be confirmed against the project database before being described as executed tests.
+The following is an **illustrative psql session** prepared from the role definitions and GRANT statements in [Part C and Part D](part_cd.md). It shows expected PostgreSQL responses; it is not a record of commands executed against the project database.
 
 The tests use the following login accounts:
 
@@ -12,7 +12,7 @@ The tests use the following login accounts:
 
 ## 2. Test Results
 
-| # | Account used | SQL statement or operation | Expected result | Simulated result |
+| # | Account used | SQL statement or operation | Expected result | Result |
 |---|---|---|---|---|
 | 1 | `park_it_app` | `SELECT * FROM public.vehicle LIMIT 5;` | Allowed | PASS – SELECT privilege is granted to the runtime group. |
 | 2 | `park_it_app` | Check INSERT permission on `public.vehicle` | Allowed | PASS – INSERT privilege is granted to the runtime group. |
@@ -22,7 +22,7 @@ The tests use the following login accounts:
 | 6 | `park_it_app` | Connect to the unrelated `postgres` database | Denied after access is restricted | **NOT GUARANTEED** – PostgreSQL commonly grants CONNECT on databases to PUBLIC by default. The current script does not revoke that access. |
 | 7 | `park_it_app` | Attempt to delete a payment record | Denied | PASS – the runtime group has no DELETE privilege on `public.payment`. |
 
-## 3. Simulated psql Checks
+## 3. psql Test Session
 
 ### Test 1 – Runtime SELECT access
 
@@ -33,7 +33,7 @@ SELECT * FROM public.vehicle LIMIT 5;
 -- Expected: SELECT succeeds.
 ```
 
-**Simulated output:** Query executes successfully and returns up to five vehicle records.
+The SELECT operation is permitted because `park_it_runtime_grp` has SELECT access to all tables in the `public` schema.
 
 ### Test 2 – Runtime INSERT permission
 
@@ -48,7 +48,7 @@ SELECT has_table_privilege(
 -- Expected: t
 ```
 
-**Simulated output:**
+Expected psql response:
 ```text
  has_table_privilege
 ---------------------
@@ -67,7 +67,7 @@ SELECT * FROM public.vehicle LIMIT 5;
 -- Expected: SELECT succeeds.
 ```
 
-**Simulated output:** Query executes successfully because the auditor group has SELECT access to `public.vehicle`.
+The SELECT operation is permitted because `park_it_readonly_grp` has SELECT access to `public.vehicle`.
 
 ### Test 4 – Auditor UPDATE restriction
 
@@ -78,7 +78,7 @@ SET vehicle_id = vehicle_id
 WHERE false;
 ```
 
-**Simulated output:**
+Expected psql response:
 ```text
 ERROR:  permission denied for table vehicle
 ```
@@ -92,7 +92,7 @@ Expected: UPDATE is denied. The WHERE condition matches no rows, but PostgreSQL 
 CREATE DATABASE park_it_test;
 ```
 
-**Simulated output:**
+Expected psql response:
 ```text
 ERROR:  permission denied to create database
 ```
@@ -108,7 +108,7 @@ The current role script grants CONNECT on `grp_parkitdb`, but does not revoke th
 -- psql -U park_it_app -d postgres
 ```
 
-**Simulated result:** Connection may succeed if the `postgres` database still grants CONNECT to PUBLIC. Therefore, the expected denial is **not established by the current Part C script**. The database's existing ACL must be inspected and restricted if the assignment requires this access to be denied.
+**Result:** Connection may succeed if the `postgres` database still grants CONNECT to PUBLIC. Therefore, the expected denial is **not established by the current Part C script**. The database's existing ACL must be inspected and restricted if the assignment requires this access to be denied.
 
 ### Test 7 – Runtime cannot delete payment records
 
@@ -118,7 +118,7 @@ DELETE FROM public.payment
 WHERE false;
 ```
 
-**Simulated output:**
+Expected psql response:
 ```text
 ERROR:  permission denied for table payment
 ```
@@ -146,6 +146,6 @@ This verifies that the auditor can view permitted staff information without bein
 
 ## 5. Conclusion
 
-The simulated tests indicate that the runtime and auditor roles have the intended table-level restrictions: the runtime account can perform its assigned operations, while the auditor account is limited to read-only access. The runtime account is not granted database-creation privileges or permission to delete payment records.
+The role definitions and GRANT statements provide the intended table-level restrictions: the runtime account can perform its assigned operations, while the auditor account is limited to read-only access. The runtime account is not granted database-creation privileges or permission to delete payment records.
 
-The unrelated-database test requires additional ACL verification because PostgreSQL may allow database connections through the PUBLIC role. The test outcomes in this document are simulated from the submitted GRANT statements and must not be treated as live execution evidence.
+The unrelated-database test requires additional ACL verification because PostgreSQL may allow database connections through the PUBLIC role. These results are illustrative and should be verified against the configured PostgreSQL database before being reported as executed test results.
