@@ -1,0 +1,41 @@
+-- Run directly as habalgo_app_user after the source role plan is installed.
+-- Source roles have no MAINTAIN. Expect permission-warning skips; never treat command tags as success.
+-- ANALYZE would refresh statistics after seeding; ordinary VACUUM would maintain reusable space/visibility.
+-- No maintenance role is supplied. Do not add grants, SET ROLE or use a superuser to bypass the result.
+-- One seeded table demonstrates the limitation; never use --single-transaction or VACUUM FULL.
+\set ON_ERROR_STOP off
+\set VERBOSITY verbose
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database();
+          captured_at          |   session_user   |   current_user   | current_database
+-------------------------------+------------------+------------------+------------------
+ 2026-11-06 18:28:50.425245+08 | habalgo_app_user | habalgo_app_user | grp00_habalgodb
+(1 row)
+
+SET lock_timeout='3s';
+SET
+SET statement_timeout='30s';
+SET
+SELECT c.relname,pg_get_userbyid(c.relowner) AS owner,has_table_privilege(current_user,c.oid,'MAINTAIN') AS can_maintain
+FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='habalgo' AND c.relkind='r' ORDER BY c.relname;
+     relname     |  owner   | can_maintain
+-----------------+----------+--------------
+ booking         | postgres | f
+ customer        | postgres | f
+ driver          | postgres | f
+ driver_vehicle  | postgres | f
+ location        | postgres | f
+ payment         | postgres | f
+ rating_feedback | postgres | f
+ vehicle         | postgres | f
+(8 rows)
+
+ANALYZE VERBOSE habalgo.driver;
+psql:activity-5/grp06-habalgo/sql/03_maintenance.sql:14: WARNING:  01000: permission denied to analyze "driver", skipping it
+LOCATION:  vacuum_is_permitted_for_relation, vacuum.c:771
+ANALYZE
+VACUUM (VERBOSE, ANALYZE) habalgo.driver;
+psql:activity-5/grp06-habalgo/sql/03_maintenance.sql:15: WARNING:  01000: permission denied to vacuum "driver", skipping it
+LOCATION:  vacuum_is_permitted_for_relation, vacuum.c:758
+VACUUM

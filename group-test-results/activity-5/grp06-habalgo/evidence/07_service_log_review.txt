@@ -1,0 +1,24 @@
+Captured: 2026-11-06T18:29:23+08:00
+Reader: existing workspace OS user me; no sudo or database impersonation.
+Command: journalctl -u postgresql --since 2026-11-06 00:00:00 --until 2026-11-06T18:29:23+08:00 --no-pager -o json
+Exit status: 0
+Readable service entries: 1640
+
+Connection authorization records (exact database/account match; not proof the session completed):
+habalgo_app_user | grp00_habalgodb | 3
+habalgo_readonly_user | grp00_habalgodb | 4
+postgres | grp00_habalgodb | 3
+
+Project session diagnostics (UTC timestamps; PID correlated with preceding authorization):
+2026-11-06T10:20:37.584103+00:00 | 54563 | habalgo_readonly_user | grp00_habalgodb | FATAL | role "habalgo_readonly_user" does not exist
+2026-11-06T10:20:37.712915+00:00 | 54565 | habalgo_app_user | grp00_habalgodb | FATAL | role "habalgo_app_user" does not exist
+2026-11-06T10:28:49.703975+00:00 | 58172 | habalgo_readonly_user | grp00_habalgodb | ERROR | permission denied for function pg_current_logfile
+2026-11-06T10:28:49.704217+00:00 | 58172 | habalgo_readonly_user | grp00_habalgodb | ERROR | permission denied for function pg_ls_logdir
+2026-11-06T10:28:50.428931+00:00 | 58182 | habalgo_app_user | grp00_habalgodb | WARNING | permission denied to analyze "driver", skipping it
+2026-11-06T10:28:50.429393+00:00 | 58182 | habalgo_app_user | grp00_habalgodb | WARNING | permission denied to vacuum "driver", skipping it
+
+Severity counts: {'FATAL': 2, 'ERROR': 2, 'WARNING': 2}
+No raw SQL, DETAIL/HINT, password values, or other projects' session diagnostics copied.
+Limitations: current user's readable service window only; PID correlation needs an authorization
+inside the window. Pre-authorization failures, rotated history, other sinks and unlogged durations
+are not covered. No observed diagnostic is not proof of no incident.

@@ -1,0 +1,14 @@
+Repository: https://github.com/jeanaroyo/HabalGo
+Reviewed main commit: c523913b6ffa57dae754a7fb6e4d6ffed4ac7070
+Working tree: clean
+Source: api.php; blob a880a4b793c37582d9389c3fe98f2e64147c08bb
+Exact options endpoint query:
+78: 'drivers' => array_map(fn($r) => [$r['driver_id'], $r['name']], rows('SELECT driver_id,name FROM driver ORDER BY name')),
+The application sets search_path TO habalgo before this query.
+Setup source blobs:
+schema.sql: 92e0147b14d6d207dbd60ff6b13ac36856d511a2
+sample data.sql: ff12a251e647a57f392966a1181f1fdb6b48409c
+database/03_roles_and_privileges.sql: e7d2f7a8b360c0f1412559d73cb20544dcb8682c
+Setup role adaptation: PASSWORD clauses removed; no maintenance grants added.
+Seed: documented root sample data.sql, INSERT 0 10; raw driver/contact values not copied into evidence.
+Original credential-bearing role script was not executed or committed.

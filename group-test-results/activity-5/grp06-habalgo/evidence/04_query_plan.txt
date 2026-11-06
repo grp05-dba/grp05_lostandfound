@@ -1,0 +1,41 @@
+-- Exact SELECT from api.php options endpoint, driver dropdown.
+-- c523913b6ffa57dae754a7fb6e4d6ffed4ac7070. Run directly as habalgo_app_user.
+-- Only the SELECT runs; no PHP/API mutation or personal result values are captured.
+\set ON_ERROR_STOP on
+\pset pager off
+Pager usage is off.
+SELECT clock_timestamp() AS captured_at,session_user,current_user,current_database();
+          captured_at          |   session_user   |   current_user   | current_database
+-------------------------------+------------------+------------------+------------------
+ 2026-11-06 18:28:51.117516+08 | habalgo_app_user | habalgo_app_user | grp00_habalgodb
+(1 row)
+
+BEGIN READ ONLY;
+BEGIN
+SET LOCAL statement_timeout='30s';
+SET
+SET LOCAL search_path=habalgo,pg_catalog;
+SET
+EXPLAIN SELECT driver_id,name FROM driver ORDER BY name;
+                           QUERY PLAN
+-----------------------------------------------------------------
+ Sort  (cost=19.09..19.57 rows=190 width=222)
+   Sort Key: name
+   ->  Seq Scan on driver  (cost=0.00..11.90 rows=190 width=222)
+(3 rows)
+
+EXPLAIN (ANALYZE, BUFFERS) SELECT driver_id,name FROM driver ORDER BY name;
+                                                  QUERY PLAN
+---------------------------------------------------------------------------------------------------------------
+ Sort  (cost=19.09..19.57 rows=190 width=222) (actual time=0.093..0.095 rows=10.00 loops=1)
+   Sort Key: name
+   Sort Method: quicksort  Memory: 25kB
+   Buffers: shared hit=4
+   ->  Seq Scan on driver  (cost=0.00..11.90 rows=190 width=222) (actual time=0.016..0.017 rows=10.00 loops=1)
+         Buffers: shared hit=1
+ Planning Time: 0.041 ms
+ Execution Time: 0.105 ms
+(8 rows)
+
+ROLLBACK;
+ROLLBACK

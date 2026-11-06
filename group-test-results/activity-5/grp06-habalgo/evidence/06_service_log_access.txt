@@ -1,0 +1,5 @@
+Captured: 2026-11-06T18:29:23.549740+08:00
+Reader: existing OS workspace user me; no sudo or database role substitution for log review.
+/var/log/postgresql: FileNotFoundError; errno=2
+/var/lib/postgres/data/log: PermissionError; errno=13
+SQL log access: 02_logging_access.txt; filtered service diagnostics: 07_service_log_review.txt.

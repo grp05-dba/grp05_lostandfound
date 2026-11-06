@@ -1,0 +1,12 @@
+Validated: 2026-11-06T18:34:23.437976+08:00
+Scope: setup/evidence/documentation checks; not successful maintenance or full PHP workflow tests.
+PASS | All local Markdown links resolve
+PASS | Exact before/after counts match all 8 tables; ten seeded driver rows retained
+PASS | All 8 table maintenance counts stay zero and timestamps stay NULL
+PASS | Both runtime maintenance attempts explicitly skipped with SQLSTATE 01000
+PASS | Exactly two expected SQLSTATE 42501 log-function denials
+PASS | Driver SELECT estimated 190 rows; actual 10; captured execution 0.105 ms
+PASS | No unexpected ERROR/FATAL/WARNING in setup, health, query or verification
+PASS | Role adaptation matches source after removing PASSWORD clauses (plus comments/trailing whitespace)
+PASS | Schema setup created 8 tables and supplied seed inserted 10 rows
+PASS | Credential/hash scan and manual review: no credentials or raw driver/contact values retained
