@@ -26,6 +26,12 @@ class AdminController {
         $path = parse_url($path, PHP_URL_PATH) ?: $path;
 
         //Lost report endpoints-------------------------------------
+        if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/images/')) {
+            $imageId = (int) str_replace('/api/admin/lost-reports/images/', '', $path);
+            $this->sendImage('lost-reports', $imageId);
+            return;
+        }
+
         if ($method === 'GET' && $path === '/api/admin/lost-reports') {
             echo json_encode($this->lostReportService->getAllLostReports());
             return;
@@ -60,12 +66,6 @@ class AdminController {
         if ($method === 'GET' && str_starts_with($path, '/api/admin/items/images/')) {
             $imageId = (int) str_replace('/api/admin/items/images/', '', $path);
             $this->sendImage('items', $imageId);
-            return;
-        }
-
-        if ($method === 'GET' && str_starts_with($path, '/api/admin/lost-reports/images/')) {
-            $imageId = (int) str_replace('/api/admin/lost-reports/images/', '', $path);
-            $this->sendImage('lost-reports', $imageId);
             return;
         }
 
