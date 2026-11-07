@@ -219,9 +219,9 @@
   function closeDialogs() {
     document.querySelectorAll("dialog[open]").forEach((d) => d.close());
   }
-  function validFiles(input) {
+  function validFiles(input, required = true) {
     const f = Array.from(input.files || []);
-    if (!f.length) return "Please attach at least one image.";
+    if (!f.length && required) return "Please attach at least one image.";
     if (f.length > 5) return "You can attach up to five images.";
     if (
       f.some((x) => !["image/jpeg", "image/png", "image/webp"].includes(x.type))
@@ -264,7 +264,7 @@
     const form = e.currentTarget,
       data = new FormData(form),
       files = form.elements["images[]"];
-    const fileError = validFiles(files),
+    const fileError = validFiles(files, false),
       contactError = validateContact(data);
     if (fileError || contactError) {
       message(form, fileError || contactError, true);
