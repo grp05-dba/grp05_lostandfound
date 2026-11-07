@@ -26,7 +26,7 @@ This folder documents the current PUP-SPOT campus Lost and Found system. It was 
 
 ## Documentation scope
 
-These pages describe behavior found in the repository, not a guarantee that every workflow has been tested in a live deployment. The public entry point currently obtains a database connection through `getAdminConnection()`; the separate public database credentials in the environment template are not used by that entry point. The admin URL is a separate interface, not a substitute for authentication or network access controls.
+These pages describe behavior found in the repository, not a guarantee that every workflow has been tested in a live deployment. The public entry point currently obtains a database connection through `getPublicConnection()`, using the separate public database credentials configured for public access. The admin entry point uses `getAdminConnection()` with administrative database credentials. The admin URL is a separate interface and is not, by itself, a substitute for appropriate authentication or network access controls.
 
 The root [README](../README.md) remains the quick-start guide. Keep secrets, real provider credentials, local `.env` files, uploaded user data and database dumps out of Git.
 
