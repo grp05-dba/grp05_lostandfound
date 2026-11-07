@@ -71,9 +71,14 @@ TextBee and EmailJS clients are integrated through SMS/email services. The poten
 
 The SMS statistics and devices endpoints are gateway diagnostics. They do not send a message.
 
-## Important access-control limitation
+## Important access-control considerations
 
-The repository has separate public and admin entry points and ports, but the current `public/index.php` calls `Connection::getAdminConnection()`, just like the admin entry point. Do not assume that `DB_PUBLIC_USER` is used for public requests or that separate URLs enforce authorization. There is no login/session authorization layer visible in these controllers. Restrict admin access at the deployment/network level until application authentication and least-privilege database access are implemented.
+The repository uses separate database connections for its public and administrative APIs:
+
+- public/index.php uses Connection::getPublicConnection(), authenticating with DB_PUBLIC_USER and DB_PUBLIC_PASSWORD.
+- admin/index.php uses Connection::getAdminConnection(), authenticating with DB_USER and DB_PASSWORD.
+
+These connections use separate PostgreSQL accounts with different privileges. Administrative access is intended to be restricted through campus private network access or equivalent network-level controls. The application does not implement individual Admin login accounts or session-based authentication.
 
 ## Source files
 
