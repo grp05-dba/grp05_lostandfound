@@ -3,7 +3,8 @@
 class RequestUtils {
     public static function getRequestBody(): array {
         $input = file_get_contents('php://input');
-        return json_decode($input, true) ?? [];
+        $data = json_decode($input, true);
+        return is_array($data) ? $data : [];
     }
 
     public static function getRequestData(): array {
