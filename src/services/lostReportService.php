@@ -204,7 +204,7 @@ class LostReportService {
     
     public function getLostReportByCode(string $code): array {
         $success = $this->lostReportRepository->getByCode($code);
-
+        
         if ($success && $success['status'] !== 'active') {
             http_response_code(404);
             return ['message' => 'Active lost report not found.'];

@@ -37,12 +37,30 @@ class PublicController {
         }
 
         if ($method === 'POST' && $path === '/api/public/lost-reports/view') {
-            echo json_encode($this->lostReportService->getLostReportByCode(RequestUtils::getRequestBody()['report_code']));
+            $body = RequestUtils::getRequestBody();
+            $reportCode = $body['report_code'] ?? null;
+
+            if (!is_string($reportCode) || trim($reportCode) === '') {
+                http_response_code(400);
+                echo json_encode(['message' => 'A valid report_code is required.']);
+                return;
+            }
+
+            echo json_encode($this->lostReportService->getLostReportByCode($reportCode));
             return;
         }
 
         if ($method === 'POST' && $path === '/api/public/lost-reports/cancel') {
-            echo json_encode($this->lostReportService->cancelLostReportByCode(RequestUtils::getRequestBody()['report_code']));
+            $body = RequestUtils::getRequestBody();
+            $reportCode = $body['report_code'] ?? null;
+
+            if (!is_string($reportCode) || trim($reportCode) === '') {
+                http_response_code(400);
+                echo json_encode(['message' => 'A valid report_code is required.']);
+                return;
+            }
+
+            echo json_encode($this->lostReportService->cancelLostReportByCode($reportCode));
             return;
         }
 
@@ -79,7 +97,16 @@ class PublicController {
         }
 
         if ($method === 'POST' && $path === '/api/public/claims/view') {
-            $claim = $this->claimService->getClaimByCode(RequestUtils::getRequestBody()['claim_code']);
+            $body = RequestUtils::getRequestBody();
+            $claimCode = $body['claim_code'] ?? null;
+
+            if (!is_string($claimCode) || trim($claimCode) === '') {
+                http_response_code(400);
+                echo json_encode(['message' => 'A valid claim_code is required.']);
+                return;
+            }
+
+            $claim = $this->claimService->getClaimByCode(trim($claimCode));
 
             if (isset($claim['item_id'])) {
                 $claim['claimed_item'] = $this->itemService->getItemById((int) $claim['item_id']);
